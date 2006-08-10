@@ -1,0 +1,24 @@
+Classes which provide much of the imlementation for a webdav server.
+
+A functioning webdav server can be built by fully implementing the abstract
+WebdavNsIntf class.
+
+To build:
+
+cd into the directory containing this file
+
+The ant command <ant> will be either
+1. If you uee a copy of ant on your class path
+      ant
+2. If you use the ant contained in the bedework quickstart
+      ../ant.sh
+
+To do a clean build of source and javadoc in directory dist
+  <ant> clean-build-all
+
+To build javadoc
+  <ant> javadoc
+
+To run the tests
+  <ant> unittest
+

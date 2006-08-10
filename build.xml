@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+
+<!-- This is the main build file for the bedework webdav server classes.
+
+     Authors: Mike Douglass   douglm@rpi.edu
+-->
+
+<project name="bedework.webdav" default="bld.all">
+
+  <!-- These may already be set from calling dir -->
+  <dirname property="org.bedework.project.webdav" file="${ant.file}"/>
+  <dirname property="project.home" file="${ant.file}"/>
+
+  <property file="${project.home}/build.properties" />
+
+  <property name="project.version" value="${edu.rpi.cmt.webdav.version}"/>
+
+  <property name="dist.home" location="${project.home}/dist"/>
+  <property name="lib.dir" location="${project.home}/lib"/>
+
+  <property name="build.dir" location="${project.home}/build"/>
+  <property name="buildjar" location="${build.dir}/buildjar.xml"/>
+
+  <!-- =================================================================
+       init:
+       ================================================================= -->
+
+  <target name="init" >
+    <property name="org.bedework.webdavserver.base" location="${project.home}/server" />
+
+    <mkdir dir="${dist.home}" />
+
+    <property name="test.data.dir"
+              location="${dist.home}/test-data" />
+
+    <property name="edu.rpi.cmt.empty.dir"
+              location="${dist.home}/empty-dir" />
+    <mkdir dir="${edu.rpi.cmt.empty.dir}" />
+
+    <fileset id="empty.fileset" dir="${edu.rpi.cmt.empty.dir}"
+             excludes="*" />
+    <!-- default to empty -->
+    <fileset id="base.resource.files" refid="empty.fileset" />
+
+    <property name="webdavserver.jar"
+              location="${dist.home}/${edu.rpi.cmt.webdavserver.jar}-${project.version}.jar" />
+
+    <!-- ==================== Compilation Classpath ==================== -->
+
+    <path id="compile.classpath">
+      <fileset dir="${lib.dir}">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${dist.home}">
+         <include name="*.jar"/>
+      </fileset>
+    </path>
+  </target>
+
+  <!-- =================================================================
+       Clean all generated files
+       ================================================================= -->
+  <target name="clean">
+    <delete dir="${dist.home}" />
+  </target>
+
+  <!-- =================================================================
+       Clean up afetr a build.
+       ================================================================= -->
+  <target name="cleanup">
+    <delete dir="${edu.rpi.cmt.empty.dir}" />
+  </target>
+
+  <!-- ========================== Base build Targets ===================
+       Here we have one target building the classes and interfaces that make
+       up the access control suite.
+       ================================================================= -->
+
+  <target name="clean-build" depends="clean,build"
+          description="Clean and compile webdav classes"/>
+
+  <target name="clean-build-all" depends="clean,build-all"
+          description="Clean and compile webdav classes"/>
+
+  <target name="build" depends="init,build-source,cleanup"
+          description="Compile webdav classes"/>
+
+  <target name="build-all" depends="init,build-source,javadoc,cleanup"
+          description="Compile webdav classes"/>
+
+  <!-- ===================== bld.all Target ===============================
+     This target builds jar files ready for the deploy target.
+     =================================================================== -->
+
+  <target name="build-source" depends="bld.webdavserver" />
+
+<!-- ==================== Javadoc Target ===============================
+     The "javadoc" target creates Javadoc API documentation for the Java
+     classes included in your application.  Normally, this is only required
+     when preparing a distribution release, but is available as a separate
+     target in case the developer wants to create Javadocs independently.
+     =================================================================== -->
+
+  <target name="javadoc" depends="init"
+          description="Create Javadoc API documentation">
+
+    <mkdir dir="${dist.home}/docs/api"/>
+    <javadoc sourcepath="${org.bedework.webdavserver.base}/src:"
+           classpathref="compile.classpath"
+                destdir="${dist.home}/docs/api"
+           packagenames="org.bedework.*,
+                         edu.rpi.*"
+                 access="public"
+                 author="true"
+                version="true"
+          breakiterator="yes"
+            windowtitle="${product.name} ${product.version} API Documentation">
+      <doctitle><![CDATA[${product.name} ${product.version}<br/>API Documentation]]></doctitle>
+      <header><![CDATA[${product.name} ${product.version}<br/>API Documentation]]></header>
+    </javadoc>
+  </target>
+
+  <!-- ======================== server target =========================
+       This builds the back end facade for the core of the calendar.
+       ================================================================= -->
+
+  <target name="bld.webdavserver" >
+    <ant antfile="${org.bedework.webdavserver.base}/build.xml" inheritrefs="true"
+         target="build" />
+  </target>
+</project>

@@ -1,0 +1,491 @@
+/*
+ Copyright (c) 2000-2005 University of Washington.  All rights reserved.
+
+ Redistribution and use of this distribution in source and binary forms,
+ with or without modification, are permitted provided that:
+
+   The above copyright notice and this permission notice appear in
+   all copies and supporting documentation;
+
+   The name, identifiers, and trademarks of the University of Washington
+   are not used in advertising or publicity without the express prior
+   written permission of the University of Washington;
+
+   Recipients acknowledge that this distribution is made available as a
+   research courtesy, "as is", potentially with defects, without
+   any obligation on the part of the University of Washington to
+   provide support, services, or repair;
+
+   THE UNIVERSITY OF WASHINGTON DISCLAIMS ALL WARRANTIES, EXPRESS OR
+   IMPLIED, WITH REGARD TO THIS SOFTWARE, INCLUDING WITHOUT LIMITATION
+   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+   PARTICULAR PURPOSE, AND IN NO EVENT SHALL THE UNIVERSITY OF
+   WASHINGTON BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL
+   DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+   PROFITS, WHETHER IN AN ACTION OF CONTRACT, TORT (INCLUDING
+   NEGLIGENCE) OR STRICT LIABILITY, ARISING OUT OF OR IN CONNECTION WITH
+   THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+/* **********************************************************************
+    Copyright 2005 Rensselaer Polytechnic Institute. All worldwide rights reserved.
+
+    Redistribution and use of this distribution in source and binary forms,
+    with or without modification, are permitted provided that:
+       The above copyright notice and this permission notice appear in all
+        copies and supporting documentation;
+
+        The name, identifiers, and trademarks of Rensselaer Polytechnic
+        Institute are not used in advertising or publicity without the
+        express prior written permission of Rensselaer Polytechnic Institute;
+
+    DISCLAIMER: The software is distributed" AS IS" without any express or
+    implied warranty, including but not limited to, any implied warranties
+    of merchantability or fitness for a particular purpose or any warrant)'
+    of non-infringement of any current or pending patent rights. The authors
+    of the software make no representations about the suitability of this
+    software for any particular purpose. The entire risk as to the quality
+    and performance of the software is with the user. Should the software
+    prove defective, the user assumes the cost of all necessary servicing,
+    repair or correction. In particular, neither Rensselaer Polytechnic
+    Institute, nor the authors of the software are liable for any indirect,
+    special, consequential, or incidental damages related to the software,
+    to the maximum extent the law permits.
+*/
+
+package edu.rpi.cct.webdav.servlet.shared;
+
+import edu.rpi.cmt.access.Acl.CurrentAccess;
+
+import java.io.Serializable;
+import javax.servlet.http.HttpServletResponse;
+
+import java.net.URI;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+
+/** Represents a node in the underlying namespace for which this
+ * servlet is acting as a gateway. This could be a file system, a set of
+ * dynamically created objects or some sort of CMS for example.
+ *
+ *   @author Mike Douglass   douglm@rpi.edu
+ */
+public abstract class WebdavNsNode implements Serializable {
+  protected boolean debug;
+
+  /** Does the resource exist? */
+  protected boolean exists = true;
+
+  private transient Logger log;
+
+  /** Uri of the node. These are relative to the root of the namespace this
+   * interface represents and should start with a "/". For example, if this
+   * namespace is part of a file system starting at uabc in /var/local/uabc
+   * and we are referring to a directory x at /var/local/uabc/a/x then the
+   * uri should be /a/x/
+   */
+  protected String uri;
+
+  /** Suitable for display
+   */
+  protected String name;
+
+  /** ISO format creation date
+   */
+  protected String creDate;
+
+  protected String lastmodDate;
+
+  //  ????? locks??????
+
+  /** True if this node is a collection
+   */
+  protected boolean collection;
+
+  /** True if GET is allowed
+   */
+  protected boolean allowsGet;
+
+  /** Can be set to indicate some sort of abnormal condition on this node,
+   * e.g. no access.
+   */
+  protected int status = HttpServletResponse.SC_OK;
+
+  /* ....................................................................
+   *                   Content fields
+   * We assume these get filled in when we get the content.
+   * .................................................................... */
+
+  protected String contentLang;
+
+  protected int contentLen;
+
+  protected String contentType;
+
+  /* ....................................................................
+   *                   Alias fields
+   * .................................................................... */
+
+  /** true if this is an alias
+   */
+  protected boolean alias;
+
+  protected String targetUri;
+
+  /** Constructor
+   *
+   * @param debug
+   */
+  public WebdavNsNode(boolean debug) {
+    this.debug = debug;
+  }
+
+  /* ====================================================================
+   *                   Abstract methods
+   * ==================================================================== */
+
+  /** Set the owner
+   *
+   * @param val
+   * @throws WebdavIntfException
+   */
+  public abstract void setOwner(String val) throws WebdavIntfException;
+
+  /** Should return a value suitable for WebdavNsIntf.makeUserHref
+   *
+   * @return String owner
+   * @throws WebdavIntfException
+   */
+  public abstract String getOwner() throws WebdavIntfException;
+
+  /** Get the current access granted to this principal for this node.
+   *
+   * @return CurrentAccess
+   * @throws WebdavIntfException
+   */
+  public abstract CurrentAccess getCurrentAccess() throws WebdavIntfException;
+
+  /** Remove the given property for this node.
+   *
+   * @param val   Element defining property to remove
+   * @return boolean   true for removed, false for already absent
+   * @throws WebdavIntfException
+   */
+  public abstract boolean removeProperty(Element val) throws WebdavIntfException;
+
+  /** Set the given property for this node.
+   *
+   * @param val   Element defining property to set
+   * @return boolean   true for created
+   * @throws WebdavIntfException
+   */
+  public abstract boolean setProperty(Element val) throws WebdavIntfException;
+
+  /* ====================================================================
+   *                   Property methods
+   * ==================================================================== */
+
+  /** This method is called before each setter/getter takes any action.
+   * It allows the concrete implementation to defer some expensive
+   * operation to just before the first call.
+   *
+   * @param content     boolean flag indicating if this is a content related
+   *                    property - that is a property which requires fetching
+   *                    and/or rendering the content
+   * @throws WebdavIntfException
+   */
+  public void init(boolean content) throws WebdavIntfException {
+  }
+
+  /**
+   * @param val  boolean true if node exists
+   * @throws WebdavIntfException
+   */
+  public void setExists(boolean val) throws WebdavIntfException {
+    exists = val;
+  }
+
+  /**
+   * @return boolean true if node exists
+   * @throws WebdavIntfException
+   */
+  public boolean getExists() throws WebdavIntfException {
+    return exists;
+  }
+
+  /** Set uri
+   *
+   * @param val
+   * @throws WebdavIntfException
+   */
+  public void setUri(String val) throws WebdavIntfException {
+    init(false);
+    uri = val;
+  }
+
+  /** Get uri
+   *
+   * @return String uri
+   * @throws WebdavIntfException
+   */
+  public String getUri() throws WebdavIntfException {
+    init(false);
+    return uri;
+  }
+
+  /**
+   * @return String encoded uri
+   * @throws WebdavIntfException
+   */
+  public String getEncodedUri() throws WebdavIntfException {
+    try {
+      return new URI(null, null, getUri(), null).toString();
+    } catch (Throwable t) {
+      if (debug) {
+        error(t);
+      }
+      throw WebdavIntfException.badRequest();
+    }
+  }
+
+  /**
+   * @param val String credate
+   * @throws WebdavIntfException
+   */
+  public void setCreDate(String val) throws WebdavIntfException {
+    init(false);
+    creDate = val;
+  }
+
+  /**
+   * @return String credate
+   * @throws WebdavIntfException
+   */
+  public String getCreDate() throws WebdavIntfException {
+    init(false);
+    return creDate;
+  }
+
+  /**
+   * @param val String last mod date
+   * @throws WebdavIntfException
+   */
+  public void setLastmodDate(String val) throws WebdavIntfException {
+    init(false);
+    lastmodDate = val;
+  }
+
+  /**
+   * @return String last mod date
+   * @throws WebdavIntfException
+   */
+  public String getLastmodDate() throws WebdavIntfException {
+    init(false);
+    return lastmodDate;
+  }
+
+  /**
+   * @param val String name
+   * @throws WebdavIntfException
+   */
+  public void setName(String val) throws WebdavIntfException {
+    init(false);
+    name = val;
+  }
+
+  /**
+   * @return String name
+   * @throws WebdavIntfException
+   */
+  public String getName() throws WebdavIntfException {
+    init(false);
+    return name;
+  }
+
+  /**
+   * @param val boolean true for a collection
+   * @throws WebdavIntfException
+   */
+  public void setCollection(boolean val) throws WebdavIntfException {
+    collection = val;
+  }
+
+  /**
+   * @return boolean true for a collection
+   * @throws WebdavIntfException
+   */
+  public boolean getCollection() throws WebdavIntfException {
+    return collection;
+  }
+
+  /**
+   * @param val boolean true if node allows get
+   * @throws WebdavIntfException
+   */
+  public void setAllowsGet(boolean val) throws WebdavIntfException {
+    allowsGet = val;
+  }
+
+  /**
+   * @return true if node allows get
+   * @throws WebdavIntfException
+   */
+  public boolean getAllowsGet() throws WebdavIntfException {
+    return allowsGet;
+  }
+
+  /**
+   * @param val in status
+   */
+  public void setStatus(int val) {
+    status = val;
+  }
+
+  /**
+   * @return int sttaus
+   */
+  public int getStatus() {
+    return status;
+  }
+
+  /**
+   * @param val String lang
+   * @throws WebdavIntfException
+   */
+  public void setContentLang(String val) throws WebdavIntfException {
+    init(false);
+    contentLang = val;
+  }
+
+  /**
+   * @return String lang
+   * @throws WebdavIntfException
+   */
+  public String getContentLang() throws WebdavIntfException {
+    init(false);
+    return contentLang;
+  }
+
+  /**
+   * @param val int content length
+   * @throws WebdavIntfException
+   */
+  public void setContentLen(int val) throws WebdavIntfException {
+    init(true);
+    contentLen = val;
+  }
+
+  /**
+   * @return int content length
+   * @throws WebdavIntfException
+   */
+  public int getContentLen() throws WebdavIntfException {
+    init(true);
+    return contentLen;
+  }
+
+  /**
+   * @param val String content type
+   * @throws WebdavIntfException
+   */
+  public void setContentType(String val) throws WebdavIntfException {
+    init(false);
+    contentType = val;
+  }
+
+  /** A content type of null implies no content (or we don't know)
+   *
+   * @return String content type
+   * @throws WebdavIntfException
+   */
+  public String getContentType() throws WebdavIntfException {
+    init(false);
+    return contentType;
+  }
+
+  /**
+   * @param val
+   * @throws WebdavIntfException
+   */
+  public void setAlias(boolean val) throws WebdavIntfException {
+    init(false);
+    alias = val;
+  }
+
+  /**
+   * @return boolean true if an alias
+   * @throws WebdavIntfException
+   */
+  public boolean getAlias() throws WebdavIntfException {
+    init(false);
+    return alias;
+  }
+
+  /**
+   * @param val
+   * @throws WebdavIntfException
+   */
+  public void setTargetUri(String val) throws WebdavIntfException {
+    init(false);
+    targetUri = val;
+  }
+
+  /**
+   * @return String uri
+   * @throws WebdavIntfException
+   */
+  public String getTargetUri() throws WebdavIntfException {
+    init(false);
+    return targetUri;
+  }
+
+  /* ********************************************************************
+   *                        Protected methods
+   * ******************************************************************** */
+
+  protected Logger getLogger() {
+    if (log == null) {
+      log = Logger.getLogger(this.getClass());
+    }
+
+    return log;
+  }
+
+  protected void error(Throwable t) {
+    getLogger().error(this, t);
+  }
+
+  protected void warn(String msg) {
+    getLogger().warn(msg);
+  }
+
+  protected void debugMsg(String msg) {
+    getLogger().debug(msg);
+  }
+
+  protected void logIt(String msg) {
+    getLogger().info(msg);
+  }
+
+  /* ********************************************************************
+   *                        Object methods
+   * ******************************************************************** */
+
+  public int hashCode() {
+    return uri.hashCode();
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+
+    if (!(o instanceof WebdavNsNode)) {
+      return false;
+    }
+
+    WebdavNsNode that = (WebdavNsNode)o;
+
+    return uri.equals(that.uri);
+  }
+}
