@@ -68,6 +68,8 @@ import edu.rpi.cmt.access.PrivilegeSet;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
@@ -467,6 +469,35 @@ public abstract class WebdavNsIntf implements Serializable {
    *                  Access methods
    * ==================================================================== */
 
+  /** Return the prefix - starting with "/" - which identifies principal urls
+   *
+   * @return String prefix
+   * @throws WebdavIntfException
+   */
+  public abstract String getPrincipalPrefix() throws WebdavIntfException;
+
+  /** Given a uri returns a Collection of uris that allow search operations on
+   * principals for that resource.
+   *
+   * @param req
+   * @param resourceUri
+   * @return Collection of String
+   * @throws WebdavIntfException
+   */
+  public abstract Collection getPrincipalCollectionSet(String resourceUri)
+         throws WebdavIntfException;
+
+  /** Given a PrincipalPropertySearch returns a Collection of matching principals.
+   *
+   * @param resourceUri
+   * @param pps
+   * @return Collection of PrincipalPropertySearch
+   * @throws WebdavIntfException
+   */
+  public abstract Collection getPrincipals(String resourceUri,
+                                           PrincipalPropertySearch pps)
+          throws WebdavIntfException;
+
   /**
    * @param id
    * @return String href
@@ -594,6 +625,44 @@ public abstract class WebdavNsIntf implements Serializable {
     closePropstat(HttpServletResponse.SC_OK);
   }
 
+  /** Parse a <prop> list of property names in any namespace.
+   *
+   * @param nd
+   * @return Collection
+   * @throws WebdavException
+   */
+  public Collection parseProp(Node nd) throws WebdavException {
+    Collection props = new ArrayList();
+
+    Element[] children = getChildren(nd);
+
+    for (int i = 0; i < children.length; i++) {
+      Element propnode = children[i];
+
+      WebdavProperty prop = makeProp(propnode);
+
+      if (debug) {
+        trace("prop: " + prop.getTag());
+      }
+
+      props.add(prop);
+    }
+
+    return props;
+  }
+
+  /** Override this to create namespace specific property objects.
+   *
+   * @param propnode
+   * @return WebdavProperty
+   * @throws WebdavException
+   */
+  public WebdavProperty makeProp(Element propnode) throws WebdavException {
+    return new WebdavProperty(new QName(propnode.getNamespaceURI(),
+                                        propnode.getLocalName()),
+                                        null);
+  }
+
   /** Generate a response for a single webdav property. This should be overrriden
    * to handle other namespaces.
    *
@@ -602,7 +671,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavIntfException
    */
   public void generatePropValue(WebdavNsNode node,
-                               WebdavProperty pr) throws WebdavIntfException {
+                                WebdavProperty pr) throws WebdavIntfException {
     QName tag = pr.getTag();
     String ns = tag.getNamespaceURI();
 
@@ -695,6 +764,18 @@ public abstract class WebdavNsIntf implements Serializable {
         // access 5.6
       } else if (tag.equals(WebdavTags.principalCollectionSet)) {
         // access 5.7
+        openPropstat();
+        xml.openTag(WebdavTags.prop);
+        xml.openTag(WebdavTags.principalCollectionSet);
+
+        Iterator it = getPrincipalCollectionSet(node.getUri()).iterator();
+        while (it.hasNext()) {
+          xml.property(tag, (String)it.next());
+        }
+
+        xml.closeTag(WebdavTags.principalCollectionSet);
+        xml.closeTag(WebdavTags.prop);
+        closePropstat();
       } else {
         // Not known
         openPropstat();

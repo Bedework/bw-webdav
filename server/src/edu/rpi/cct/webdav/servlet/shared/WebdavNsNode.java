@@ -60,8 +60,11 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.bedework.davdefs.WebdavTags;
 import org.w3c.dom.Element;
 
 /** Represents a node in the underlying namespace for which this
@@ -102,6 +105,14 @@ public abstract class WebdavNsNode implements Serializable {
    */
   protected boolean collection;
 
+  /** True if this node is a user
+   */
+  protected boolean userPrincipal;
+
+  /** True if this node is a group
+   */
+  protected boolean groupPrincipal;
+
   /** True if GET is allowed
    */
   protected boolean allowsGet;
@@ -110,6 +121,15 @@ public abstract class WebdavNsNode implements Serializable {
    * e.g. no access.
    */
   protected int status = HttpServletResponse.SC_OK;
+
+  private final static Collection propertyNames = new ArrayList();
+
+  static {
+    propertyNames.add(WebdavTags.creationdate);
+    propertyNames.add(WebdavTags.displayname);
+    propertyNames.add(WebdavTags.getlastmodified);
+    propertyNames.add(WebdavTags.resourcetype);
+  }
 
   /* ....................................................................
    *                   Content fields
@@ -195,6 +215,33 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavIntfException
    */
   public void init(boolean content) throws WebdavIntfException {
+  }
+
+  /** Return true if this represents a principal
+   *
+   * @return boolean
+   * @throws WebdavIntfException
+   */
+  public boolean isPrincipal() throws WebdavIntfException {
+    return userPrincipal || groupPrincipal;
+  }
+
+  /** Return a set of QName defining properties this node supports.
+   *
+   * @return
+   * @throws WebdavIntfException
+   */
+  public Collection getPropertyNames()throws WebdavIntfException {
+    if (!isPrincipal()) {
+      return propertyNames;
+    }
+
+    Collection res = new ArrayList();
+
+    res.addAll(getPropertyNames());
+    res.add(WebdavTags.principalURL);
+
+    return res;
   }
 
   /**

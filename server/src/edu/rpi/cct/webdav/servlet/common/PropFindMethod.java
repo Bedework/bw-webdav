@@ -56,6 +56,7 @@ package edu.rpi.cct.webdav.servlet.common;
 
 import org.bedework.davdefs.WebdavTags;
 
+import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
@@ -130,22 +131,17 @@ public class PropFindMethod extends MethodBase {
       parsedReq = new PropRequest(PropRequest.reqPropAll);
     }
 
-    startEmit(resp);
-
     if (doc != null) {
-      int st = processDoc(doc);
-
-      if (st != HttpServletResponse.SC_OK) {
-        resp.setStatus(st);
-        throw new WebdavException(st);
-      }
+      processDoc(doc);
     }
 
     int depth = Headers.depth(req);
 
     if (debug) {
-      trace("PropFindMethod: depth=" + depth);
+      trace("PropFindMethod: depth=" + depth + " type=" + parsedReq.reqType);
     }
+
+    startEmit(resp);
 
     processResp(req, resp, depth);
   }
@@ -154,9 +150,14 @@ public class PropFindMethod extends MethodBase {
    *                   Private methods
    * ==================================================================== */
 
-  private int processDoc(Document doc) throws WebdavException {
+  private void processDoc(Document doc) throws WebdavException {
     try {
       Element root = doc.getDocumentElement();
+
+      if (!WebdavTags.propfind.nodeMatches(root)) {
+        throw new WebdavBadRequest();
+      }
+
       Element[] children = getChildren(root);
 
       for (int i = 0; i < children.length; i++) {
@@ -174,15 +175,13 @@ public class PropFindMethod extends MethodBase {
           break;
         }
       }
-
-      return HttpServletResponse.SC_OK;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
       if (debug) {
         t.printStackTrace();
       }
 
-      return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -217,36 +216,9 @@ public class PropFindMethod extends MethodBase {
    */
   public PropRequest parseProps(Node nd) throws WebdavException {
     PropRequest pr = new PropRequest(PropRequest.reqProp);
-    pr.props = new ArrayList();
-
-    Element[] children = getChildren(nd);
-
-    for (int i = 0; i < children.length; i++) {
-      Element propnode = children[i];
-
-      WebdavProperty prop = makeProp(propnode);
-
-      if (debug) {
-        trace("prop: " + prop.getTag());
-      }
-      addNs(prop.getTag().getNamespaceURI());
-
-      pr.props.add(prop);
-    }
+    pr.props = getNsIntf().parseProp(nd);
 
     return pr;
-  }
-
-  /** Override this to create namespace specific property objects.
-   *
-   * @param propnode
-   * @return WebdavProperty
-   * @throws WebdavException
-   */
-  public WebdavProperty makeProp(Element propnode) throws WebdavException {
-    return new WebdavProperty(new QName(propnode.getNamespaceURI(),
-                                        propnode.getLocalName()),
-                                        null);
   }
 
   /**
@@ -289,6 +261,8 @@ public class PropFindMethod extends MethodBase {
                                 PropRequest pr) throws WebdavException {
     addHref(node);
 
+    openTag(WebdavTags.propstat);
+
     if ((pr != null) && (node.getExists())) {
       if (pr.reqType == PropRequest.reqProp) {
         doPropFind(node, pr);
@@ -298,6 +272,12 @@ public class PropFindMethod extends MethodBase {
         doPropAll(node);
       }
     }
+    int status = node.getStatus();
+
+    property(WebdavTags.status, "HTTP/1.1 " + status + " " +
+                   WebdavStatusCode.getMessage(status));
+
+    closeTag(WebdavTags.propstat);
   }
 
   private void doNodeAndChildren(WebdavNsNode node,
@@ -338,14 +318,24 @@ public class PropFindMethod extends MethodBase {
 
     while (it.hasNext()) {
       WebdavProperty pr = (WebdavProperty)it.next();
+      addNs(pr.getTag().getNamespaceURI());
       intf.generatePropValue(node, pr);
     }
   }
 
   /* Build the response for a single node for a propnames request
    */
-  private int doPropNames(WebdavNsNode node) throws WebdavException {
-    return HttpServletResponse.SC_OK;
+  private void doPropNames(WebdavNsNode node) throws WebdavException {
+    Iterator it = node.getPropertyNames().iterator();
+
+    openTag(WebdavTags.prop);
+
+    while (it.hasNext()) {
+      QName nm = (QName)it.next();
+      emptyTag(nm);
+    }
+
+    closeTag(WebdavTags.prop);
   }
 
   /* Build the response for a single node for an allprop request

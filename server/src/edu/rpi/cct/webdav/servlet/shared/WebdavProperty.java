@@ -122,7 +122,7 @@ public class WebdavProperty implements Serializable {
     WebdavProperty[] ps = null;
     int index;
 
-    /** COnstructor
+    /** Constructor
      *
      * @param ps
      */

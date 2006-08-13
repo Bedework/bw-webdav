@@ -566,7 +566,7 @@ public abstract class MethodBase {
    */
   public void emptyTag(QName tag) throws WebdavException {
     try {
-      xml.closeTag(tag);
+      xml.emptyTag(tag);
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
