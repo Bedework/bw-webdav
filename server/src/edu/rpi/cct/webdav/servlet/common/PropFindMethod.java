@@ -264,6 +264,10 @@ public class PropFindMethod extends MethodBase {
     openTag(WebdavTags.propstat);
 
     if ((pr != null) && (node.getExists())) {
+      if (debug) {
+        trace("doNodePropertiest type=" + pr.reqType);
+      }
+
       if (pr.reqType == PropRequest.reqProp) {
         doPropFind(node, pr);
       } else if (pr.reqType == PropRequest.reqPropName) {
@@ -316,11 +320,15 @@ public class PropFindMethod extends MethodBase {
     Iterator it = preq.props.iterator();
     WebdavNsIntf intf = getNsIntf();
 
+    openTag(WebdavTags.prop);
+
     while (it.hasNext()) {
       WebdavProperty pr = (WebdavProperty)it.next();
       addNs(pr.getTag().getNamespaceURI());
       intf.generatePropValue(node, pr);
     }
+
+    closeTag(WebdavTags.prop);
   }
 
   /* Build the response for a single node for a propnames request

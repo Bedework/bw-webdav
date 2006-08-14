@@ -25,9 +25,6 @@
 */
 package edu.rpi.cct.webdav.servlet.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;

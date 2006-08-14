@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.shared;
 
 import edu.rpi.cmt.access.Acl.CurrentAccess;
+import edu.rpi.sss.util.xml.QName;
 
 import java.io.Serializable;
 import javax.servlet.http.HttpServletResponse;
@@ -204,6 +205,83 @@ public abstract class WebdavNsNode implements Serializable {
   /* ====================================================================
    *                   Property methods
    * ==================================================================== */
+
+  public static class PropVal {
+    public boolean notFound;
+
+    public String val;
+  }
+
+  /** Get the value for the given property.
+   *
+   * @param pr   WebdavProperty defining property
+   * @return PropVal   value
+   * @throws WebdavIntfException
+   */
+  public PropVal generatePropertyValue(WebdavProperty pr) throws WebdavIntfException {
+    PropVal pv = new PropVal();
+
+    QName tag = pr.getTag();
+    String ns = tag.getNamespaceURI();
+
+    if (!ns.equals(WebdavTags.namespace)) {
+      // Not ours
+
+      pv.notFound = true;
+      return pv;
+    }
+
+    if (tag.equals(WebdavTags.creationdate)) {
+      // dav 13.1
+
+      pv.val = getCreDate();
+      if (pv.val == null) {
+        pv.notFound = true;
+      }
+
+      return pv;
+    }
+
+    if (tag.equals(WebdavTags.displayname)) {
+      // dav 13.2
+      pv.val = getName();
+
+      return pv;
+    }
+
+    if (tag.equals(WebdavTags.getcontentlanguage)) {
+      // dav 13.3
+      pv.notFound = true;
+      return pv;
+    }
+
+    if (tag.equals(WebdavTags.getcontentlength)) {
+      // dav 13.4
+      pv.notFound = true;
+      return pv;
+    }
+
+    if (tag.equals(WebdavTags.getcontenttype)) {
+      // dav 13.5
+
+      pv.val = getContentType();
+      return pv;
+    }
+
+    if (tag.equals(WebdavTags.getlastmodified)) {
+      // dav 13.7
+      pv.val = getLastmodDate();
+      if (pv.val == null) {
+        pv.notFound = true;
+      }
+
+      return pv;
+    }
+
+    // Not known
+    pv.notFound = true;
+    return pv;
+  }
 
   /** This method is called before each setter/getter takes any action.
    * It allows the concrete implementation to defer some expensive

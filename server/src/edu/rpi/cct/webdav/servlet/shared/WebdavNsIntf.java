@@ -61,6 +61,7 @@ import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode.PropVal;
 import edu.rpi.cmt.access.AccessXmlUtil;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
 import edu.rpi.cmt.access.PrivilegeSet;
@@ -668,103 +669,98 @@ public abstract class WebdavNsIntf implements Serializable {
    *
    * @param node
    * @param pr
+   * @return int status
    * @throws WebdavIntfException
    */
-  public void generatePropValue(WebdavNsNode node,
-                                WebdavProperty pr) throws WebdavIntfException {
+  public int generatePropValue(WebdavNsNode node,
+                               WebdavProperty pr) throws WebdavIntfException {
     QName tag = pr.getTag();
     String ns = tag.getNamespaceURI();
+    int status = HttpServletResponse.SC_OK;
 
     try {
       /* Deal with webdav properties */
       if (!ns.equals(WebdavTags.namespace)) {
         // Not ours
-        openPropstat();
         xml.emptyTag(tag);
-        closePropstat(HttpServletResponse.SC_NOT_FOUND);
-        return;
+        return HttpServletResponse.SC_NOT_FOUND;
       }
 
-      if (tag.equals(WebdavTags.creationdate)) {
-        // dav 13.1
-        if (node.getCreDate() != null) {
-          openPropstat();
-          xml.property(tag, node.getCreDate());
-          closePropstat();
-        }
-      } else if (tag.equals(WebdavTags.displayname)) {
-        // dav 13.2
-        openPropstat();
-        xml.property(tag, node.getName());
-        closePropstat();
-      } else if (tag.equals(WebdavTags.getcontentlanguage)) {
-        // dav 13.3
-      } else if (tag.equals(WebdavTags.getcontentlength)) {
-        // dav 13.4
-      } else if (tag.equals(WebdavTags.getcontenttype)) {
-        // dav 13.5
-        openPropstat();
-        generatePropContenttype(node);
-        closePropstat();
-      } else if (tag.equals(WebdavTags.getetag)) {
+      if (tag.equals(WebdavTags.getetag)) {
         // dav 13.6
-        openPropstat();
         xml.property(tag, getEntityTag(node, true));
-        closePropstat();
-      } else if (tag.equals(WebdavTags.getlastmodified)) {
-        // dav 13.7
-        if (node.getLastmodDate() != null) {
-          openPropstat();
-          xml.property(tag, node.getLastmodDate());
-          closePropstat();
-        }
-      } else if (tag.equals(WebdavTags.lockdiscovery)) {
+        return status;
+      }
+
+      if (tag.equals(WebdavTags.lockdiscovery)) {
         // dav 13.8
-      } else if (tag.equals(WebdavTags.resourcetype)) {
+        xml.emptyTag(tag);
+        return HttpServletResponse.SC_NOT_FOUND;
+      }
+
+      if (tag.equals(WebdavTags.resourcetype)) {
         // dav 13.9
-        openPropstat();
         generatePropResourcetype(node);
-        closePropstat();
-      } else if (tag.equals(WebdavTags.source)) {
+        return status;
+      }
+
+      if (tag.equals(WebdavTags.source)) {
         // dav 13.10
-      } else if (tag.equals(WebdavTags.supportedlock)) {
+        xml.emptyTag(tag);
+        return HttpServletResponse.SC_NOT_FOUND;
+      }
+
+      if (tag.equals(WebdavTags.supportedlock)) {
         // dav 13.11
-      } else if (tag.equals(WebdavTags.owner)) {
+        xml.emptyTag(tag);
+        return HttpServletResponse.SC_NOT_FOUND;
+      }
+
+      if (tag.equals(WebdavTags.owner)) {
         // access 5.1
-        openPropstat();
         xml.openTag(tag);
         xml.property(WebdavTags.href, makeUserHref(node.getOwner()));
         xml.closeTag(tag);
-        closePropstat();
-      } else if (tag.equals(WebdavTags.supportedPrivilegeSet)) {
+        return status;
+      }
+
+      if (tag.equals(WebdavTags.supportedPrivilegeSet)) {
         // access 5.2
-        openPropstat();
         emitSupportedPrivSet(node);
-        closePropstat();
-      } else if (tag.equals(WebdavTags.currentUserPrivilegeSet)) {
+        return status;
+      }
+
+      if (tag.equals(WebdavTags.currentUserPrivilegeSet)) {
         // access 5.3
         CurrentAccess ca = node.getCurrentAccess();
         if (ca != null) {
           PrivilegeSet ps = ca.privileges;
           char[] privileges = ps.getPrivileges();
 
-          openPropstat();
           AccessXmlUtil.emitCurrentPrivSet(xml, getPrivTags(),
                                            new WebdavTags(), privileges);
-          closePropstat();
         }
-      } else if (tag.equals(WebdavTags.acl)) {
+        return status;
+      }
+
+      if (tag.equals(WebdavTags.acl)) {
         // access 5.4
-        openPropstat();
         emitAcl(node);
-        closePropstat();
-      } else if (tag.equals(WebdavTags.aclRestrictions)) {
+        return status;
+      }
+
+      if (tag.equals(WebdavTags.aclRestrictions)) {
         // access 5.5
-      } else if (tag.equals(WebdavTags.inheritedAclSet)) {
+        return HttpServletResponse.SC_NOT_FOUND;
+      }
+
+      if (tag.equals(WebdavTags.inheritedAclSet)) {
         // access 5.6
-      } else if (tag.equals(WebdavTags.principalCollectionSet)) {
+        return HttpServletResponse.SC_NOT_FOUND;
+      }
+
+      if (tag.equals(WebdavTags.principalCollectionSet)) {
         // access 5.7
-        openPropstat();
         xml.openTag(WebdavTags.prop);
         xml.openTag(WebdavTags.principalCollectionSet);
 
@@ -775,13 +771,21 @@ public abstract class WebdavNsIntf implements Serializable {
 
         xml.closeTag(WebdavTags.principalCollectionSet);
         xml.closeTag(WebdavTags.prop);
-        closePropstat();
-      } else {
-        // Not known
-        openPropstat();
-        xml.emptyTag(tag);
-        closePropstat(HttpServletResponse.SC_NOT_FOUND);
+        return status;
       }
+
+      /* Try the node for a value */
+
+      PropVal pv = node.generatePropertyValue(pr);
+
+      if (!pv.notFound) {
+        xml.property(tag, pv.val);
+        return status;
+      }
+
+      // Not known
+      xml.emptyTag(tag);
+      return HttpServletResponse.SC_NOT_FOUND;
     } catch (WebdavIntfException wie) {
       throw wie;
     } catch (Throwable t) {
