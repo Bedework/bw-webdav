@@ -179,6 +179,7 @@ public abstract class WebdavServlet extends HttpServlet {
 
         byte[] bs = str.getBytes();
         resp = (HttpServletResponse)wresp.getResponse();
+        debugMsg("contentLength=" + bs.length);
         resp.setContentLength(bs.length);
         resp.getOutputStream().write(bs);
       }
