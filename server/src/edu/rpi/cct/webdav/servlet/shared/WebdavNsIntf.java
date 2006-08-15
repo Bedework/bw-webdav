@@ -144,7 +144,6 @@ public abstract class WebdavNsIntf implements Serializable {
     account = req.getRemoteUser();
     anonymous = (account == null) || (account.length() == 0);
 
-    xml.addNs(WebdavTags.namespace);
     addNamespace();
   }
 
@@ -262,6 +261,24 @@ public abstract class WebdavNsIntf implements Serializable {
     return returnMultistatusOk;
   }
 
+  /** Add any namespaces for xml tag names in requests and responses.
+   * An abbreviation will be supplied by the servlet.
+
+   * The name should be globally unique in a global sense so don't return
+   * something like "RPI:"
+   *
+   * <p>Something more like "http://ahost.rpi.edu/webdav/"
+   *
+   * @throws WebdavIntfException
+   */
+  public void addNamespace() throws WebdavIntfException {
+    try {
+      xml.addNs(WebdavTags.namespace);
+    } catch (Throwable t) {
+      throw new WebdavIntfException(t);
+    }
+  }
+
   /** Called on the way out to allow resources to be freed.
    *
    * @throws WebdavIntfException
@@ -291,18 +308,6 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return boolean
    */
   public abstract boolean getAccessControl();
-
-  /** Add any namespaces for xml tag names in requests and responses.
-   * An abbreviation will be supplied by the servlet.
-
-   * The name should be globally unique in a global sense so don't return
-   * something like "RPI:"
-   *
-   * <p>Something more like "http://ahost.rpi.edu/webdav/"
-   *
-   * @throws WebdavIntfException
-   */
-  public abstract void addNamespace() throws WebdavIntfException;
 
   /** Return the complete URL describing the location of the object
    * represented by the node
