@@ -142,6 +142,8 @@ public abstract class WebdavServlet extends HttpServlet {
 
       MethodBase method = (MethodBase)intf.getMethods().get(methodName.toUpperCase());
 
+      resp.addHeader("DAV", intf.getDavHeader());
+
       if (method == null) {
         logIt("No method for '" + methodName + "'");
 

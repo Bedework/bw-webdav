@@ -162,6 +162,14 @@ public abstract class WebdavNsIntf implements Serializable {
     return req;
   }
 
+  /** Return DAV header
+   *
+   * @retrun  String
+   */
+  public String getDavHeader() {
+    return "1";
+  }
+
   /**
    * @return HashMap   methods objects
    */

@@ -115,11 +115,7 @@ public class OptionsMethod extends MethodBase {
   }
 
   protected void addDavHeader(HttpServletResponse resp) throws WebdavException {
-    if (getNsIntf().getAccessControl()) {
-      resp.addHeader("DAV", "1, 2, 3, access-control");
-    } else {
-      resp.addHeader("DAV", "1, 2, 3");
-    }
+    resp.addHeader("DAV", getNsIntf().getDavHeader());
   }
 }
 
