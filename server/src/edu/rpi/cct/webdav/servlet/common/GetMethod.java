@@ -57,8 +57,10 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
+import java.io.CharArrayReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,7 +105,20 @@ public class GetMethod extends MethodBase {
 
       /** Get the content now to set up length, type etc.
        */
-      Reader in = getNsIntf().getContent(node);
+      Reader in = null;
+      String contentType;
+      int contentLength;
+
+      if (node.getCollection()) {
+        String content = generateHtml(req, node);
+        in = new CharArrayReader(content.toCharArray());
+        contentType = "text/html";
+        contentLength = content.getBytes().length;
+      } else {
+        in = getNsIntf().getContent(node);
+        contentType = node.getContentType();
+        contentLength = node.getContentLen();
+      }
 
       if (doContent) {
         out = resp.getWriter();
@@ -120,8 +135,8 @@ public class GetMethod extends MethodBase {
       if (ranges == null) {
         /* Entire content
          */
-        resp.setContentType(node.getContentType());
-        resp.setContentLength(node.getContentLen());
+        resp.setContentType(contentType);
+        resp.setContentLength(contentLength);
 
         if (doContent) {
           if (in == null) {
@@ -203,6 +218,102 @@ public class GetMethod extends MethodBase {
       try {
         out.close();
       } catch (Throwable t) {}
+    }
+  }
+
+
+  /** Return a Reader giving an HTML representation of the directory.
+   *
+   * @param node  WebdavNsNode
+   * @return Reader
+   */
+  protected String generateHtml(HttpServletRequest req,
+                                WebdavNsNode node) throws WebdavException {
+    try {
+      Sbuff sb = new Sbuff();
+
+      sb.lines(new String[] {"<html>",
+                             "  <head>"});
+      /* Need some styles I guess */
+      sb.append("    <title>");
+      sb.append(node.getName());
+      sb.line("</title>");
+
+      sb.lines(new String[] {"</head>",
+                             "<body>"});
+
+      sb.append("    <h1>");
+      sb.append(node.getName());
+      sb.line("</h1>");
+
+      sb.line("  <hr>");
+
+      sb.line("  <table width=\"100%\" +" +
+              "cellspacing=\"0\"" +
+              " cellpadding=\"4\"");
+
+      Iterator children = getNsIntf().getChildren(node);
+
+      while (children.hasNext()) {
+        WebdavNsNode child = (WebdavNsNode)children.next();
+
+        /* icon would be nice */
+
+        sb.line("<tr>");
+
+        if (node.getCollection()) {
+          /* folder */
+        } else {
+          /* calendar? */
+        }
+
+        sb.line("  <td align=\"left\">");
+        sb.append("<a href=\"");
+        sb.append(req.getContextPath());
+        sb.append(child.getUri());
+        sb.append("\">");
+        sb.append(child.getName());
+        sb.line("</a>");
+        sb.line("</td>");
+
+        sb.line("  <td align=\"left\">");
+        sb.line(String.valueOf(child.getLastmodDate()));
+        sb.line("</td>");
+        sb.append("</tr>\r\n");
+      }
+
+      sb.line("</table>");
+
+      /* Could use a footer */
+      sb.line("</body>");
+      sb.line("</html>");
+
+      return sb.toString();
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  private static class Sbuff {
+    StringBuffer sb = new StringBuffer();
+
+    public void lines(String[] ss) {
+      for (int i = 0; i < ss.length; i++) {
+        line(ss[i]);
+      }
+    }
+
+    public void line(String s) {
+      sb.append(s);
+      sb.append("\r\n");
+    }
+
+    public void append(String s) {
+      sb.append(s);
+    }
+
+    public String toString() {
+      return sb.toString();
     }
   }
 
