@@ -29,6 +29,7 @@ import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 
@@ -38,6 +39,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.bedework.davdefs.WebdavTags;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 /** Class called to handle POST
  *
@@ -49,7 +53,12 @@ public class ReportMethod extends MethodBase {
 
   private int reportType;
 
-  PrincipalPropertySearch pps;
+  private PrincipalPropertySearch pps;
+
+  protected PropFindMethod.PropRequest preq;
+
+  protected PropFindMethod pm;
+
 
   /** Called at each request
    */
@@ -60,6 +69,15 @@ public class ReportMethod extends MethodBase {
                        HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("ReportMethod: doMethod");
+    }
+
+    /* Get hold of the PROPFIND method instance - we need it to process
+       possible prop requests.
+     */
+    pm = (PropFindMethod)getNsIntf().findMethod(WebdavMethods.propFind);
+
+    if (pm == null) {
+      throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     Document doc = parseContent(req, resp);
@@ -95,6 +113,29 @@ public class ReportMethod extends MethodBase {
     processDoc(doc);
 
     processResp(req, resp, depth);
+  }
+
+  /* Apply a node to a parsed request - or the other way - whatever.
+   */
+  protected void doNodeProperties(WebdavNsNode node) throws WebdavException {
+    int status = node.getStatus();
+
+    openTag(WebdavTags.response);
+
+    if (status != HttpServletResponse.SC_OK) {
+      openTag(WebdavTags.propstat);
+
+      property(WebdavTags.status, "HTTP/1.1 " + status + " " +
+                     WebdavStatusCode.getMessage(status));
+
+      closeTag(WebdavTags.propstat);
+    } else {
+      pm.doNodeProperties(node, preq);
+    }
+
+    closeTag(WebdavTags.response);
+
+    flush();
   }
 
   /* ====================================================================
@@ -152,8 +193,9 @@ public class ReportMethod extends MethodBase {
           i++;
 
           if (i < children.length) {
-            if (WebdavTags.prop.nodeMatches(curnode)) {
-              pps.returnProps = intf.parseProp(children[i]);
+            pps.pr = pm.tryPropRequest(curnode);
+            preq = pps.pr;
+            if (pps.pr != null) {
               i++;
             }
 
@@ -195,6 +237,7 @@ public class ReportMethod extends MethodBase {
   private void processResp(HttpServletRequest req,
                            HttpServletResponse resp,
                            int depth) throws WebdavException {
+    WebdavNsIntf intf = getNsIntf();
 
     if (reportType == reportTypeExpandProperty) {
       return;
@@ -215,7 +258,16 @@ public class ReportMethod extends MethodBase {
 
     String resourceUri = getResourceUri(req);
 
+    Collection principals = intf.getPrincipalCollectionSet(resourceUri);
+
     openTag(WebdavTags.multistatus);
+
+    Iterator it = principals.iterator();
+    while (it.hasNext()) {
+      WebdavNsNode node = (WebdavNsNode)it.next();
+
+      doNodeProperties(node);
+    }
 
     closeTag(WebdavTags.multistatus);
 

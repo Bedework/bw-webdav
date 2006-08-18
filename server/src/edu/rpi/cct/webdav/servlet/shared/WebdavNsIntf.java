@@ -511,8 +511,8 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Given a PrincipalPropertySearch returns a Collection of matching principals.
    *
    * @param resourceUri
-   * @param pps
-   * @return Collection of PrincipalPropertySearch
+   * @param pps Collection of PrincipalPropertySearch
+   * @return Collection of WebdavNsNode principals
    * @throws WebdavIntfException
    */
   public abstract Collection getPrincipals(String resourceUri,

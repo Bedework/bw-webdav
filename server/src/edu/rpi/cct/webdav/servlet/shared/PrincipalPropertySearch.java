@@ -25,6 +25,8 @@
 */
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.cct.webdav.servlet.common.PropFindMethod;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -42,9 +44,17 @@ public class PrincipalPropertySearch {
     public Element match;
   }
 
+  /** Collection of PropertySearch objects.
+   */
   public Collection propertySearches = new ArrayList();
 
-  public Collection returnProps;
+  /** Properties to be returned
+   */
+  public PropFindMethod.PropRequest pr;
 
+  /** If true the request is applied to each collection identified by the
+      DAV:principal-collection-set property of the resource identified
+      by the Request-URI.
+      */
   public boolean applyToPrincipalCollectionSet;
 }
