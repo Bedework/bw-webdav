@@ -110,6 +110,10 @@ public class GetMethod extends MethodBase {
       int contentLength;
 
       if (node.getCollection()) {
+        if (getNsIntf().getDirectoryBrowsingDisallowed()) {
+          throw new WebdavException(HttpServletResponse.SC_FORBIDDEN);
+        }
+
         String content = generateHtml(req, node);
         in = new CharArrayReader(content.toCharArray());
         contentType = "text/html";
@@ -222,7 +226,13 @@ public class GetMethod extends MethodBase {
   }
 
 
-  /** Return a Reader giving an HTML representation of the directory.
+  /** Return a String giving an HTML representation of the directory.
+   *
+   * TODO
+   *
+   * <p>Use some form of template to generate an internationalized form of the
+   * listing. We don't need a great deal to start with. It will also allow us to
+   * provide stylesheets, images etc. Probably place it in the resources directory.
    *
    * @param node  WebdavNsNode
    * @return Reader
@@ -277,7 +287,14 @@ public class GetMethod extends MethodBase {
         sb.line("</td>");
 
         sb.line("  <td align=\"left\">");
-        sb.line(String.valueOf(child.getLastmodDate()));
+
+        String lastMod = child.getLastmodDate();
+
+        if (lastMod != null) {
+          sb.line(lastMod);
+        } else {
+          sb.line("&nbsp;");
+        }
         sb.line("</td>");
         sb.append("</tr>\r\n");
       }

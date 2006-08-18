@@ -279,6 +279,13 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
+  /** Return true if the system disallows directory browsing.
+   *
+   * @return boolean
+   * @throws WebdavIntfException
+   */
+  public abstract boolean getDirectoryBrowsingDisallowed() throws WebdavIntfException;
+
   /** Called on the way out to allow resources to be freed.
    *
    * @throws WebdavIntfException

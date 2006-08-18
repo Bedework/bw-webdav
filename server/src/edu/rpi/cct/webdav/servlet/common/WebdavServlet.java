@@ -154,7 +154,10 @@ public abstract class WebdavServlet extends HttpServlet {
         method.doMethod(req, resp);
       }
     } catch (WebdavException wde) {
-      getLogger().error(this, wde);
+      int status = wde.getStatusCode();
+      if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+        getLogger().error(this, wde);
+      }
       resp.sendError(wde.getStatusCode());
     } catch (Throwable t) {
       getLogger().error(this, t);
