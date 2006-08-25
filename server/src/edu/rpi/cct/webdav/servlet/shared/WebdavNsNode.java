@@ -54,8 +54,11 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.cmt.access.AccessXmlUtil;
+import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
 import edu.rpi.sss.util.xml.QName;
+import edu.rpi.sss.util.xml.XmlEmit;
 
 import java.io.Serializable;
 import javax.servlet.http.HttpServletResponse;
@@ -125,11 +128,32 @@ public abstract class WebdavNsNode implements Serializable {
 
   private final static Collection propertyNames = new ArrayList();
 
+  public static final class PropertyTagEntry {
+    public QName tag;
+    public boolean inPropAll = true;
+
+    public PropertyTagEntry(QName tag) {
+      this.tag = tag;
+    }
+
+    public PropertyTagEntry(QName tag, boolean inPropAll) {
+      this.tag = tag;
+      this.inPropAll = inPropAll;
+    }
+  }
+
   static {
-    propertyNames.add(WebdavTags.creationdate);
-    propertyNames.add(WebdavTags.displayname);
-    propertyNames.add(WebdavTags.getlastmodified);
-    propertyNames.add(WebdavTags.resourcetype);
+    addPropEntry(WebdavTags.acl);
+    addPropEntry(WebdavTags.creationdate);
+    addPropEntry(WebdavTags.currentUserPrivilegeSet);
+    addPropEntry(WebdavTags.displayname);
+    addPropEntry(WebdavTags.getcontentlanguage);
+    addPropEntry(WebdavTags.getcontentlength);
+    addPropEntry(WebdavTags.getcontenttype);
+    addPropEntry(WebdavTags.getlastmodified);
+    addPropEntry(WebdavTags.owner);
+    addPropEntry(WebdavTags.resourcetype);
+    addPropEntry(WebdavTags.supportedPrivilegeSet);
   }
 
   /* ....................................................................
@@ -212,75 +236,136 @@ public abstract class WebdavNsNode implements Serializable {
     public String val;
   }
 
-  /** Get the value for the given property.
+  /** Emit the property indicated by the tag.
    *
-   * @param pr   WebdavProperty defining property
-   * @return PropVal   value
+   * @param tag  QName defining property
+   * @param intf WebdavNsIntf
+   * @return boolean   true if emitted
    * @throws WebdavIntfException
    */
-  public PropVal generatePropertyValue(WebdavProperty pr) throws WebdavIntfException {
-    PropVal pv = new PropVal();
-
-    QName tag = pr.getTag();
+  public boolean generatePropertyValue(QName tag,
+                                       WebdavNsIntf intf) throws WebdavIntfException {
     String ns = tag.getNamespaceURI();
+    XmlEmit xml = intf.getXmlEmit();
 
     if (!ns.equals(WebdavTags.namespace)) {
       // Not ours
 
-      pv.notFound = true;
-      return pv;
+      return false;
     }
 
-    if (tag.equals(WebdavTags.creationdate)) {
-      // dav 13.1
-
-      pv.val = getCreDate();
-      if (pv.val == null) {
-        pv.notFound = true;
+    try {
+      if (tag.equals(WebdavTags.acl)) {
+        // access 5.4
+        intf.emitAcl(this);
+        return true;
       }
 
-      return pv;
-    }
+      if (tag.equals(WebdavTags.creationdate)) {
+        // dav 13.1
 
-    if (tag.equals(WebdavTags.displayname)) {
-      // dav 13.2
-      pv.val = getName();
+        String val = getCreDate();
+        if (val == null) {
+          return false;
+        }
 
-      return pv;
-    }
-
-    if (tag.equals(WebdavTags.getcontentlanguage)) {
-      // dav 13.3
-      pv.notFound = true;
-      return pv;
-    }
-
-    if (tag.equals(WebdavTags.getcontentlength)) {
-      // dav 13.4
-      pv.notFound = true;
-      return pv;
-    }
-
-    if (tag.equals(WebdavTags.getcontenttype)) {
-      // dav 13.5
-
-      pv.val = getContentType();
-      return pv;
-    }
-
-    if (tag.equals(WebdavTags.getlastmodified)) {
-      // dav 13.7
-      pv.val = getLastmodDate();
-      if (pv.val == null) {
-        pv.notFound = true;
+        xml.property(tag, val);
+        return true;
       }
 
-      return pv;
-    }
+      if (tag.equals(WebdavTags.currentUserPrivilegeSet)) {
+        // access 5.3
+        CurrentAccess ca = getCurrentAccess();
+        if (ca != null) {
+          PrivilegeSet ps = ca.privileges;
+          char[] privileges = ps.getPrivileges();
 
-    // Not known
-    pv.notFound = true;
-    return pv;
+          AccessXmlUtil.emitCurrentPrivSet(xml, intf.getPrivTags(),
+                                           new WebdavTags(), privileges);
+        }
+
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.displayname)) {
+        // dav 13.2
+        xml.property(tag, getName());
+
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.getcontentlanguage)) {
+        // dav 13.3
+        return false;
+      }
+
+      if (tag.equals(WebdavTags.getcontentlength)) {
+        // dav 13.4
+        if (!getAllowsGet()) {
+          return false;
+        }
+        xml.property(tag, String.valueOf(getContentLen()));
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.getcontenttype)) {
+        // dav 13.5
+        if (!getAllowsGet()) {
+          return false;
+        }
+
+        String val = getContentType();
+        if (val == null) {
+          return false;
+        }
+
+        xml.property(tag, val);
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.getlastmodified)) {
+        // dav 13.7
+        String val = getLastmodDate();
+        if (val == null) {
+          return false;
+        }
+
+        xml.property(tag, val);
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.owner)) {
+        // access 5.1
+        xml.openTag(tag);
+        xml.property(WebdavTags.href, intf.makeUserHref(getOwner()));
+        xml.closeTag(tag);
+
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.resourcetype)) {
+        // dav 13.9
+        if (getCollection()) {
+          xml.propertyTagVal(WebdavTags.resourcetype,
+                             WebdavTags.collection);
+        }
+
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.supportedPrivilegeSet)) {
+        // access 5.2
+        intf.emitSupportedPrivSet(this);
+        return true;
+      }
+
+      // Not known
+      return false;
+    } catch (WebdavIntfException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      throw new WebdavIntfException(t);
+    }
   }
 
   /** This method is called before each setter/getter takes any action.
@@ -590,6 +675,14 @@ public abstract class WebdavNsNode implements Serializable {
 
   protected void logIt(String msg) {
     getLogger().info(msg);
+  }
+
+  protected static void addPropEntry(QName tag) {
+    propertyNames.add(new PropertyTagEntry(tag));
+  }
+
+  protected static void addPropEntry(QName tag, boolean inAllProp) {
+    propertyNames.add(new PropertyTagEntry(tag, inAllProp));
   }
 
   /* ********************************************************************

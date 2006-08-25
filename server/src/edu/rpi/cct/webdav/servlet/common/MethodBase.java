@@ -54,9 +54,11 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
+import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
+import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
@@ -64,18 +66,20 @@ import edu.rpi.sss.util.xml.XmlUtil;
 import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.log4j.Logger;
+import org.bedework.davdefs.WebdavTags;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -170,8 +174,8 @@ public abstract class MethodBase {
    * @return String  fixed up uri
    * @throws WebdavException
    */
-  protected String getResourceUri(HttpServletRequest req)
-      throws WebdavException{
+  public String getResourceUri(HttpServletRequest req)
+      throws WebdavException {
     if (resourceUri != null) {
       return resourceUri;
     }
@@ -194,6 +198,138 @@ public abstract class MethodBase {
     }
 
     return resourceUri;
+  }
+
+  /** Return a path, beginning with a "/", after "." and ".." are removed.
+   * If the parameter path attempts to go above the root we return null.
+   *
+   * Other than the backslash thing why not use URI?
+   *
+   * @param path      String path to be fixed
+   * @return String   fixed path
+   * @throws WebdavException
+   */
+  protected String fixPath(String path) throws WebdavException {
+    if (path == null) {
+      return null;
+    }
+
+    String decoded;
+    try {
+      decoded = URLDecoder.decode(path, "UTF8");
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+
+    if (decoded == null) {
+      return (null);
+    }
+
+    /** Make any backslashes into forward slashes.
+     */
+    if (decoded.indexOf('\\') >= 0) {
+      decoded = decoded.replace('\\', '/');
+    }
+
+    /** Ensure a leading '/'
+     */
+    if (!decoded.startsWith("/")) {
+      decoded = "/" + decoded;
+    }
+
+    /** Remove all instances of '//'.
+     */
+    while (decoded.indexOf("//") >= 0) {
+      decoded = decoded.replaceAll("//", "/");
+    }
+
+    if (decoded.indexOf("/.") < 0) {
+      return decoded;
+    }
+
+    /** Somewhere we may have /./ or /../
+     */
+
+    StringTokenizer st = new StringTokenizer(decoded, "/");
+
+    ArrayList al = new ArrayList();
+    while (st.hasMoreTokens()) {
+      String s = st.nextToken();
+
+      if (s.equals(".")) {
+        // ignore
+      } else if (s.equals("..")) {
+        // Back up 1
+        if (al.size() == 0) {
+          // back too far
+          return null;
+        }
+
+        al.remove(al.size() - 1);
+      } else {
+        al.add(s);
+      }
+    }
+
+    /** Reconstruct */
+    StringBuffer sb = new StringBuffer();
+    Iterator it = al.iterator();
+    while (it.hasNext()) {
+      sb.append('/');
+      sb.append((String)it.next());
+    }
+
+    return sb.toString();
+  }
+
+  protected int defaultDepth(int depth, int def) {
+    if (depth < 0) {
+      return def;
+    }
+
+    return depth;
+  }
+
+  /* depth must have given value
+   */
+  protected void checkDepth(int depth, int val) throws WebdavException {
+    if (depth != val) {
+      throw new WebdavBadRequest();
+    }
+  }
+
+  /* depth must be in min-max
+   */
+  protected void checkDepth(int depth, int min, int max) throws WebdavException {
+    if ((depth < min) || (depth > max)) {
+      throw new WebdavBadRequest();
+    }
+  }
+
+  protected void addHref(WebdavNsNode node) throws WebdavException {
+    try {
+      if (debug) {
+        trace("Adding href " + getUrlPrefix() + node.getEncodedUri());
+      }
+
+      String url = getUrlPrefix() + new URI(node.getEncodedUri()).toASCIIString();
+      property(WebdavTags.href, url);
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  protected void addStatus(int status) throws WebdavException {
+    try {
+      property(WebdavTags.status, "HTTP/1.1 " + status + " " +
+               WebdavStatusCode.getMessage(status));
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
   }
 
   /* * Get request content.
@@ -358,88 +494,6 @@ public abstract class MethodBase {
    */
   public static boolean nodeMatches(Node nd, QName tag) {
     return tag.nodeMatches(nd);
-  }
-
-  /** Return a path, beginning with a "/", after "." and ".." are removed.
-   * If the parameter path attempts to go above the root we return null.
-   *
-   * Other than the backslash thing why not use URI?
-   *
-   * @param path      String path to be fixed
-   * @return String   fixed path
-   * @throws WebdavException
-   */
-  protected String fixPath(String path) throws WebdavException {
-    if (path == null) {
-      return null;
-    }
-
-    String decoded;
-    try {
-      decoded = URLDecoder.decode(path, "UTF8");
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
-
-    if (decoded == null) {
-      return (null);
-    }
-
-    /** Make any backslashes into forward slashes.
-     */
-    if (decoded.indexOf('\\') >= 0) {
-      decoded = decoded.replace('\\', '/');
-    }
-
-    /** Ensure a leading '/'
-     */
-    if (!decoded.startsWith("/")) {
-      decoded = "/" + decoded;
-    }
-
-    /** Remove all instances of '//'.
-     */
-    while (decoded.indexOf("//") >= 0) {
-      decoded = decoded.replaceAll("//", "/");
-    }
-
-    if (decoded.indexOf("/.") < 0) {
-      return decoded;
-    }
-
-    /** Somewhere we may have /./ or /../
-     */
-
-    StringTokenizer st = new StringTokenizer(decoded, "/");
-
-    Vector v = new Vector();
-    while (st.hasMoreTokens()) {
-      String s = st.nextToken();
-
-      if (s.equals(".")) {
-        // ignore
-      } else if (s.equals("..")) {
-        // Back up 1
-        if (v.size() == 0) {
-          // back too far
-          return null;
-        }
-
-        v.removeElementAt(v.size() - 1);
-      } else {
-        v.addElement(s);
-      }
-    }
-
-    /** Reconstruct */
-    StringBuffer sb = new StringBuffer();
-    Enumeration e = v.elements();
-    while (e.hasMoreElements()) {
-      sb.append('/');
-      sb.append((String)e.nextElement());
-    }
-
-    return sb.toString();
   }
 
   protected String formatHTTPDate(Timestamp val) {

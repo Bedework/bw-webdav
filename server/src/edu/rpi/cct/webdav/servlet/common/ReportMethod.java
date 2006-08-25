@@ -30,6 +30,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
+import edu.rpi.cct.webdav.servlet.shared.WebdavProperty;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 
@@ -50,15 +51,17 @@ import java.util.Iterator;
 public class ReportMethod extends MethodBase {
   private final static int reportTypeExpandProperty = 0;
   private final static int reportTypePrincipalPropertySearch = 1;
+  private final static int reportTypePrincipalMatch = 2;
 
   private int reportType;
+
+  private PrincipalMatchReport pmatch;
 
   private PrincipalPropertySearch pps;
 
   protected PropFindMethod.PropRequest preq;
 
   protected PropFindMethod pm;
-
 
   /** Called at each request
    */
@@ -110,7 +113,7 @@ public class ReportMethod extends MethodBase {
       throw new WebdavBadRequest();
     }
 
-    processDoc(doc);
+    processDoc(doc, depth);
 
     processResp(req, resp, depth);
   }
@@ -125,8 +128,7 @@ public class ReportMethod extends MethodBase {
     if (status != HttpServletResponse.SC_OK) {
       openTag(WebdavTags.propstat);
 
-      property(WebdavTags.status, "HTTP/1.1 " + status + " " +
-                     WebdavStatusCode.getMessage(status));
+      addStatus(status);
 
       closeTag(WebdavTags.propstat);
     } else {
@@ -148,28 +150,62 @@ public class ReportMethod extends MethodBase {
    * @param doc
    * @throws WebdavException
    */
-  private void processDoc(Document doc) throws WebdavException {
+  private void processDoc(Document doc,
+                          int depth) throws WebdavException {
     try {
       WebdavNsIntf intf = getNsIntf();
 
       Element root = doc.getDocumentElement();
 
-      Element[] children = getChildren(root);
-
       if (reportType == reportTypeExpandProperty) {
         return;
       }
 
-      /*
-       <!ELEMENT principal-property-search
-       ((property-search+), prop?, apply-to-principal-collection-set?) >
+      if (reportType == reportTypePrincipalMatch) {
+        depth = defaultDepth(depth, 0);
+        checkDepth(depth, 0);
+        pmatch = new PrincipalMatchReport(this, intf, debug);
 
-       <!ELEMENT property-search (prop, match) >
-       prop: see RFC 2518, Section 12.11
+        pmatch.parse(root, depth);
+        return;
+      }
 
-       <!ELEMENT match #PCDATA >
+      if (reportType == reportTypePrincipalPropertySearch) {
+        depth = defaultDepth(depth, 0);
+        checkDepth(depth, 0);
+        parsePrincipalPropertySearch(root, depth, intf);
+        return;
+      }
 
-       */
+      throw new WebdavBadRequest();
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      System.err.println(t.getMessage());
+      if (debug) {
+        t.printStackTrace();
+      }
+
+      throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+
+  /*
+   *  <!ELEMENT principal-property-search
+   *  ((property-search+), prop?, apply-to-principal-collection-set?) >
+   *
+   *  <!ELEMENT property-search (prop, match) >
+   *  prop: see RFC 2518, Section 12.11
+   *
+   *  <!ELEMENT match #PCDATA >
+   *
+   */
+  private void parsePrincipalPropertySearch(Element root,
+                                            int depth,
+                                            WebdavNsIntf intf) throws WebdavException {
+    try {
+      Element[] children = getChildren(root);
 
       pps = new PrincipalPropertySearch();
 
@@ -240,25 +276,57 @@ public class ReportMethod extends MethodBase {
     WebdavNsIntf intf = getNsIntf();
 
     if (reportType == reportTypeExpandProperty) {
+      processExpandProperty(req, resp, depth, intf);
       return;
     }
 
-    // reportTypePrincipalPropertySearch
-
-    startEmit(resp);
-
-    if (pps != null) {
-      if (depth != 0) {
-        throw new WebdavBadRequest();
-      }
+    if (reportType == reportTypePrincipalMatch) {
+      pmatch.process(req, resp, defaultDepth(depth, 0));
+      return;
     }
+
+    if (reportType == reportTypePrincipalPropertySearch) {
+      processPrincipalPropertySearch(req, resp,
+                                     defaultDepth(depth, 0), intf);
+      return;
+    }
+
+    throw new WebdavBadRequest();
+  }
+
+  /**
+   * @param req
+   * @param resp
+   * @param depth
+   * @param intf
+   * @throws WebdavException
+   */
+  private void processExpandProperty(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     int depth,
+                                     WebdavNsIntf intf) throws WebdavException {
+    return;
+  }
+
+  /**
+   * @param req
+   * @param resp
+   * @param depth
+   * @param intf
+   * @throws WebdavException
+   */
+  private void processPrincipalPropertySearch(HttpServletRequest req,
+                                              HttpServletResponse resp,
+                                              int depth,
+                                              WebdavNsIntf intf) throws WebdavException {
+    startEmit(resp);
 
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
 
     String resourceUri = getResourceUri(req);
 
-    Collection principals = intf.getPrincipalCollectionSet(resourceUri);
+    Collection principals = intf.getPrincipals(resourceUri, pps);
 
     openTag(WebdavTags.multistatus);
 
@@ -287,8 +355,13 @@ public class ReportMethod extends MethodBase {
       if (WebdavTags.expandProperty.nodeMatches(root)) {
         return reportTypeExpandProperty;
       }
+
       if (WebdavTags.principalPropertySearch.nodeMatches(root)) {
         return reportTypePrincipalPropertySearch;
+      }
+
+      if (WebdavTags.principalMatch.nodeMatches(root)) {
+        return reportTypePrincipalMatch;
       }
 
       return -1;

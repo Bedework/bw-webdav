@@ -52,80 +52,18 @@
     to the maximum extent the law permits.
 */
 
-package edu.rpi.cct.webdav.servlet.common;
+package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
-import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import javax.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-
-/** Retrieve and process Webdav header values
+/** Forbidden exception thrown by webdav classes
  *
  *   @author Mike Douglass   douglm@rpi.edu
  */
-public class Headers {
-  protected final static int depthInfinity = Integer.MAX_VALUE;
-  protected final static int depthNone = Integer.MIN_VALUE;
-
-  /** Get the depth header
-   *
-   * @param req    HttpServletRequest
-   * @return int   depth - depthInfinity if absent
-   * @throws WebdavException
+public class WebdavForbidden extends WebdavException {
+  /** Constructor
    */
-  public static int depth(HttpServletRequest req) throws WebdavException {
-    return depth(req, depthNone);
-  }
-
-  /** Get the depth header
-   *
-   * @param req    HttpServletRequest
-   * @param def    int default if no header
-   * @return int   depth -
-   * @throws WebdavException
-   */
-  public static int depth(HttpServletRequest req,
-                          int def) throws WebdavException {
-    String depthStr = req.getHeader("Depth");
-
-    if (depthStr == null) {
-      return def;
-    }
-
-    if (depthStr.equals("infinity")) {
-      return depthInfinity;
-    }
-
-    if (depthStr.equals("0")) {
-      return 0;
-    }
-
-    if (depthStr.equals("1")) {
-      return 1;
-    }
-
-    throw new WebdavBadRequest();
-  }
-
-  /** Look for the If-None-Match header
-   *
-   * @param req    HttpServletRequest
-   * @return boolean true if present
-   * @throws WebdavException
-   */
-  public static boolean ifNoneMatchAny(HttpServletRequest req)
-          throws WebdavException {
-    String hdrStr = req.getHeader("If-None-Match");
-
-    return "*".equals(hdrStr);
-  }
-
-  /** The following is instantiated for If headers
-   */
-  public static class IfHeaders {
-    /* Only If-Match or If-None-Match are allowed not both
-     */
-
+  public WebdavForbidden() {
+    super(HttpServletResponse.SC_FORBIDDEN);
   }
 }
-
