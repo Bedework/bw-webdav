@@ -128,14 +128,24 @@ public abstract class WebdavNsNode implements Serializable {
 
   private final static Collection propertyNames = new ArrayList();
 
+  /** */
   public static final class PropertyTagEntry {
+    /** */
     public QName tag;
+    /** */
     public boolean inPropAll = true;
 
+    /**
+     * @param tag
+     */
     public PropertyTagEntry(QName tag) {
       this.tag = tag;
     }
 
+    /**
+     * @param tag
+     * @param inPropAll
+     */
     public PropertyTagEntry(QName tag, boolean inPropAll) {
       this.tag = tag;
       this.inPropAll = inPropAll;
@@ -230,9 +240,15 @@ public abstract class WebdavNsNode implements Serializable {
    *                   Property methods
    * ==================================================================== */
 
+  /**
+   */
   public static class PropVal {
+    /**
+     */
     public boolean notFound;
 
+    /**
+     */
     public String val;
   }
 

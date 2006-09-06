@@ -39,8 +39,12 @@ public class PrincipalPropertySearch {
   /**
    */
   public static class PropertySearch {
+    /**
+     */
     public Collection props;
 
+    /**
+     */
     public Element match;
   }
 

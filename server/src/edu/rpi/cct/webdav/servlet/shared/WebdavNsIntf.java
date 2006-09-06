@@ -172,7 +172,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Return DAV header
    *
-   * @retrun  String
+   * @return  String
    */
   public String getDavHeader() {
     return "1";
@@ -872,6 +872,12 @@ public abstract class WebdavNsIntf implements Serializable {
    *                   XmlUtil wrappers
    * ==================================================================== */
 
+  /** Get all the children if any
+   *
+   * @param nd
+   * @return
+   * @throws WebdavIntfException
+   */
   public Element[] getChildren(Node nd) throws WebdavIntfException {
     try {
       return XmlUtil.getElementsArray(nd);
@@ -884,6 +890,12 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
+  /** We expect a single child
+   *
+   * @param nd
+   * @return Element
+   * @throws WebdavIntfException
+   */
   public Element getOnlyChild(Node nd) throws WebdavIntfException {
     try {
       return XmlUtil.getOnlyElement(nd);
@@ -896,6 +908,11 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
+  /**
+   * @param el
+   * @return String
+   * @throws WebdavIntfException
+   */
   public String getElementContent(Element el) throws WebdavIntfException {
     try {
       return XmlUtil.getElementContent(el);

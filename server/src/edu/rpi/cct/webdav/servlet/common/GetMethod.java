@@ -234,8 +234,10 @@ public class GetMethod extends MethodBase {
    * listing. We don't need a great deal to start with. It will also allow us to
    * provide stylesheets, images etc. Probably place it in the resources directory.
    *
+   * @param req
    * @param node  WebdavNsNode
    * @return Reader
+   * @throws WebdavException
    */
   protected String generateHtml(HttpServletRequest req,
                                 WebdavNsNode node) throws WebdavException {
@@ -314,17 +316,26 @@ public class GetMethod extends MethodBase {
   private static class Sbuff {
     StringBuffer sb = new StringBuffer();
 
+    /**
+     * @param ss
+     */
     public void lines(String[] ss) {
       for (int i = 0; i < ss.length; i++) {
         line(ss[i]);
       }
     }
 
+    /**
+     * @param s
+     */
     public void line(String s) {
       sb.append(s);
       sb.append("\r\n");
     }
 
+    /**
+     * @param s
+     */
     public void append(String s) {
       sb.append(s);
     }
