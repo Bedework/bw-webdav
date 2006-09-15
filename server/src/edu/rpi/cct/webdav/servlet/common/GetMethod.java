@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import java.io.CharArrayReader;
@@ -94,7 +95,9 @@ public class GetMethod extends MethodBase {
     }
 
     try {
-      WebdavNsNode node = getNsIntf().getNode(getResourceUri(req));
+      WebdavNsNode node = getNsIntf().getNode(getResourceUri(req),
+                                              WebdavNsIntf.existanceMust,
+                                              WebdavNsIntf.nodeTypeUnknown);
 
       if ((node == null) || !node.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

@@ -335,38 +335,58 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract String getLocation(WebdavNsNode node)
       throws WebdavIntfException;
 
+  //ENUM
+
+  /** Must not exist */
+  public static final int existanceNot = 0;
+
+  /** Must exist. */
+  public static final int existanceMust = 1;
+
+  /** We know it exists. */
+  public static final int existanceDoesExist = 2;
+
+  /** May exist */
+  public static final int existanceMay = 3;
+
+  //ENUM
+
+  /** Must be collection */
+  public static final int nodeTypeCollection = 0;
+
+  /** Must be entity. */
+  public static final int nodeTypeEntity = 1;
+
+  /** Unknown. */
+  public static final int nodeTypeUnknown = 2;
+
   /** Retrieves a node by uri, following any links.
    *
    * @param uri              String decoded uri of the node to retrieve
+   * @param existance        Say's something about the state of existance
+   * @param nodeType         Say's something about the type of node
    * @return WebdavNsNode    node specified by the URI or the node aliased by
    *                         the node at the URI.
    * @throws WebdavIntfException
    */
-  public abstract WebdavNsNode getNode(String uri)
+  public abstract WebdavNsNode getNode(String uri,
+                                       int existance,
+                                       int nodeType)
       throws WebdavIntfException;
 
   /** Retrieves a node by encoded uri, following any links. That si the uri
    * will have the usual encoding applied.
    *
    * @param uri              String encoded uri of the node to retrieve
+   * @param existance        Say's something about the state of existance
+   * @param nodeType         Say's something about the type of node
    * @return WebdavNsNode    node specified by the URI or the node aliased by
    *                         the node at the URI.
    * @throws WebdavIntfException
    */
-  public abstract WebdavNsNode getNodeEncoded(String uri)
-      throws WebdavIntfException;
-
-  /** Retrieves a node by URI optionally following the last alias.
-   *
-   * @param uri              String URI of the node to retrieve
-   * @param followAlias      boolean true is we should retrieve the target
-   *                         of the alias if the last element is an alias.
-   *                         otherwise the node itself is returned
-   * @return WebdavNsNode    node specified by the URI or the node aliased by
-   *                         the node at the URI if followAlias is true.
-   * @throws WebdavIntfException
-   */
-  public abstract WebdavNsNode getNode(String uri, boolean followAlias)
+  public abstract WebdavNsNode getNodeEncoded(String uri,
+                                              int existance,
+                                              int nodeType)
       throws WebdavIntfException;
 
   /** Stores/updates an object.

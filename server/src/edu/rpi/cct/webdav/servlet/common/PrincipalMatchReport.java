@@ -188,7 +188,9 @@ public class PrincipalMatchReport {
         wdnodes = intf.principalMatch(resourceUri, this);
       } else {
         // Search for nodes matching the principal-property element.
-        wdnodes = doNodeAndChildren(intf.getNode(resourceUri));
+        wdnodes = doNodeAndChildren(intf.getNode(resourceUri,
+                                                 WebdavNsIntf.existanceMust,
+                                                 WebdavNsIntf.nodeTypeUnknown));
       }
 
       if (wdnodes != null) {

@@ -58,6 +58,7 @@ import org.bedework.davdefs.WebdavTags;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import java.util.ArrayList;
@@ -92,7 +93,9 @@ public class PropPatchMethod extends MethodBase {
     /* Create the node */
     String resourceUri = getResourceUri(req);
 
-    WebdavNsNode node = getNsIntf().getNode(resourceUri);
+    WebdavNsNode node = getNsIntf().getNode(resourceUri,
+                                            WebdavNsIntf.existanceMust,
+                                            WebdavNsIntf.nodeTypeUnknown);
 
     if (doc != null) {
       processDoc(req, doc, node);

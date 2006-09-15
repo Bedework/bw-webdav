@@ -54,6 +54,7 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import java.util.Iterator;
@@ -79,7 +80,9 @@ public class OptionsMethod extends MethodBase {
     }
 
     try {
-      WebdavNsNode node = getNsIntf().getNode(getResourceUri(req));
+      WebdavNsNode node = getNsIntf().getNode(getResourceUri(req),
+                                              WebdavNsIntf.existanceMust,
+                                              WebdavNsIntf.nodeTypeUnknown);
 
       /* Apparently if the node doesn't exist we're supposed to respond
        * not found, rather than indicate if PUT is allowed for example.

@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import javax.servlet.http.HttpServletRequest;
@@ -84,7 +85,9 @@ public class MkcolMethod extends MethodBase {
     /* Create the node */
     String resourceUri = getResourceUri(req);
 
-    WebdavNsNode node = getNsIntf().getNode(resourceUri);
+    WebdavNsNode node = getNsIntf().getNode(resourceUri,
+                                            WebdavNsIntf.existanceNot,
+                                            WebdavNsIntf.nodeTypeCollection);
 
     getNsIntf().makeCollection(req, node);
 

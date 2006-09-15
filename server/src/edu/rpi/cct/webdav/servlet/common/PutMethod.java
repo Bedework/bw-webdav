@@ -80,7 +80,9 @@ public class PutMethod extends MethodBase {
 
     try {
       WebdavNsIntf intf = getNsIntf();
-      WebdavNsNode node = intf.getNode(getResourceUri(req));
+      WebdavNsNode node = intf.getNode(getResourceUri(req),
+                                       WebdavNsIntf.existanceMay,
+                                       WebdavNsIntf.nodeTypeEntity);
 
       if (node == null) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

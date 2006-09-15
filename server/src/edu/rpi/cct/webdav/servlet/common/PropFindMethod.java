@@ -237,7 +237,9 @@ public class PropFindMethod extends MethodBase {
       trace("About to get node at " + resourceUri);
     }
 
-    WebdavNsNode node = getNsIntf().getNode(resourceUri);
+    WebdavNsNode node = getNsIntf().getNode(resourceUri,
+                                            WebdavNsIntf.existanceMust,
+                                            WebdavNsIntf.nodeTypeUnknown);
 
     openTag(WebdavTags.multistatus);
 
