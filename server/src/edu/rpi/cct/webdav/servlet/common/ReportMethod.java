@@ -224,24 +224,18 @@ public class ReportMethod extends MethodBase {
 
           ps.props = intf.parseProp(pschildren[0]);
           ps.match = pschildren[1];
-        } else {
+        } else if (WebdavTags.prop.nodeMatches(curnode)) {
+          pps.pr = pm.parseProps(curnode);
+          preq = pps.pr;
           i++;
 
           if (i < children.length) {
-            pps.pr = pm.tryPropRequest(curnode);
-            preq = pps.pr;
-            if (pps.pr != null) {
-              i++;
+            if (!WebdavTags.applyToPrincipalCollectionSet.nodeMatches(curnode)) {
+              throw new WebdavBadRequest();
             }
 
-            if (i < children.length) {
-              if (!WebdavTags.applyToPrincipalCollectionSet.nodeMatches(curnode)) {
-                throw new WebdavBadRequest();
-              }
-
-              pps.applyToPrincipalCollectionSet = true;
-              i++;
-            }
+            pps.applyToPrincipalCollectionSet = true;
+            i++;
           }
 
           if (i < children.length) {
