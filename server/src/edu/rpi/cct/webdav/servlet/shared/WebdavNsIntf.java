@@ -512,7 +512,8 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param node             node to create
    * @throws WebdavIntfException
    */
-  public abstract void makeCollection(HttpServletRequest req, WebdavNsNode node)
+  public abstract void makeCollection(HttpServletRequest req,
+                                      WebdavNsNode node)
       throws WebdavIntfException;
 
   /* ====================================================================
