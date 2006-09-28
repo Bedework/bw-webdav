@@ -61,8 +61,8 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import java.io.CharArrayReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -76,7 +76,7 @@ import javax.servlet.http.HttpServletResponse;
 public class GetMethod extends MethodBase {
   protected boolean doContent;
 
-  private Vector ranges;
+  private ArrayList ranges;
 
   /** size of buffer used for copying content to response.
    */
