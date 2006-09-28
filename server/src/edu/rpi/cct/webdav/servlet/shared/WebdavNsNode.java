@@ -236,6 +236,17 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract boolean setProperty(Element val) throws WebdavIntfException;
 
+  /** Entity tags are defined in RFC2068 - they are supposed to provide some
+   * sort of indication the data has changed - e.g. a checksum.
+   * <p>There are weak and strong tags
+   *
+   * <p>This methods should return a suitable value for that tag.
+   *
+   * @return String
+   * @throws WebdavIntfException
+   */
+  public abstract String getEtagValue() throws WebdavIntfException;
+
   /* ====================================================================
    *                   Property methods
    * ==================================================================== */

@@ -424,20 +424,6 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract WebdavNsNode getParent(WebdavNsNode node)
       throws WebdavIntfException;
 
-  /** Entity tags are defined in RFC2068 - they are supposed to provide some
-   * sort of indication the data has changed - e.g. a checksum.
-   * <p>There are weak and strong tags
-   *
-   * <p>This methods should return a suitable value for that tag.
-   *
-   * @param node
-   * @param strong
-   * @return String
-   * @throws WebdavIntfException
-   */
-  public abstract String getEtagValue(WebdavNsNode node, boolean strong)
-      throws WebdavIntfException;
-
   /** Returns all the namespace specific properties for the given node
    * Properties that can be supplied by using node values should not be
    * included.
@@ -824,7 +810,7 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public String getEntityTag(WebdavNsNode node, boolean strong)
       throws WebdavException {
-    String val = getEtagValue(node, strong);
+    String val = node.getEtagValue();
 
     if (strong) {
       return "\"" + val + "\"";

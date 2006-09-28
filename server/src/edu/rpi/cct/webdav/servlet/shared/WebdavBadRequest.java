@@ -66,4 +66,12 @@ public class WebdavBadRequest extends WebdavException {
   public WebdavBadRequest() {
     super(HttpServletResponse.SC_BAD_REQUEST);
   }
+
+  /** Constructor
+   *
+   * @param msg
+   */
+  public WebdavBadRequest(String msg) {
+    super(HttpServletResponse.SC_BAD_REQUEST, msg);
+  }
 }
