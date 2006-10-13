@@ -115,7 +115,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Table of methods to be initialised by servlet service method
    */
-  protected HashMap methods = new HashMap();
+  protected HashMap<String, MethodBase> methods = new HashMap<String, MethodBase>();
 
   /** Should we return ok status in multistatus?
    */
@@ -181,7 +181,7 @@ public abstract class WebdavNsIntf implements Serializable {
   /**
    * @return HashMap   methods objects
    */
-  public HashMap getMethods() {
+  public HashMap<String, MethodBase> getMethods() {
     return methods;
   }
 
@@ -520,8 +520,8 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return Collection of WebdavNsNode
    * @throws WebdavIntfException
    */
-  public abstract Collection principalMatch(String resourceUri,
-                                            PrincipalMatchReport pmatch)
+  public abstract Collection<WebdavNsNode> principalMatch(String resourceUri,
+                                                          PrincipalMatchReport pmatch)
           throws WebdavIntfException;
 
   /** Given a uri returns a Collection of uris that allow search operations on
@@ -679,8 +679,8 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return Collection
    * @throws WebdavException
    */
-  public Collection parseProp(Node nd) throws WebdavException {
-    Collection props = new ArrayList();
+  public Collection<WebdavProperty> parseProp(Node nd) throws WebdavException {
+    Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
 
     Element[] children = getChildren(nd);
 

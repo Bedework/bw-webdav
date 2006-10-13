@@ -96,18 +96,7 @@ public class PropFindMethod extends MethodBase {
 
     /** For the prop element we build a Collection of WebdavProperty
      */
-    private Collection props;
-
-    /**
-     * @return Iterator
-     */
-    public Iterator iterateProperties() {
-      if (props == null) {
-        return new ArrayList().iterator();
-      }
-
-      return props.iterator();
-    }
+    public Collection<WebdavProperty> props;
   }
 
   private PropRequest parsedReq;
@@ -316,13 +305,11 @@ public class PropFindMethod extends MethodBase {
    * @throws WebdavException
    */
   private void doPropFind(WebdavNsNode node, PropRequest preq) throws WebdavException {
-    Iterator it = preq.props.iterator();
     WebdavNsIntf intf = getNsIntf();
 
     openTag(WebdavTags.prop);
 
-    while (it.hasNext()) {
-      WebdavProperty pr = (WebdavProperty)it.next();
+    for (WebdavProperty pr: preq.props) {
       addNs(pr.getTag().getNamespaceURI());
       intf.generatePropValue(node, pr);
     }

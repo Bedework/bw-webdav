@@ -66,7 +66,7 @@ public class PrincipalMatchReport {
 
   /** Properties to return (none for empty collection)
    */
-  public Collection props = new ArrayList();
+  public Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
 
   /** Constructor
    *
@@ -182,7 +182,7 @@ public class PrincipalMatchReport {
       xml.openTag(WebdavTags.multistatus);
 
       String resourceUri = mb.getResourceUri(req);
-      Collection wdnodes = null;
+      Collection<WebdavNsNode> wdnodes = null;
 
       if (self) {
         wdnodes = intf.principalMatch(resourceUri, this);
@@ -194,17 +194,10 @@ public class PrincipalMatchReport {
       }
 
       if (wdnodes != null) {
-        Iterator it = wdnodes.iterator();
-
-        while (it.hasNext()) {
-          WebdavNsNode nd = (WebdavNsNode)it.next();
-
+        for (WebdavNsNode nd: wdnodes) {
           intf.addHref(nd);
 
-          Iterator pit = props.iterator();
-          while (pit.hasNext()) {
-            WebdavProperty prop = (WebdavProperty)pit.next();
-
+          for (WebdavProperty prop: props) {
             nd.generatePropertyValue(prop.getTag(), intf);
           }
 
@@ -227,8 +220,9 @@ public class PrincipalMatchReport {
     }
   }
 
-  private Collection doNodeAndChildren(WebdavNsNode node) throws WebdavException {
-    Collection nodes = new ArrayList();
+  private Collection<WebdavNsNode> doNodeAndChildren(WebdavNsNode node)
+          throws WebdavException {
+    Collection<WebdavNsNode> nodes = new ArrayList<WebdavNsNode>();
 
     if (!nodeMatches(node)) {
       // Stop here?

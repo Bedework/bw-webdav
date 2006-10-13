@@ -218,7 +218,7 @@ public abstract class WebdavServlet extends HttpServlet {
    * @throws WebdavException
    */
   public void addMethods(WebdavNsIntf nsIntf) throws WebdavException{
-    HashMap methods = nsIntf.getMethods();
+    HashMap<String, MethodBase> methods = nsIntf.getMethods();
 
     methods.put("ACL", new AclMethod());
     methods.put("COPY", new CopyMethod());

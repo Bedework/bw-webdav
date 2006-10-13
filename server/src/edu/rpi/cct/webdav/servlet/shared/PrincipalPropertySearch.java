@@ -41,7 +41,7 @@ public class PrincipalPropertySearch {
   public static class PropertySearch {
     /**
      */
-    public Collection props;
+    public Collection<WebdavProperty> props;
 
     /**
      */
