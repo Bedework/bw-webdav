@@ -126,7 +126,8 @@ public abstract class WebdavNsNode implements Serializable {
    */
   protected int status = HttpServletResponse.SC_OK;
 
-  private final static Collection propertyNames = new ArrayList();
+  private final static Collection<PropertyTagEntry> propertyNames =
+    new ArrayList<PropertyTagEntry>();
 
   /** */
   public static final class PropertyTagEntry {
@@ -421,15 +422,15 @@ public abstract class WebdavNsNode implements Serializable {
    * @return
    * @throws WebdavIntfException
    */
-  public Collection getPropertyNames()throws WebdavIntfException {
+  public Collection<PropertyTagEntry> getPropertyNames()throws WebdavIntfException {
     if (!isPrincipal()) {
       return propertyNames;
     }
 
-    Collection res = new ArrayList();
+    Collection<PropertyTagEntry> res = new ArrayList<PropertyTagEntry>();
 
     res.addAll(getPropertyNames());
-    res.add(WebdavTags.principalURL);
+    res.add(new PropertyTagEntry(WebdavTags.principalURL));
 
     return res;
   }
