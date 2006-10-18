@@ -50,7 +50,8 @@ public class PrincipalPropertySearch {
 
   /** Collection of PropertySearch objects.
    */
-  public Collection propertySearches = new ArrayList();
+  public Collection<PropertySearch> propertySearches =
+    new ArrayList<PropertySearch>();
 
   /** Properties to be returned
    */
