@@ -71,7 +71,6 @@ import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -252,7 +251,7 @@ public abstract class MethodBase {
 
     StringTokenizer st = new StringTokenizer(decoded, "/");
 
-    ArrayList al = new ArrayList();
+    ArrayList<String> al = new ArrayList<String>();
     while (st.hasMoreTokens()) {
       String s = st.nextToken();
 
@@ -273,10 +272,9 @@ public abstract class MethodBase {
 
     /** Reconstruct */
     StringBuffer sb = new StringBuffer();
-    Iterator it = al.iterator();
-    while (it.hasNext()) {
+    for (String s: al) {
       sb.append('/');
-      sb.append((String)it.next());
+      sb.append(s);
     }
 
     return sb.toString();

@@ -424,17 +424,6 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract WebdavNsNode getParent(WebdavNsNode node)
       throws WebdavIntfException;
 
-  /** Returns all the namespace specific properties for the given node
-   * Properties that can be supplied by using node values should not be
-   * included.
-   *
-   * @param node          node in question
-   * @return Iterator     over proprrties
-   * @throws WebdavIntfException
-   */
-  public abstract Iterator iterateProperties(WebdavNsNode node)
-      throws WebdavIntfException;
-
   /** Returns an InputStream for the content.
    *
    * @param node             node in question

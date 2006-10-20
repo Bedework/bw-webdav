@@ -57,8 +57,6 @@ package edu.rpi.cct.webdav.servlet.shared;
 import edu.rpi.sss.util.xml.QName;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
 
 /** One of these for each property in a request.
  *
@@ -105,54 +103,5 @@ public class WebdavProperty implements Serializable {
    */
   public String getPval() {
     return pval;
-  }
-
-  /** Convenience method to provide an Iterator over these objects
-   *
-   * @param c
-   * @return Iterator
-   */
-  public static Iterator iterator(Collection c) {
-    WebdavProperty[] ps = (WebdavProperty[])c.toArray(
-            new WebdavProperty[c.size()]);
-    return new PropertyIterator(ps);
-  }
-
-  private static class PropertyIterator implements Iterator {
-    WebdavProperty[] ps = null;
-    int index;
-
-    /** Constructor
-     *
-     * @param ps
-     */
-    public PropertyIterator(WebdavProperty[] ps) {
-      this.ps = ps;
-    }
-
-    public boolean hasNext() {
-      if ((ps == null) ||
-          (index >= ps.length)) {
-        return false;
-      }
-
-      return true;
-    }
-
-    public Object next() {
-      if ((ps == null) ||
-          (index >= ps.length)) {
-        return null;
-      }
-
-      WebdavProperty p = ps[index];
-      index++;
-
-      return p;
-    }
-
-    public void remove() {
-      throw new RuntimeException("Unimplemented");
-    }
   }
 }

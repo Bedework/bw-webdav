@@ -65,7 +65,7 @@ public class WebdavStatusCode {
   /** multi-status OK response */
   public final static int SC_MULTI_STATUS = 207;
 
-  private final static HashMap msgtext = new HashMap();
+  private final static HashMap<Integer, String> msgtext = new HashMap<Integer, String>();
 
   static {
     addmsg(SC_MULTI_STATUS, "Multi-Status");
@@ -115,7 +115,7 @@ public class WebdavStatusCode {
   }
 
   private static void addmsg(int sc, String txt) {
-    msgtext.put(new Integer(sc), txt);
+    msgtext.put(sc, txt);
   }
 
   /** Get a message for a code
@@ -124,7 +124,7 @@ public class WebdavStatusCode {
    * @return   String emssage
    */
   public static String getMessage(int sc) {
-    String msg = (String)msgtext.get(new Integer(sc));
+    String msg = msgtext.get(sc);
 
     if (msg == null) {
       msg = String.valueOf(sc);

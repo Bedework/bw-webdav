@@ -63,7 +63,6 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -105,13 +104,13 @@ public class PropPatchMethod extends MethodBase {
   /** List of properties to set
    *
    */
-  public static class PropertySetList extends ArrayList {
+  public static class PropertySetList extends ArrayList<Element> {
   }
 
   /** List of properties to remove
   *
   */
-  public static class PropertyRemoveList extends ArrayList {
+  public static class PropertyRemoveList extends ArrayList<Element> {
   }
 
   /* ====================================================================
@@ -128,18 +127,12 @@ public class PropPatchMethod extends MethodBase {
         throw new WebdavBadRequest();
       }
 
-      Collection setRemoveList = processUpdate(root);
+      Collection<? extends Collection<Element>> setRemoveList = processUpdate(root);
 
-      Iterator it = setRemoveList.iterator();
-      while (it.hasNext()) {
-        Collection sr = (Collection)it.next();
-
+      for (Collection<Element> sr: setRemoveList) {
         boolean setting = sr instanceof PropPatchMethod.PropertySetList;
 
-        Iterator pit = sr.iterator();
-        while (pit.hasNext()) {
-          Element prop = (Element)pit.next();
-
+        for (Element prop: sr) {
           if (setting) {
             node.setProperty(prop);
           } else {
@@ -172,15 +165,15 @@ public class PropPatchMethod extends MethodBase {
    * @return Collection
    * @throws WebdavException
    */
-  protected Collection processUpdate(Element node) throws WebdavException {
-    ArrayList res = new ArrayList();
+  protected Collection<? extends Collection<Element>> processUpdate(Element node) throws WebdavException {
+    ArrayList<Collection<Element>> res = new ArrayList<Collection<Element>>();
 
     try {
       Element[] children = getChildren(node);
 
       for (int i = 0; i < children.length; i++) {
         Element curnode = children[i];
-        Collection plist;
+        PropertySetList plist;
 
         if (WebdavTags.set.nodeMatches(curnode)) {
           plist = new PropertySetList();
@@ -217,7 +210,7 @@ public class PropPatchMethod extends MethodBase {
   /* Process the node which should contain either empty elements for remove or
    * elements with or without values for remove==false
    */
-  private void processPlist(Collection plist, Element node,
+  private void processPlist(Collection<Element> plist, Element node,
                             boolean remove) throws WebdavException {
     Element[] props = getChildren(node);
 
