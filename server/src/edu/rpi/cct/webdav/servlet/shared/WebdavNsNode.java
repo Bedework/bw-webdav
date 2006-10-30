@@ -154,17 +154,21 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   static {
-    addPropEntry(WebdavTags.acl);
+    addPropEntry(WebdavTags.acl, false);
+    // addPropEntry(WebdavTags.aclRestrictons, false);
     addPropEntry(WebdavTags.creationdate);
-    addPropEntry(WebdavTags.currentUserPrivilegeSet);
+    addPropEntry(WebdavTags.currentUserPrivilegeSet, false);
     addPropEntry(WebdavTags.displayname);
     addPropEntry(WebdavTags.getcontentlanguage);
     addPropEntry(WebdavTags.getcontentlength);
     addPropEntry(WebdavTags.getcontenttype);
     addPropEntry(WebdavTags.getlastmodified);
-    addPropEntry(WebdavTags.owner);
+    //addPropEntry(WebdavTags.group, false);
+    //addPropEntry(WebdavTags.inheritedAclSet, false);
+    addPropEntry(WebdavTags.owner, false);
+    //addPropEntry(WebdavTags.principalCollectionSet, false);
     addPropEntry(WebdavTags.resourcetype);
-    addPropEntry(WebdavTags.supportedPrivilegeSet);
+    addPropEntry(WebdavTags.supportedPrivilegeSet, false);
   }
 
   /* ....................................................................
@@ -268,11 +272,13 @@ public abstract class WebdavNsNode implements Serializable {
    *
    * @param tag  QName defining property
    * @param intf WebdavNsIntf
+   * @param allProp    true if we're doing allprop
    * @return boolean   true if emitted
    * @throws WebdavIntfException
    */
   public boolean generatePropertyValue(QName tag,
-                                       WebdavNsIntf intf) throws WebdavIntfException {
+                                       WebdavNsIntf intf,
+                                       boolean allProp) throws WebdavIntfException {
     String ns = tag.getNamespaceURI();
     XmlEmit xml = intf.getXmlEmit();
 
@@ -294,7 +300,7 @@ public abstract class WebdavNsNode implements Serializable {
 
         String val = getCreDate();
         if (val == null) {
-          return false;
+          return true;
         }
 
         xml.property(tag, val);
@@ -324,13 +330,13 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.getcontentlanguage)) {
         // dav 13.3
-        return false;
+        return true;
       }
 
       if (tag.equals(WebdavTags.getcontentlength)) {
         // dav 13.4
         if (!getAllowsGet()) {
-          return false;
+          return true;
         }
         xml.property(tag, String.valueOf(getContentLen()));
         return true;
@@ -339,12 +345,12 @@ public abstract class WebdavNsNode implements Serializable {
       if (tag.equals(WebdavTags.getcontenttype)) {
         // dav 13.5
         if (!getAllowsGet()) {
-          return false;
+          return true;
         }
 
         String val = getContentType();
         if (val == null) {
-          return false;
+          return true;
         }
 
         xml.property(tag, val);
@@ -355,7 +361,7 @@ public abstract class WebdavNsNode implements Serializable {
         // dav 13.7
         String val = getLastmodDate();
         if (val == null) {
-          return false;
+          return true;
         }
 
         xml.property(tag, val);

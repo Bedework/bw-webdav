@@ -198,7 +198,7 @@ public class PrincipalMatchReport {
           intf.addHref(nd);
 
           for (WebdavProperty prop: props) {
-            nd.generatePropertyValue(prop.getTag(), intf);
+            nd.generatePropertyValue(prop.getTag(), intf, false);
           }
 
           intf.addStatus(HttpServletResponse.SC_OK);

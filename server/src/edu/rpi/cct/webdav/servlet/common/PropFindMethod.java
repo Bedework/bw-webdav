@@ -310,7 +310,7 @@ public class PropFindMethod extends MethodBase {
 
     for (WebdavProperty pr: preq.props) {
       addNs(pr.getTag().getNamespaceURI());
-      intf.generatePropValue(node, pr);
+      intf.generatePropValue(node, pr, false);
     }
 
     closeTag(WebdavTags.prop);
@@ -346,13 +346,9 @@ public class PropFindMethod extends MethodBase {
       property(WebdavTags.supportedlock, sl);
     }
 
-    Iterator it = node.getPropertyNames().iterator();
-
-    while (it.hasNext()) {
-      PropertyTagEntry pte = (PropertyTagEntry)it.next();
-
+    for (PropertyTagEntry pte: node.getPropertyNames()) {
       if (pte.inPropAll) {
-        intf.generatePropValue(node, new WebdavProperty(pte.tag, null));
+        intf.generatePropValue(node, new WebdavProperty(pte.tag, null), true);
       }
     }
 
