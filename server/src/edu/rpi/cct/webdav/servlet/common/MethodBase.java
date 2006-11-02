@@ -124,6 +124,40 @@ public abstract class MethodBase {
                                 HttpServletResponse resp)
         throws WebdavException;
 
+  /** Allow servelt to create method.
+   */
+  public static class MethodInfo {
+    private Class methodClass;
+
+    private boolean requiresAuth;
+
+    /**
+     * @param methodClass
+     * @param requiresAuth
+     */
+    public MethodInfo(Class methodClass, boolean requiresAuth) {
+      this.methodClass = methodClass;
+      this.requiresAuth = requiresAuth;
+    }
+
+    /**
+     * @return Class for this method
+     */
+    public Class getMethodClass() {
+      return methodClass;
+    }
+
+    /** Called when servicing a request to determine if this method requires
+     * authentication. Allows the servlet to reject attempts to change state
+     * while unauthenticated.
+     *
+     * @return boolean true if authentication required.
+     */
+    public boolean getRequiresAuth() {
+      return requiresAuth;
+    }
+  }
+
   /** Called at each request
    *
    * @param nsIntf
@@ -147,11 +181,7 @@ public abstract class MethodBase {
 
     init();
   }
-/*
-  public ServletConfig getConfig() {
-    return config;
-  }
-*/
+
   /** Get namespace interface
    *
    * @return WebdavNsIntf

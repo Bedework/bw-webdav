@@ -100,7 +100,8 @@ public class PropFindMethod extends MethodBase {
 
   private PropRequest parsedReq;
 
-  /** Called at each request
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
   public void init() {
   }
@@ -123,6 +124,9 @@ public class PropFindMethod extends MethodBase {
     }
 
     int depth = Headers.depth(req);
+    if (depth == Headers.depthNone) {
+      depth = Headers.depthInfinity;
+    }
 
     if (debug) {
       trace("PropFindMethod: depth=" + depth + " type=" + parsedReq.reqType);

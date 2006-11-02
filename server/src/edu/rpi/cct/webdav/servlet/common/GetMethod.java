@@ -82,7 +82,8 @@ public class GetMethod extends MethodBase {
    */
   private static final int bufferSize = 4096;
 
-  /** Called at each request
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
   public void init() {
     doContent = true;

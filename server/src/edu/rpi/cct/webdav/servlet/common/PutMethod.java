@@ -66,7 +66,8 @@ import javax.servlet.http.HttpServletResponse;
  *   @author Mike Douglass   douglm@rpi.edu
  */
 public class PutMethod extends MethodBase {
-  /** Called at each request
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
   public void init() {
   }

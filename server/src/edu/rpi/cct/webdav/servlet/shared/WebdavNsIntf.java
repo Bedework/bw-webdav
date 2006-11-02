@@ -63,6 +63,7 @@ import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.PrincipalMatchReport;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
+import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 
 import java.io.Reader;
 import java.io.Serializable;
@@ -111,11 +112,17 @@ public abstract class WebdavNsIntf implements Serializable {
   protected String account;
   protected boolean anonymous;
 
+  protected boolean dumpContent;
+
   protected XmlEmit xml;
 
-  /** Table of methods to be initialised by servlet service method
+  /** Table of methods - set by servlet
    */
-  protected HashMap<String, MethodBase> methods = new HashMap<String, MethodBase>();
+  protected HashMap<String, MethodInfo> methods;
+
+  /** Table of created methods
+   */
+  private HashMap<String, MethodBase> createdMethods = new HashMap<String, MethodBase>();
 
   /** Should we return ok status in multistatus?
    */
@@ -130,17 +137,23 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param req
    * @param props
    * @param debug
+   * @param methods    HashMap   table of method info
+   * @param dumpContent
    * @throws WebdavIntfException
    */
   public void init(WebdavServlet servlet,
                    HttpServletRequest req,
                    Properties props,
-                   boolean debug) throws WebdavIntfException {
+                   boolean debug,
+                   HashMap<String, MethodInfo> methods,
+                   boolean dumpContent) throws WebdavIntfException {
     this.servlet = servlet;
     this.req = req;
     this.props = props;
     this.xml = new XmlEmit();
     this.debug = debug;
+    this.methods = methods;
+    this.dumpContent = dumpContent;
 
     account = req.getRemoteUser();
     anonymous = (account == null) || (account.length() == 0);
@@ -179,10 +192,46 @@ public abstract class WebdavNsIntf implements Serializable {
   }
 
   /**
-   * @return HashMap   methods objects
+   * @return Collection of method names.
    */
-  public HashMap<String, MethodBase> getMethods() {
-    return methods;
+  public Collection<String> getMethodNames() {
+    return methods.keySet();
+  }
+
+  /** Return the named initialised method or null if no such method or the
+   * method requires authentication and we are anonymous
+   *
+   * @param name  name
+   * @return MethodBase object or null
+   * @throws WebdavIntfException
+   */
+  public MethodBase getMethod(String name) throws WebdavIntfException {
+    name = name.toUpperCase();
+    MethodBase mb = createdMethods.get(name);
+    if (mb != null) {
+      return mb;
+    }
+
+    MethodInfo mi = methods.get(name);
+
+    if ((mi == null) || getAnonymous() && mi.getRequiresAuth()) {
+      return null;
+    }
+
+    try {
+      mb = (MethodBase)mi.getMethodClass().newInstance();
+
+      mb.init(this, debug, dumpContent);
+
+      createdMethods.put(name, mb);
+
+      return mb;
+    } catch (Throwable t) {
+      if (debug) {
+        error(t);
+      }
+      throw new WebdavIntfException(t);
+    }
   }
 
   /**
@@ -253,14 +302,6 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public WebdavServlet getServlet() {
     return servlet;
-  }
-
-  /**
-   * @param name
-   * @return MethodBase
-   */
-  public MethodBase findMethod(String name) {
-    return (MethodBase)getMethods().get(name);
   }
 
   /**

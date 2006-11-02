@@ -62,7 +62,8 @@ public class ReportMethod extends MethodBase {
 
   protected PropFindMethod pm;
 
-  /** Called at each request
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
   public void init() {
   }
@@ -76,7 +77,7 @@ public class ReportMethod extends MethodBase {
     /* Get hold of the PROPFIND method instance - we need it to process
        possible prop requests.
      */
-    pm = (PropFindMethod)getNsIntf().findMethod(WebdavMethods.propFind);
+    pm = (PropFindMethod)getNsIntf().getMethod("PROPFIND");
 
     if (pm == null) {
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

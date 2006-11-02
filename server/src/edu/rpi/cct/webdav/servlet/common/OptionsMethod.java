@@ -57,7 +57,6 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
-import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -68,7 +67,8 @@ import javax.servlet.http.HttpServletResponse;
  *   @author Mike Douglass   douglm@rpi.edu
  */
 public class OptionsMethod extends MethodBase {
-  /** Called at each request
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
   public void init() {
   }
@@ -100,13 +100,12 @@ public class OptionsMethod extends MethodBase {
       // This probably needs changes
 
       StringBuffer methods = new StringBuffer();
-      Iterator mnames = getNsIntf().getMethods().keySet().iterator();
-      while (mnames.hasNext()) {
+      for (String name: getNsIntf().getMethodNames()) {
         if (methods.length() > 0) {
           methods.append(", ");
         }
 
-        methods.append(mnames.next());
+        methods.append(name);
       }
 
       resp.addHeader("Allow", methods.toString());

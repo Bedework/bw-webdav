@@ -154,21 +154,21 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   static {
-    addPropEntry(WebdavTags.acl, false);
-    // addPropEntry(WebdavTags.aclRestrictons, false);
-    addPropEntry(WebdavTags.creationdate);
-    addPropEntry(WebdavTags.currentUserPrivilegeSet, false);
-    addPropEntry(WebdavTags.displayname);
-    addPropEntry(WebdavTags.getcontentlanguage);
-    addPropEntry(WebdavTags.getcontentlength);
-    addPropEntry(WebdavTags.getcontenttype);
-    addPropEntry(WebdavTags.getlastmodified);
-    //addPropEntry(WebdavTags.group, false);
-    //addPropEntry(WebdavTags.inheritedAclSet, false);
-    addPropEntry(WebdavTags.owner, false);
-    //addPropEntry(WebdavTags.principalCollectionSet, false);
-    addPropEntry(WebdavTags.resourcetype);
-    addPropEntry(WebdavTags.supportedPrivilegeSet, false);
+    addPropEntry(propertyNames, WebdavTags.acl, false);
+    // addPropEntry(propertyNames, WebdavTags.aclRestrictons, false);
+    addPropEntry(propertyNames, WebdavTags.creationdate);
+    addPropEntry(propertyNames, WebdavTags.currentUserPrivilegeSet, false);
+    addPropEntry(propertyNames, WebdavTags.displayname);
+    addPropEntry(propertyNames, WebdavTags.getcontentlanguage);
+    addPropEntry(propertyNames, WebdavTags.getcontentlength);
+    addPropEntry(propertyNames, WebdavTags.getcontenttype);
+    addPropEntry(propertyNames, WebdavTags.getlastmodified);
+    //addPropEntry(propertyNames, WebdavTags.group, false);
+    //addPropEntry(propertyNames, WebdavTags.inheritedAclSet, false);
+    addPropEntry(propertyNames, WebdavTags.owner, false);
+    //addPropEntry(propertyNames, WebdavTags.principalCollectionSet, false);
+    addPropEntry(propertyNames, WebdavTags.resourcetype);
+    addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet, false);
   }
 
   /* ....................................................................
@@ -435,7 +435,7 @@ public abstract class WebdavNsNode implements Serializable {
 
     Collection<PropertyTagEntry> res = new ArrayList<PropertyTagEntry>();
 
-    res.addAll(getPropertyNames());
+    res.addAll(propertyNames);
     res.add(new PropertyTagEntry(WebdavTags.principalURL));
 
     return res;
@@ -711,11 +711,13 @@ public abstract class WebdavNsNode implements Serializable {
     getLogger().info(msg);
   }
 
-  protected static void addPropEntry(QName tag) {
+  protected static void addPropEntry(Collection<PropertyTagEntry> propertyNames,
+                                     QName tag) {
     propertyNames.add(new PropertyTagEntry(tag));
   }
 
-  protected static void addPropEntry(QName tag, boolean inAllProp) {
+  protected static void addPropEntry(Collection<PropertyTagEntry> propertyNames,
+                                     QName tag, boolean inAllProp) {
     propertyNames.add(new PropertyTagEntry(tag, inAllProp));
   }
 

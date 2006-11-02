@@ -54,6 +54,7 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
+import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.sss.util.servlets.io.CharArrayWrappedResponse;
@@ -62,7 +63,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -90,23 +90,33 @@ public abstract class WebdavServlet extends HttpServlet {
    */
   protected Properties props;
 
+  /** Table of methods - set at init
+   */
+  protected HashMap<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
+
   /** Some sort of identifying string for logging
    *
    * @return String id
    */
   public abstract String getId();
 
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+
+    dumpContent = "true".equals(config.getInitParameter("dumpContent"));
+
+    getResources(config);
+
+    addMethods();
+  }
+
   /** Get an interface for the namespace
    *
    * @param req       HttpServletRequest
-   * @param config    ServletConfig
-   * @param props     Properties
    * @return WebdavNsIntf  or subclass of
    * @throws WebdavException
    */
-  public abstract WebdavNsIntf getNsIntf(HttpServletRequest req,
-                                         ServletConfig config,
-                                         Properties props)
+  public abstract WebdavNsIntf getNsIntf(HttpServletRequest req)
       throws WebdavException;
 
   protected void service(HttpServletRequest req,
@@ -125,22 +135,16 @@ public abstract class WebdavServlet extends HttpServlet {
         dumpRequest(req);
       }
 
-      intf = getNsIntf(req, getServletConfig(), props);
-
-      intf.init(this, req, props, debug);
-
-      initMethods(intf, debug, dumpContent);
+      intf = getNsIntf(req);
 
       if (dumpContent) {
         resp = new CharArrayWrappedResponse(resp,
                                             getLogger(), debug);
       }
 
-      // resp.setStatus(HttpServletResponse.SC_OK);
-
       String methodName = req.getMethod();
 
-      MethodBase method = (MethodBase)intf.getMethods().get(methodName.toUpperCase());
+      MethodBase method = intf.getMethod(methodName);
 
       resp.addHeader("DAV", intf.getDavHeader());
 
@@ -189,63 +193,26 @@ public abstract class WebdavServlet extends HttpServlet {
     }
   }
 
-  /** Init the methods.
-   *
-   * @param nsIntf
-   * @param debug
-   * @param dumpContent
-   * @throws WebdavException
-   */
-  public void initMethods(WebdavNsIntf nsIntf,
-                          boolean debug,
-                          boolean dumpContent) throws WebdavException{
-    HashMap methods = nsIntf.getMethods();
-    addMethods(nsIntf);
-
-    Iterator mnames = methods.keySet().iterator();
-    while (mnames.hasNext()) {
-      MethodBase mb = (MethodBase)methods.get(mnames.next());
-
-      if (mb != null) {
-        mb.init(nsIntf, debug, dumpContent);
-      }
-    }
-  }
-
   /** Add methods for this namespace
    *
-   * @param nsIntf
-   * @throws WebdavException
    */
-  public void addMethods(WebdavNsIntf nsIntf) throws WebdavException{
-    HashMap<String, MethodBase> methods = nsIntf.getMethods();
+  protected void addMethods() {
+    methods.put("ACL", new MethodInfo(AclMethod.class, false));
+    methods.put("COPY", new MethodInfo(CopyMethod.class, false));
+    methods.put("GET", new MethodInfo(GetMethod.class, false));
+    methods.put("HEAD", new MethodInfo(HeadMethod.class, false));
+    methods.put("OPTIONS", new MethodInfo(OptionsMethod.class, false));
+    methods.put("PROPFIND", new MethodInfo(PropFindMethod.class, false));
 
-    methods.put("ACL", new AclMethod());
-    methods.put("COPY", new CopyMethod());
-    methods.put("GET", new GetMethod());
-    methods.put("HEAD", new HeadMethod());
-    methods.put("OPTIONS", new OptionsMethod());
-    methods.put("PROPFIND", new PropFindMethod());
+    methods.put("DELETE", new MethodInfo(DeleteMethod.class, true));
+    methods.put("MKCOL", new MethodInfo(MkcolMethod.class, true));
+    methods.put("MOVE", new MethodInfo(MoveMethod.class, true));
+    methods.put("POST", new MethodInfo(PostMethod.class, true));
+    methods.put("PROPPATCH", new MethodInfo(PropPatchMethod.class, true));
+    methods.put("PUT", new MethodInfo(PutMethod.class, true));
 
-    if (!nsIntf.getAnonymous()) {
-      methods.put("DELETE", new DeleteMethod());
-      methods.put("MKCOL", new MkcolMethod());
-      methods.put("MOVE", new MoveMethod());
-      methods.put("POST", new PostMethod());
-      methods.put("PROPPATCH", new PropPatchMethod());
-      methods.put("PUT", new PutMethod());
-
-      //methods.put("LOCK", new LockMethod());
-      //methods.put("UNLOCK", new UnlockMethod());
-    }
-  }
-
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-
-    dumpContent = "true".equals(config.getInitParameter("dumpContent"));
-
-    getResources(config);
+    //methods.put("LOCK", new MethodInfo(LockMethod.class, true));
+    //methods.put("UNLOCK", new MethodInfo(UnlockMethod.class, true));
   }
 
   private void getResources(ServletConfig config) throws ServletException {
