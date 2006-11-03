@@ -342,6 +342,9 @@ public class PropFindMethod extends MethodBase {
    */
   private int doPropAll(WebdavNsNode node) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
+
+    openTag(WebdavTags.prop);
+
     doLockDiscovery(node);
 
     String sl = getNsIntf().getSupportedLocks();
@@ -355,6 +358,8 @@ public class PropFindMethod extends MethodBase {
         intf.generatePropValue(node, new WebdavProperty(pte.tag, null), true);
       }
     }
+
+    closeTag(WebdavTags.prop);
 
     return HttpServletResponse.SC_OK;
   }
