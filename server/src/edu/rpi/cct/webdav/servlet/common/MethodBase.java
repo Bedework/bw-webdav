@@ -534,20 +534,6 @@ public abstract class MethodBase {
     }
   }
 
-  /** Entity tags are defined in RFC2068 - they are supposed to provide some
-   * sort of indication the data has changed - e.g. a checksum.
-   * <p>There are weak and strong tags
-   *
-   * @param node
-   * @param strong
-   * @return String tag
-   * @throws WebdavException
-   */
-  protected String getEntityTag(WebdavNsNode node, boolean strong)
-      throws WebdavException {
-    return getNsIntf().getEntityTag(node, strong);
-  }
-
   /* ====================================================================
    *                   XmlUtil wrappers
    * ==================================================================== */

@@ -765,12 +765,6 @@ public abstract class WebdavNsIntf implements Serializable {
         return HttpServletResponse.SC_NOT_FOUND;
       }
 
-      if (tag.equals(WebdavTags.getetag)) {
-        // dav 13.6
-        xml.property(tag, getEntityTag(node, true));
-        return status;
-      }
-
       if (tag.equals(WebdavTags.lockdiscovery)) {
         // dav 13.8
         xml.emptyTag(tag);
@@ -828,26 +822,6 @@ public abstract class WebdavNsIntf implements Serializable {
     } catch (Throwable t) {
       throw new WebdavIntfException(t);
     }
-  }
-
-  /** Entity tags are defined in RFC2068 - they are supposed to provide some
-   * sort of indication the data has changed - e.g. a checksum.
-   * <p>There are weak and strong tags
-   *
-   * @param node
-   * @param strong
-   * @return String tag
-   * @throws WebdavException
-   */
-  public String getEntityTag(WebdavNsNode node, boolean strong)
-      throws WebdavException {
-    String val = node.getEtagValue();
-
-    if (strong) {
-      return "\"" + val + "\"";
-    }
-
-    return "W/\"" + val + "\"";
   }
 
   /** xml rpivilege tags */

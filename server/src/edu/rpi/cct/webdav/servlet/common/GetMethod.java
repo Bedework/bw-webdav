@@ -134,7 +134,7 @@ public class GetMethod extends MethodBase {
         out = null;
       }
 
-      resp.setHeader("ETag", getEntityTag(node, true));
+      resp.setHeader("ETag", node.getEtagValue(true));
 
       if (node.getLastmodDate() != null) {
         resp.addHeader("Last-Modified", node.getLastmodDate().toString());
@@ -252,14 +252,14 @@ public class GetMethod extends MethodBase {
                              "  <head>"});
       /* Need some styles I guess */
       sb.append("    <title>");
-      sb.append(node.getName());
+      sb.append(node.getDisplayname());
       sb.line("</title>");
 
       sb.lines(new String[] {"</head>",
                              "<body>"});
 
       sb.append("    <h1>");
-      sb.append(node.getName());
+      sb.append(node.getDisplayname());
       sb.line("</h1>");
 
       sb.line("  <hr>");
@@ -288,7 +288,7 @@ public class GetMethod extends MethodBase {
         sb.append(req.getContextPath());
         sb.append(child.getUri());
         sb.append("\">");
-        sb.append(child.getName());
+        sb.append(child.getDisplayname());
         sb.line("</a>");
         sb.line("</td>");
 

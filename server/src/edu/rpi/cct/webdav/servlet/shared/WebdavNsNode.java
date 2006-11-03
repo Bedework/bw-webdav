@@ -66,6 +66,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.bedework.davdefs.WebdavTags;
@@ -95,15 +96,7 @@ public abstract class WebdavNsNode implements Serializable {
 
   /** Suitable for display
    */
-  protected String name;
-
-  /** ISO format creation date
-   */
-  protected String creDate;
-
-  protected String lastmodDate;
-
-  //  ????? locks??????
+  //protected String name;
 
   /** True if this node is a collection
    */
@@ -126,8 +119,8 @@ public abstract class WebdavNsNode implements Serializable {
    */
   protected int status = HttpServletResponse.SC_OK;
 
-  private final static Collection<PropertyTagEntry> propertyNames =
-    new ArrayList<PropertyTagEntry>();
+  private final static HashMap<QName, PropertyTagEntry> propertyNames =
+    new HashMap<QName, PropertyTagEntry>();
 
   /** */
   public static final class PropertyTagEntry {
@@ -162,6 +155,7 @@ public abstract class WebdavNsNode implements Serializable {
     addPropEntry(propertyNames, WebdavTags.getcontentlanguage);
     addPropEntry(propertyNames, WebdavTags.getcontentlength);
     addPropEntry(propertyNames, WebdavTags.getcontenttype);
+    addPropEntry(propertyNames, WebdavTags.getetag);
     addPropEntry(propertyNames, WebdavTags.getlastmodified);
     //addPropEntry(propertyNames, WebdavTags.group, false);
     //addPropEntry(propertyNames, WebdavTags.inheritedAclSet, false);
@@ -170,17 +164,6 @@ public abstract class WebdavNsNode implements Serializable {
     addPropEntry(propertyNames, WebdavTags.resourcetype);
     addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet, false);
   }
-
-  /* ....................................................................
-   *                   Content fields
-   * We assume these get filled in when we get the content.
-   * .................................................................... */
-
-  protected String contentLang;
-
-  protected int contentLen;
-
-  protected String contentType;
 
   /* ....................................................................
    *                   Alias fields
@@ -204,20 +187,6 @@ public abstract class WebdavNsNode implements Serializable {
    *                   Abstract methods
    * ==================================================================== */
 
-  /** Set the owner
-   *
-   * @param val
-   * @throws WebdavIntfException
-   */
-  public abstract void setOwner(String val) throws WebdavIntfException;
-
-  /** Should return a value suitable for WebdavNsIntf.makeUserHref
-   *
-   * @return String owner
-   * @throws WebdavIntfException
-   */
-  public abstract String getOwner() throws WebdavIntfException;
-
   /** Get the current access granted to this principal for this node.
    *
    * @return CurrentAccess
@@ -240,17 +209,6 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavIntfException
    */
   public abstract boolean setProperty(Element val) throws WebdavIntfException;
-
-  /** Entity tags are defined in RFC2068 - they are supposed to provide some
-   * sort of indication the data has changed - e.g. a checksum.
-   * <p>There are weak and strong tags
-   *
-   * <p>This methods should return a suitable value for that tag.
-   *
-   * @return String
-   * @throws WebdavIntfException
-   */
-  public abstract String getEtagValue() throws WebdavIntfException;
 
   /* ====================================================================
    *                   Property methods
@@ -323,13 +281,17 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.displayname)) {
         // dav 13.2
-        xml.property(tag, getName());
+        xml.property(tag, getDisplayname());
 
         return true;
       }
 
       if (tag.equals(WebdavTags.getcontentlanguage)) {
         // dav 13.3
+        if (!getAllowsGet()) {
+          return true;
+        }
+        xml.property(tag, String.valueOf(getContentLang()));
         return true;
       }
 
@@ -354,6 +316,12 @@ public abstract class WebdavNsNode implements Serializable {
         }
 
         xml.property(tag, val);
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.getetag)) {
+        // dav 13.6
+        xml.property(tag, getEtagValue(true));
         return true;
       }
 
@@ -430,12 +398,12 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public Collection<PropertyTagEntry> getPropertyNames()throws WebdavIntfException {
     if (!isPrincipal()) {
-      return propertyNames;
+      return propertyNames.values();
     }
 
     Collection<PropertyTagEntry> res = new ArrayList<PropertyTagEntry>();
 
-    res.addAll(propertyNames);
+    res.addAll(propertyNames.values());
     res.add(new PropertyTagEntry(WebdavTags.principalURL));
 
     return res;
@@ -493,60 +461,6 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   /**
-   * @param val String credate
-   * @throws WebdavIntfException
-   */
-  public void setCreDate(String val) throws WebdavIntfException {
-    init(false);
-    creDate = val;
-  }
-
-  /**
-   * @return String credate
-   * @throws WebdavIntfException
-   */
-  public String getCreDate() throws WebdavIntfException {
-    init(false);
-    return creDate;
-  }
-
-  /**
-   * @param val String last mod date
-   * @throws WebdavIntfException
-   */
-  public void setLastmodDate(String val) throws WebdavIntfException {
-    init(false);
-    lastmodDate = val;
-  }
-
-  /**
-   * @return String last mod date
-   * @throws WebdavIntfException
-   */
-  public String getLastmodDate() throws WebdavIntfException {
-    init(false);
-    return lastmodDate;
-  }
-
-  /**
-   * @param val String name
-   * @throws WebdavIntfException
-   */
-  public void setName(String val) throws WebdavIntfException {
-    init(false);
-    name = val;
-  }
-
-  /**
-   * @return String name
-   * @throws WebdavIntfException
-   */
-  public String getName() throws WebdavIntfException {
-    init(false);
-    return name;
-  }
-
-  /**
    * @param val boolean true for a collection
    * @throws WebdavIntfException
    */
@@ -593,61 +507,6 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   /**
-   * @param val String lang
-   * @throws WebdavIntfException
-   */
-  public void setContentLang(String val) throws WebdavIntfException {
-    init(false);
-    contentLang = val;
-  }
-
-  /**
-   * @return String lang
-   * @throws WebdavIntfException
-   */
-  public String getContentLang() throws WebdavIntfException {
-    init(false);
-    return contentLang;
-  }
-
-  /**
-   * @param val int content length
-   * @throws WebdavIntfException
-   */
-  public void setContentLen(int val) throws WebdavIntfException {
-    init(true);
-    contentLen = val;
-  }
-
-  /**
-   * @return int content length
-   * @throws WebdavIntfException
-   */
-  public int getContentLen() throws WebdavIntfException {
-    init(true);
-    return contentLen;
-  }
-
-  /**
-   * @param val String content type
-   * @throws WebdavIntfException
-   */
-  public void setContentType(String val) throws WebdavIntfException {
-    init(false);
-    contentType = val;
-  }
-
-  /** A content type of null implies no content (or we don't know)
-   *
-   * @return String content type
-   * @throws WebdavIntfException
-   */
-  public String getContentType() throws WebdavIntfException {
-    init(false);
-    return contentType;
-  }
-
-  /**
    * @param val
    * @throws WebdavIntfException
    */
@@ -683,6 +542,66 @@ public abstract class WebdavNsNode implements Serializable {
     return targetUri;
   }
 
+  /* ====================================================================
+   *                   Required webdav properties
+   * ==================================================================== */
+
+  /**
+   * @return String lang
+   * @throws WebdavIntfException
+   */
+  public abstract String getContentLang() throws WebdavIntfException;
+
+  /**
+   * @return int content length
+   * @throws WebdavIntfException
+   */
+  public abstract int getContentLen() throws WebdavIntfException;
+
+  /** A content type of null implies no content (or we don't know)
+   *
+   * @return String content type
+   * @throws WebdavIntfException
+   */
+  public abstract String getContentType() throws WebdavIntfException;
+
+  /**
+   * @return String credate
+   * @throws WebdavIntfException
+   */
+  public abstract String getCreDate() throws WebdavIntfException;
+
+  /**
+   * @return String name
+   * @throws WebdavIntfException
+   */
+  public abstract String getDisplayname() throws WebdavIntfException;
+
+  /** Entity tags are defined in RFC2068 - they are supposed to provide some
+   * sort of indication the data has changed - e.g. a checksum.
+   * <p>There are weak and strong tags
+   *
+   * <p>This methods should return a suitable value for that tag.
+   *
+   * @param strong
+   * @return String
+   * @throws WebdavIntfException
+   */
+  public abstract String getEtagValue(boolean strong) throws WebdavIntfException;
+
+  /**
+   * @return String last mod date
+   * @throws WebdavIntfException
+   */
+  public abstract String getLastmodDate() throws WebdavIntfException;
+
+  /** Should return a value suitable for WebdavNsIntf.makeUserHref
+   *
+   * @return String owner
+   * @throws WebdavIntfException
+   */
+  public abstract String getOwner() throws WebdavIntfException;
+
   /* ********************************************************************
    *                        Protected methods
    * ******************************************************************** */
@@ -711,14 +630,14 @@ public abstract class WebdavNsNode implements Serializable {
     getLogger().info(msg);
   }
 
-  protected static void addPropEntry(Collection<PropertyTagEntry> propertyNames,
+  protected static void addPropEntry(HashMap<QName, PropertyTagEntry> propertyNames,
                                      QName tag) {
-    propertyNames.add(new PropertyTagEntry(tag));
+    propertyNames.put(tag, new PropertyTagEntry(tag));
   }
 
-  protected static void addPropEntry(Collection<PropertyTagEntry> propertyNames,
+  protected static void addPropEntry(HashMap<QName, PropertyTagEntry> propertyNames,
                                      QName tag, boolean inAllProp) {
-    propertyNames.add(new PropertyTagEntry(tag, inAllProp));
+    propertyNames.put(tag, new PropertyTagEntry(tag, inAllProp));
   }
 
   /* ********************************************************************

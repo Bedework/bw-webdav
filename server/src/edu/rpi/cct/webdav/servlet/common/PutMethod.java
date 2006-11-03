@@ -108,7 +108,8 @@ public class PutMethod extends MethodBase {
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
       }
       resp.setContentLength(0);
-      resp.setHeader("ETag", getEntityTag(pcr.node, true));
+
+      resp.setHeader("ETag", node.getEtagValue(true));
       resp.setHeader("Location", intf.getLocation(pcr.node));
 
     } catch (WebdavException we) {
