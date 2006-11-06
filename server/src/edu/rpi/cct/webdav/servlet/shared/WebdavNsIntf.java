@@ -150,7 +150,7 @@ public abstract class WebdavNsIntf implements Serializable {
     this.servlet = servlet;
     this.req = req;
     this.props = props;
-    this.xml = new XmlEmit(false, true /* try with no default namespace */);
+    this.xml = new XmlEmit();
     this.debug = debug;
     this.methods = methods;
     this.dumpContent = dumpContent;
