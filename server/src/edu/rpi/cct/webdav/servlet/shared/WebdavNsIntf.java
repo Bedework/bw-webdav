@@ -452,7 +452,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return Iterator        over WebdavNsNode children
    * @throws WebdavIntfException
    */
-  public abstract Iterator getChildren(WebdavNsNode node)
+  public abstract Iterator<WebdavNsNode> getChildren(WebdavNsNode node)
       throws WebdavIntfException;
 
   /** Returns the parent of a node.
@@ -582,6 +582,13 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavIntfException
    */
   public abstract String makeUserHref(String id) throws WebdavIntfException;
+
+  /**
+   * @param id
+   * @return String href
+   * @throws WebdavIntfException
+   */
+  public abstract String makeGroupHref(String id) throws WebdavIntfException;
 
   /** Object class passed around as we parse access.
    */

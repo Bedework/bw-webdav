@@ -96,6 +96,9 @@ public class GetMethod extends MethodBase {
     }
 
     try {
+      //String reqContentType = req.getContentType();
+      //boolean reqHtml = "text/html".equals(reqContentType);
+
       WebdavNsNode node = getNsIntf().getNode(getResourceUri(req),
                                               WebdavNsIntf.existanceMust,
                                               WebdavNsIntf.nodeTypeUnknown);
@@ -268,11 +271,10 @@ public class GetMethod extends MethodBase {
               "cellspacing=\"0\"" +
               " cellpadding=\"4\"");
 
-      Iterator children = getNsIntf().getChildren(node);
+      Iterator<WebdavNsNode> children = getNsIntf().getChildren(node);
 
       while (children.hasNext()) {
-        WebdavNsNode child = (WebdavNsNode)children.next();
-
+        WebdavNsNode child = children.next();
         /* icon would be nice */
 
         sb.line("<tr>");
