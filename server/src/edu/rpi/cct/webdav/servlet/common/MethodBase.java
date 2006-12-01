@@ -546,7 +546,7 @@ public abstract class MethodBase {
         getLogger().error(this, t);
       }
 
-      throw new WebdavException(t);
+      throw new WebdavBadRequest(t.getMessage());
     }
   }
 
@@ -558,7 +558,7 @@ public abstract class MethodBase {
         getLogger().error(this, t);
       }
 
-      throw new WebdavException(t);
+      throw new WebdavBadRequest(t.getMessage());
     }
   }
 
@@ -570,7 +570,7 @@ public abstract class MethodBase {
         getLogger().error(this, t);
       }
 
-      throw new WebdavException(t);
+      throw new WebdavBadRequest(t.getMessage());
     }
   }
 

@@ -288,7 +288,7 @@ public abstract class WebdavNsIntf implements Serializable {
         throw new WebdavIntfException("bad URI " + href);
       }
 
-      return path.substring(pos + 1);
+      return path.substring(pos);
     } catch (Throwable t) {
       if (debug) {
         error(t);
