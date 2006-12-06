@@ -557,7 +557,6 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Given a uri returns a Collection of uris that allow search operations on
    * principals for that resource.
    *
-   * @param req
    * @param resourceUri
    * @return Collection of String
    * @throws WebdavIntfException
@@ -894,7 +893,7 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Get all the children if any
    *
    * @param nd
-   * @return
+   * @return array of Element
    * @throws WebdavIntfException
    */
   public Element[] getChildren(Node nd) throws WebdavIntfException {
