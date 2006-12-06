@@ -127,7 +127,7 @@ public abstract class WebdavNsNode implements Serializable {
     /** */
     public QName tag;
     /** */
-    public boolean inPropAll = true;
+    public boolean inPropAll = false;
 
     /**
      * @param tag
@@ -147,22 +147,22 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   static {
-    addPropEntry(propertyNames, WebdavTags.acl, false);
+    addPropEntry(propertyNames, WebdavTags.acl);
     // addPropEntry(propertyNames, WebdavTags.aclRestrictons, false);
-    addPropEntry(propertyNames, WebdavTags.creationdate);
-    addPropEntry(propertyNames, WebdavTags.currentUserPrivilegeSet, false);
-    addPropEntry(propertyNames, WebdavTags.displayname);
-    addPropEntry(propertyNames, WebdavTags.getcontentlanguage);
-    addPropEntry(propertyNames, WebdavTags.getcontentlength);
-    addPropEntry(propertyNames, WebdavTags.getcontenttype);
-    addPropEntry(propertyNames, WebdavTags.getetag);
-    addPropEntry(propertyNames, WebdavTags.getlastmodified);
+    addPropEntry(propertyNames, WebdavTags.creationdate, true);
+    addPropEntry(propertyNames, WebdavTags.currentUserPrivilegeSet);
+    addPropEntry(propertyNames, WebdavTags.displayname, true);
+    addPropEntry(propertyNames, WebdavTags.getcontentlanguage, true);
+    addPropEntry(propertyNames, WebdavTags.getcontentlength, true);
+    addPropEntry(propertyNames, WebdavTags.getcontenttype, true);
+    addPropEntry(propertyNames, WebdavTags.getetag, true);
+    addPropEntry(propertyNames, WebdavTags.getlastmodified, true);
     //addPropEntry(propertyNames, WebdavTags.group, false);
     //addPropEntry(propertyNames, WebdavTags.inheritedAclSet, false);
-    addPropEntry(propertyNames, WebdavTags.owner, false);
+    addPropEntry(propertyNames, WebdavTags.owner);
     //addPropEntry(propertyNames, WebdavTags.principalCollectionSet, false);
-    addPropEntry(propertyNames, WebdavTags.resourcetype);
-    addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet, false);
+    addPropEntry(propertyNames, WebdavTags.resourcetype, true);
+    addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet);
   }
 
   /* ....................................................................
