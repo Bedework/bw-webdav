@@ -6,6 +6,7 @@
 -->
 
 <project name="bedework.webdav" default="bld.all">
+  <property environment="env"/>
 
   <!-- These may already be set from calling dir -->
   <dirname property="org.bedework.project.webdav" file="${ant.file}"/>
@@ -127,11 +128,12 @@
 
   <target name="javadoc" depends="init"
           description="Create Javadoc API documentation">
+    <property name="destdir" location="${dist.home}/docs/api"/>
+    <mkdir dir="${destdir}"/>
 
-    <mkdir dir="${dist.home}/docs/api"/>
     <javadoc sourcepath="${org.bedework.webdavserver.base}/src:"
            classpathref="compile.classpath"
-                destdir="${dist.home}/docs/api"
+                destdir="${destdir}"
            packagenames="org.bedework.*,
                          edu.rpi.*"
                  access="public"
@@ -141,6 +143,10 @@
             windowtitle="${project.name} ${project.version} API Documentation">
       <doctitle><![CDATA[${project.name} ${project.version}<br/>API Documentation]]></doctitle>
       <header><![CDATA[${project.name} ${project.version}<br/>API Documentation]]></header>
+      <link href="../../access/api" />
+      <link href="../../davutil/api" />
+      <link href="../../rpiutil/api" />
+      <link href="${env.JAVA_HOME}/docs/api" />
     </javadoc>
   </target>
 
