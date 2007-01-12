@@ -185,9 +185,11 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Return DAV header
    *
+   * @param node
    * @return  String
+   * @throws WebdavIntfException
    */
-  public String getDavHeader() {
+  public String getDavHeader(WebdavNsNode node) throws WebdavIntfException {
     return "1";
   }
 

@@ -92,7 +92,7 @@ public class OptionsMethod extends MethodBase {
         return;
       }
 
-      addDavHeader(resp);
+      addDavHeader(resp, node);
 
       // Lisa say's we need this
       resp.addHeader("MS-Author-Via", "DAV");
@@ -116,8 +116,9 @@ public class OptionsMethod extends MethodBase {
     }
   }
 
-  protected void addDavHeader(HttpServletResponse resp) throws WebdavException {
-    resp.addHeader("DAV", getNsIntf().getDavHeader());
+  protected void addDavHeader(HttpServletResponse resp,
+                              WebdavNsNode node) throws WebdavException {
+    resp.addHeader("DAV", getNsIntf().getDavHeader(node));
   }
 }
 

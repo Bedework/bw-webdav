@@ -56,6 +56,7 @@ package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.sss.util.servlets.io.CharArrayWrappedResponse;
 
@@ -146,7 +147,7 @@ public abstract class WebdavServlet extends HttpServlet {
 
       MethodBase method = intf.getMethod(methodName);
 
-      resp.addHeader("DAV", intf.getDavHeader());
+      //resp.addHeader("DAV", intf.getDavHeader());
 
       if (method == null) {
         logIt("No method for '" + methodName + "'");
@@ -157,12 +158,18 @@ public abstract class WebdavServlet extends HttpServlet {
       } else {
         method.doMethod(req, resp);
       }
+    } catch (WebdavForbidden wdf) {
+      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
     } catch (WebdavException wde) {
-      int status = wde.getStatusCode();
-      if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-        getLogger().error(this, wde);
+      if (wde.getCause() instanceof WebdavForbidden) {
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      } else {
+        int status = wde.getStatusCode();
+        if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+          getLogger().error(this, wde);
+        }
+        resp.sendError(wde.getStatusCode());
       }
-      resp.sendError(wde.getStatusCode());
     } catch (Throwable t) {
       getLogger().error(this, t);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
