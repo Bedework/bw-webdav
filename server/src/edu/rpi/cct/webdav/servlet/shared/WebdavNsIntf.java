@@ -102,6 +102,14 @@ public abstract class WebdavNsIntf implements Serializable {
 
   protected transient Logger log;
 
+  protected static class SessCt {
+    int sessNum;
+  }
+
+  /** Mostly to distinguish trace entries */
+  protected static volatile SessCt session = new SessCt();
+  protected int sessNum;
+
   protected WebdavServlet servlet;
 
   protected Properties props;
@@ -121,8 +129,8 @@ public abstract class WebdavNsIntf implements Serializable {
   protected HashMap<String, MethodInfo> methods;
 
   /** Table of created methods
-   */
   private HashMap<String, MethodBase> createdMethods = new HashMap<String, MethodBase>();
+   */
 
   /** Should we return ok status in multistatus?
    */
@@ -154,6 +162,11 @@ public abstract class WebdavNsIntf implements Serializable {
     this.debug = debug;
     this.methods = methods;
     this.dumpContent = dumpContent;
+
+    synchronized (session) {
+      session.sessNum++;
+      sessNum = session.sessNum;
+    }
 
     account = req.getRemoteUser();
     anonymous = (account == null) || (account.length() == 0);
@@ -209,6 +222,8 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public MethodBase getMethod(String name) throws WebdavIntfException {
     name = name.toUpperCase();
+
+    /*
     MethodBase mb = createdMethods.get(name);
     if (mb != null) {
       return mb;
@@ -226,6 +241,25 @@ public abstract class WebdavNsIntf implements Serializable {
       mb.init(this, debug, dumpContent);
 
       createdMethods.put(name, mb);
+
+      return mb;
+    } catch (Throwable t) {
+      if (debug) {
+        error(t);
+      }
+      throw new WebdavIntfException(t);
+    }
+    */
+    MethodInfo mi = methods.get(name);
+
+    if ((mi == null) || getAnonymous() && mi.getRequiresAuth()) {
+      return null;
+    }
+
+    try {
+      MethodBase mb = (MethodBase)mi.getMethodClass().newInstance();
+
+      mb.init(this, debug, dumpContent);
 
       return mb;
     } catch (Throwable t) {
@@ -958,15 +992,15 @@ public abstract class WebdavNsIntf implements Serializable {
   }
 
   protected void trace(String msg) {
-    getLogger().debug(msg);
+    getLogger().debug("[" + sessNum + "] " + msg);
   }
 
   protected void debugMsg(String msg) {
-    getLogger().debug(msg);
+    getLogger().debug("[" + sessNum + "] " + msg);
   }
 
   protected void warn(String msg) {
-    getLogger().warn(msg);
+    getLogger().warn("[" + sessNum + "] " + msg);
   }
 
   protected void error(Throwable t) {
@@ -974,6 +1008,6 @@ public abstract class WebdavNsIntf implements Serializable {
   }
 
   protected void logIt(String msg) {
-    getLogger().info(msg);
+    getLogger().info("[" + sessNum + "] " + msg);
   }
 }

@@ -66,4 +66,11 @@ public class WebdavNotFound extends WebdavException {
   public WebdavNotFound() {
     super(HttpServletResponse.SC_NOT_FOUND);
   }
+
+  /** Constructor
+   * @param msg
+   */
+  public WebdavNotFound(String msg) {
+    super(HttpServletResponse.SC_NOT_FOUND, msg);
+  }
 }

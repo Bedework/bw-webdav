@@ -159,20 +159,21 @@ public abstract class WebdavServlet extends HttpServlet {
         method.doMethod(req, resp);
       }
     } catch (WebdavForbidden wdf) {
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      resp.sendError(HttpServletResponse.SC_FORBIDDEN, wdf.getMessage());
     } catch (WebdavException wde) {
       if (wde.getCause() instanceof WebdavForbidden) {
-        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN, wde.getCause().getMessage());
       } else {
         int status = wde.getStatusCode();
         if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
           getLogger().error(this, wde);
         }
-        resp.sendError(wde.getStatusCode());
+        resp.sendError(wde.getStatusCode(), wde.getMessage());
       }
     } catch (Throwable t) {
       getLogger().error(this, t);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                     t.getMessage());
     } finally {
       if (intf != null) {
         try {

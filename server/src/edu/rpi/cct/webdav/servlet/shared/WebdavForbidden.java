@@ -66,4 +66,11 @@ public class WebdavForbidden extends WebdavException {
   public WebdavForbidden() {
     super(HttpServletResponse.SC_FORBIDDEN);
   }
+
+  /** Constructor
+   * @param msg
+   */
+  public WebdavForbidden(String msg) {
+    super(HttpServletResponse.SC_NOT_FOUND, msg);
+  }
 }
