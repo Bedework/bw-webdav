@@ -58,8 +58,8 @@ import org.bedework.davdefs.WebdavTags;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-import edu.rpi.cct.webdav.servlet.shared.WebdavIntfException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
+import edu.rpi.cct.webdav.servlet.shared.WebdavServerError;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -138,7 +138,7 @@ public class AclMethod extends MethodBase {
         t.printStackTrace();
       }
 
-      throw WebdavIntfException.serverError();
+      throw new WebdavServerError();
     }
   }
 

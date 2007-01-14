@@ -56,21 +56,21 @@ package edu.rpi.cct.webdav.servlet.shared;
 
 import javax.servlet.http.HttpServletResponse;
 
-/** Forbidden exception thrown by webdav classes
+/** ServerError exception thrown by webdav classes
  *
- *   @author Mike Douglass   douglm@rpi.edu
+ *   @author Mike Douglass
  */
-public class WebdavForbidden extends WebdavException {
+public class WebdavServerError extends WebdavException {
   /** Constructor
    */
-  public WebdavForbidden() {
-    super(HttpServletResponse.SC_FORBIDDEN);
+  public WebdavServerError() {
+    super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
   }
 
   /** Constructor
    * @param msg
    */
-  public WebdavForbidden(String msg) {
-    super(HttpServletResponse.SC_FORBIDDEN, msg);
+  public WebdavServerError(String msg) {
+    super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
   }
 }

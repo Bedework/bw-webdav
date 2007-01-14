@@ -56,91 +56,21 @@ package edu.rpi.cct.webdav.servlet.shared;
 
 import javax.servlet.http.HttpServletResponse;
 
-/** Exception thrown by classes which implement WebdavNsIntf
+/** Unauthorized exception thrown by webdav classes
  *
- *   @author Mike Douglass   douglm@rpi.edu
+ *   @author Mike Douglass
  */
-public class WebdavIntfException extends WebdavException {
+public class WebdavUnauthorized extends WebdavException {
   /** Constructor
-   *
-   * @param s
    */
-  public WebdavIntfException(String s) {
-    super(s);
+  public WebdavUnauthorized() {
+    super(HttpServletResponse.SC_UNAUTHORIZED);
   }
 
   /** Constructor
-   *
-   * @param t
-   */
-  public WebdavIntfException(Throwable t) {
-    super(t);
-  }
-
-  /** Constructor
-   *
-   * @param st
-   */
-  public WebdavIntfException(int st) {
-    super(st);
-  }
-
-  /** Constructor
-   *
-   * @param st
    * @param msg
    */
-  public WebdavIntfException(int st, String msg) {
-    super(st, msg);
-  }
-
-  /**
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException badRequest() {
-    return new WebdavIntfException(HttpServletResponse.SC_BAD_REQUEST);
-  }
-
-  /**
-   * @param msg
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException badRequest(String msg) {
-    return new WebdavIntfException(HttpServletResponse.SC_BAD_REQUEST, msg);
-  }
-
-  /**
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException forbidden() {
-    return new WebdavIntfException(HttpServletResponse.SC_FORBIDDEN);
-  }
-
-  /**
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException notFound() {
-    return new WebdavIntfException(HttpServletResponse.SC_NOT_FOUND);
-  }
-
-  /**
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException serverError() {
-    return new WebdavIntfException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-  }
-
-  /**
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException unauthorized() {
-    return new WebdavIntfException(HttpServletResponse.SC_UNAUTHORIZED);
-  }
-
-  /**
-   * @return WebdavIntfException
-   */
-  public static WebdavIntfException unsupportedMediaType() {
-    return new WebdavIntfException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+  public WebdavUnauthorized(String msg) {
+    super(HttpServletResponse.SC_UNAUTHORIZED, msg);
   }
 }

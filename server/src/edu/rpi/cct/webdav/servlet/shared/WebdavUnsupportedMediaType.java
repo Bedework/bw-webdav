@@ -56,21 +56,21 @@ package edu.rpi.cct.webdav.servlet.shared;
 
 import javax.servlet.http.HttpServletResponse;
 
-/** Forbidden exception thrown by webdav classes
+/** Unauthorized exception thrown by webdav classes
  *
- *   @author Mike Douglass   douglm@rpi.edu
+ *   @author Mike Douglass
  */
-public class WebdavForbidden extends WebdavException {
+public class WebdavUnsupportedMediaType extends WebdavException {
   /** Constructor
    */
-  public WebdavForbidden() {
-    super(HttpServletResponse.SC_FORBIDDEN);
+  public WebdavUnsupportedMediaType() {
+    super(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
   }
 
   /** Constructor
    * @param msg
    */
-  public WebdavForbidden(String msg) {
-    super(HttpServletResponse.SC_FORBIDDEN, msg);
+  public WebdavUnsupportedMediaType(String msg) {
+    super(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, msg);
   }
 }

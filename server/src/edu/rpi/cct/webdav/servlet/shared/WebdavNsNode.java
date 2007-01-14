@@ -190,25 +190,25 @@ public abstract class WebdavNsNode implements Serializable {
   /** Get the current access granted to this principal for this node.
    *
    * @return CurrentAccess
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract CurrentAccess getCurrentAccess() throws WebdavIntfException;
+  public abstract CurrentAccess getCurrentAccess() throws WebdavException;
 
   /** Remove the given property for this node.
    *
    * @param val   Element defining property to remove
    * @return boolean   true for removed, false for already absent
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract boolean removeProperty(Element val) throws WebdavIntfException;
+  public abstract boolean removeProperty(Element val) throws WebdavException;
 
   /** Set the given property for this node.
    *
    * @param val   Element defining property to set
    * @return boolean   true for created
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract boolean setProperty(Element val) throws WebdavIntfException;
+  public abstract boolean setProperty(Element val) throws WebdavException;
 
   /* ====================================================================
    *                   Property methods
@@ -232,11 +232,11 @@ public abstract class WebdavNsNode implements Serializable {
    * @param intf WebdavNsIntf
    * @param allProp    true if we're doing allprop
    * @return boolean   true if emitted
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
   public boolean generatePropertyValue(QName tag,
                                        WebdavNsIntf intf,
-                                       boolean allProp) throws WebdavIntfException {
+                                       boolean allProp) throws WebdavException {
     String ns = tag.getNamespaceURI();
     XmlEmit xml = intf.getXmlEmit();
 
@@ -363,10 +363,10 @@ public abstract class WebdavNsNode implements Serializable {
 
       // Not known
       return false;
-    } catch (WebdavIntfException wde) {
+    } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {
-      throw new WebdavIntfException(t);
+      throw new WebdavException(t);
     }
   }
 
@@ -377,26 +377,26 @@ public abstract class WebdavNsNode implements Serializable {
    * @param content     boolean flag indicating if this is a content related
    *                    property - that is a property which requires fetching
    *                    and/or rendering the content
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void init(boolean content) throws WebdavIntfException {
+  public void init(boolean content) throws WebdavException {
   }
 
   /** Return true if this represents a principal
    *
    * @return boolean
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public boolean isPrincipal() throws WebdavIntfException {
+  public boolean isPrincipal() throws WebdavException {
     return userPrincipal || groupPrincipal;
   }
 
   /** Return a set of PropertyTagEntry defining properties this node supports.
    *
    * @return Collection of PropertyTagEntry
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public Collection<PropertyTagEntry> getPropertyNames()throws WebdavIntfException {
+  public Collection<PropertyTagEntry> getPropertyNames()throws WebdavException {
     if (!isPrincipal()) {
       return propertyNames.values();
     }
@@ -411,26 +411,26 @@ public abstract class WebdavNsNode implements Serializable {
 
   /**
    * @param val  boolean true if node exists
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void setExists(boolean val) throws WebdavIntfException {
+  public void setExists(boolean val) throws WebdavException {
     exists = val;
   }
 
   /**
    * @return boolean true if node exists
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public boolean getExists() throws WebdavIntfException {
+  public boolean getExists() throws WebdavException {
     return exists;
   }
 
   /** Set uri
    *
    * @param val
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void setUri(String val) throws WebdavIntfException {
+  public void setUri(String val) throws WebdavException {
     init(false);
     uri = val;
   }
@@ -438,57 +438,57 @@ public abstract class WebdavNsNode implements Serializable {
   /** Get uri
    *
    * @return String uri
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public String getUri() throws WebdavIntfException {
+  public String getUri() throws WebdavException {
     init(false);
     return uri;
   }
 
   /**
    * @return String encoded uri
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public String getEncodedUri() throws WebdavIntfException {
+  public String getEncodedUri() throws WebdavException {
     try {
       return new URI(null, null, getUri(), null).toString();
     } catch (Throwable t) {
       if (debug) {
         error(t);
       }
-      throw WebdavIntfException.badRequest();
+      throw new WebdavBadRequest();
     }
   }
 
   /**
    * @param val boolean true for a collection
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void setCollection(boolean val) throws WebdavIntfException {
+  public void setCollection(boolean val) throws WebdavException {
     collection = val;
   }
 
   /**
    * @return boolean true for a collection
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public boolean getCollection() throws WebdavIntfException {
+  public boolean getCollection() throws WebdavException {
     return collection;
   }
 
   /**
    * @param val boolean true if node allows get
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void setAllowsGet(boolean val) throws WebdavIntfException {
+  public void setAllowsGet(boolean val) throws WebdavException {
     allowsGet = val;
   }
 
   /**
    * @return true if node allows get
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public boolean getAllowsGet() throws WebdavIntfException {
+  public boolean getAllowsGet() throws WebdavException {
     return allowsGet;
   }
 
@@ -508,36 +508,36 @@ public abstract class WebdavNsNode implements Serializable {
 
   /**
    * @param val
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void setAlias(boolean val) throws WebdavIntfException {
+  public void setAlias(boolean val) throws WebdavException {
     init(false);
     alias = val;
   }
 
   /**
    * @return boolean true if an alias
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public boolean getAlias() throws WebdavIntfException {
+  public boolean getAlias() throws WebdavException {
     init(false);
     return alias;
   }
 
   /**
    * @param val
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public void setTargetUri(String val) throws WebdavIntfException {
+  public void setTargetUri(String val) throws WebdavException {
     init(false);
     targetUri = val;
   }
 
   /**
    * @return String uri
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public String getTargetUri() throws WebdavIntfException {
+  public String getTargetUri() throws WebdavException {
     init(false);
     return targetUri;
   }
@@ -548,34 +548,34 @@ public abstract class WebdavNsNode implements Serializable {
 
   /**
    * @return String lang
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getContentLang() throws WebdavIntfException;
+  public abstract String getContentLang() throws WebdavException;
 
   /**
    * @return int content length
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract int getContentLen() throws WebdavIntfException;
+  public abstract int getContentLen() throws WebdavException;
 
   /** A content type of null implies no content (or we don't know)
    *
    * @return String content type
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getContentType() throws WebdavIntfException;
+  public abstract String getContentType() throws WebdavException;
 
   /**
    * @return String credate
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getCreDate() throws WebdavIntfException;
+  public abstract String getCreDate() throws WebdavException;
 
   /**
    * @return String name
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getDisplayname() throws WebdavIntfException;
+  public abstract String getDisplayname() throws WebdavException;
 
   /** Entity tags are defined in RFC2068 - they are supposed to provide some
    * sort of indication the data has changed - e.g. a checksum.
@@ -585,22 +585,22 @@ public abstract class WebdavNsNode implements Serializable {
    *
    * @param strong
    * @return String
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getEtagValue(boolean strong) throws WebdavIntfException;
+  public abstract String getEtagValue(boolean strong) throws WebdavException;
 
   /**
    * @return String last mod date
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getLastmodDate() throws WebdavIntfException;
+  public abstract String getLastmodDate() throws WebdavException;
 
   /** Should return a value suitable for WebdavNsIntf.makeUserHref
    *
    * @return String owner
-   * @throws WebdavIntfException
+   * @throws WebdavException
    */
-  public abstract String getOwner() throws WebdavIntfException;
+  public abstract String getOwner() throws WebdavException;
 
   /* ********************************************************************
    *                        Protected methods
