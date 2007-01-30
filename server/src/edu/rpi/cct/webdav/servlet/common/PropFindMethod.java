@@ -81,15 +81,19 @@ public class PropFindMethod extends MethodBase {
   /**
    */
   public static class PropRequest {
-    // ENUM
-    //private static final int reqPropNone = 0;
-    private static final int reqProp = 1;
-    private static final int reqPropName = 2;
-    private static final int reqPropAll = 3;
+    /** */
+    public static enum ReqType {
+      /** */
+      prop,
+      /** */
+      propName,
+      /** */
+      propAll
+    }
 
-    int reqType;
+    ReqType reqType;
 
-    PropRequest(int reqType)  {
+    PropRequest(ReqType reqType)  {
       this.reqType = reqType;
     }
 
@@ -116,7 +120,7 @@ public class PropFindMethod extends MethodBase {
 
     if (doc == null) {
       // Treat as allprop request
-      parsedReq = new PropRequest(PropRequest.reqPropAll);
+      parsedReq = new PropRequest(PropRequest.ReqType.propAll);
     }
 
     if (doc != null) {
@@ -154,10 +158,10 @@ public class PropFindMethod extends MethodBase {
       for (int i = 0; i < children.length; i++) {
         Element curnode = children[i];
 
-        String nm = curnode.getLocalName();
-        String ns = curnode.getNamespaceURI();
-
         if (debug) {
+          String nm = curnode.getLocalName();
+          String ns = curnode.getNamespaceURI();
+
           trace("reqtype: " + nm + " ns: " + ns);
         }
 
@@ -185,7 +189,7 @@ public class PropFindMethod extends MethodBase {
    */
   public PropRequest tryPropRequest(Node nd) throws WebdavException {
     if (WebdavTags.allprop.nodeMatches(nd)) {
-      return new PropRequest(PropRequest.reqPropAll);
+      return new PropRequest(PropRequest.ReqType.propAll);
     }
 
     if (WebdavTags.prop.nodeMatches(nd)) {
@@ -193,7 +197,7 @@ public class PropFindMethod extends MethodBase {
     }
 
     if (WebdavTags.propname.nodeMatches(nd)) {
-      return new PropRequest(PropRequest.reqPropName);
+      return new PropRequest(PropRequest.ReqType.propName);
     }
 
     return null;
@@ -206,7 +210,7 @@ public class PropFindMethod extends MethodBase {
    * @throws WebdavException
    */
   public PropRequest parseProps(Node nd) throws WebdavException {
-    PropRequest pr = new PropRequest(PropRequest.reqProp);
+    PropRequest pr = new PropRequest(PropRequest.ReqType.prop);
     pr.props = getNsIntf().parseProp(nd);
 
     return pr;
@@ -258,14 +262,14 @@ public class PropFindMethod extends MethodBase {
 
     if ((pr != null) && (node.getExists())) {
       if (debug) {
-        trace("doNodePropertiest type=" + pr.reqType);
+        trace("doNodeProperties type=" + pr.reqType);
       }
 
-      if (pr.reqType == PropRequest.reqProp) {
+      if (pr.reqType == PropRequest.ReqType.prop) {
         doPropFind(node, pr);
-      } else if (pr.reqType == PropRequest.reqPropName) {
+      } else if (pr.reqType == PropRequest.ReqType.propName) {
         doPropNames(node);
-      } else if (pr.reqType == PropRequest.reqPropAll) {
+      } else if (pr.reqType == PropRequest.ReqType.propAll) {
         doPropAll(node);
       }
     }
@@ -323,13 +327,9 @@ public class PropFindMethod extends MethodBase {
   /* Build the response for a single node for a propnames request
    */
   private void doPropNames(WebdavNsNode node) throws WebdavException {
-    Iterator it = node.getPropertyNames().iterator();
-
     openTag(WebdavTags.prop);
 
-    while (it.hasNext()) {
-      PropertyTagEntry pte = (PropertyTagEntry)it.next();
-
+    for (PropertyTagEntry pte: node.getPropertyNames()) {
       if (pte.inPropAll) {
         emptyTag(pte.tag);
       }

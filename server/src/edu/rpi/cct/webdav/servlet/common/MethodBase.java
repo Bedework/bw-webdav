@@ -486,7 +486,8 @@ public abstract class MethodBase {
   protected Document parseContent(HttpServletRequest req,
                                   HttpServletResponse resp)
       throws WebdavException{
-    if (req.getContentLength() == 0) {
+    int len = req.getContentLength();
+    if (len == 0) {
       return null;
     }
 
@@ -649,6 +650,20 @@ public abstract class MethodBase {
   public void property(QName tag, String val) throws WebdavException {
     try {
       xml.property(tag, val);
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  /** Emit a property
+   *
+   * @param tag
+   * @param val
+   * @throws WebdavException
+   */
+  public void cdataProperty(QName tag, String val) throws WebdavException {
+    try {
+      xml.cdataProperty(tag, val);
     } catch (Throwable t) {
       throw new WebdavException(t);
     }

@@ -54,6 +54,7 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
+import org.bedework.davdefs.CaldavTags;
 import org.bedework.davdefs.WebdavTags;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
@@ -179,6 +180,12 @@ public class PropPatchMethod extends MethodBase {
         if (WebdavTags.set.nodeMatches(curnode)) {
           plist = new PropertySetList();
 
+          curnode = getOnlyChild(curnode);
+
+          if (!WebdavTags.prop.nodeMatches(curnode)) {
+            throw new WebdavBadRequest();
+          }
+
           processPlist(plist, curnode, false);
         } else if (WebdavTags.remove.nodeMatches(curnode)) {
           plist = new PropertySetList();
@@ -218,19 +225,23 @@ public class PropPatchMethod extends MethodBase {
     for (int i = 0; i < props.length; i++) {
       Element prop = props[i];
 
-      String value = getElementContent(prop);
+      if (CaldavTags.supportedCalendarComponentSet.nodeMatches(prop)) {
+        // XXX Need to do something
+      } else {
+        String value = getElementContent(prop);
 
-      if (remove && (value != null)) {
-        throw new WebdavBadRequest();
+        if (remove && (value != null)) {
+          throw new WebdavBadRequest();
+        }
       }
 
       plist.add(prop);
 
-      if (debug) {
+      /* if (debug) {
         trace("reqtype: " + prop.getLocalName() +
               " ns: " + prop.getNamespaceURI() +
               " value: " + value);
-      }
+      } */
     }
   }
 }
