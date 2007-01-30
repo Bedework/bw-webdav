@@ -68,6 +68,9 @@ import java.util.Properties;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
@@ -80,7 +83,8 @@ import org.apache.log4j.Logger;
  * @author Mike Douglass   douglm@rpi.edu
  * @version 1.0
  */
-public abstract class WebdavServlet extends HttpServlet {
+public abstract class WebdavServlet extends HttpServlet
+        implements HttpSessionListener {
   protected boolean debug;
 
   protected boolean dumpContent;
@@ -94,6 +98,16 @@ public abstract class WebdavServlet extends HttpServlet {
   /** Table of methods - set at init
    */
   protected HashMap<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
+
+  /* Try to serialize requests from a single session
+   * Thisis very imperfect.
+   */
+  static class Waiter {
+    boolean active;
+    int waiting;
+  }
+
+  private static volatile HashMap<String, Waiter> waiters = new HashMap<String, Waiter>();
 
   /** Some sort of identifying string for logging
    *
@@ -135,6 +149,8 @@ public abstract class WebdavServlet extends HttpServlet {
         debugMsg("entry: " + req.getMethod());
         dumpRequest(req);
       }
+
+      tryWait(req, true);
 
       intf = getNsIntf(req);
 
@@ -179,6 +195,10 @@ public abstract class WebdavServlet extends HttpServlet {
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
       }
+
+      try {
+        tryWait(req, false);
+      } catch (Throwable t) {}
 
       if (dumpContent) {
         CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
@@ -239,6 +259,63 @@ public abstract class WebdavServlet extends HttpServlet {
         log.error(ie);
         throw new ServletException(ie);
       }
+    }
+  }
+
+  private void tryWait(HttpServletRequest req, boolean in) throws Throwable {
+    synchronized (waiters) {
+      String sessid = req.getRequestedSessionId();
+      if (sessid == null) {
+        return;
+      }
+
+      Waiter wtr = waiters.get(sessid);
+      if (wtr == null) {
+        if (!in) {
+          return;
+        }
+
+        wtr = new Waiter();
+        wtr.active = true;
+        waiters.put(sessid, wtr);
+        return;
+      }
+
+      if (!in) {
+        wtr.notify();
+        return;
+      }
+
+      wtr.waiting++;
+      if (wtr.active) {
+        if (debug) {
+          log.debug("in: waiters=" + wtr.waiting);
+        }
+
+        wtr.wait();
+      }
+      wtr.waiting--;
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
+   */
+  public void sessionCreated(HttpSessionEvent se) {
+  }
+
+  /* (non-Javadoc)
+   * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
+   */
+  public void sessionDestroyed(HttpSessionEvent se) {
+    HttpSession session = se.getSession();
+    String sessid = session.getId();
+    if (sessid == null) {
+      return;
+    }
+
+    synchronized (waiters) {
+      waiters.remove(sessid);
     }
   }
 

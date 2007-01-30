@@ -758,6 +758,9 @@ public abstract class WebdavNsIntf implements Serializable {
 
     for (int i = 0; i < children.length; i++) {
       Element propnode = children[i];
+      String ns = propnode.getNamespaceURI();
+
+      xml.addNs(ns);
 
       WebdavProperty prop = makeProp(propnode);
 

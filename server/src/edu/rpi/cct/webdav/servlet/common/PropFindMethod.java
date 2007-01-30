@@ -157,10 +157,12 @@ public class PropFindMethod extends MethodBase {
 
       for (int i = 0; i < children.length; i++) {
         Element curnode = children[i];
+        String ns = curnode.getNamespaceURI();
+
+        addNs(ns);
 
         if (debug) {
           String nm = curnode.getLocalName();
-          String ns = curnode.getNamespaceURI();
 
           trace("reqtype: " + nm + " ns: " + ns);
         }
