@@ -61,6 +61,9 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
+import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode.SetPropertyResult;
+import edu.rpi.sss.util.xml.QName;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,7 +102,7 @@ public class PropPatchMethod extends MethodBase {
                                             WebdavNsIntf.nodeTypeUnknown);
 
     if (doc != null) {
-      processDoc(req, doc, node);
+      processDoc(req, resp, doc, node, WebdavTags.propertyUpdate, false);
     }
   }
 
@@ -110,8 +113,8 @@ public class PropPatchMethod extends MethodBase {
   }
 
   /** List of properties to remove
-  *
-  */
+   *
+   */
   public static class PropertyRemoveList extends ArrayList<Element> {
   }
 
@@ -119,29 +122,76 @@ public class PropPatchMethod extends MethodBase {
    *                   Protected methods
    * ==================================================================== */
 
-  protected void processDoc(HttpServletRequest req,
-                            Document doc,
-                            WebdavNsNode node) throws WebdavException {
+  protected boolean processDoc(HttpServletRequest req,
+                               HttpServletResponse resp,
+                               Document doc,
+                               WebdavNsNode node,
+                               QName expectedRoot,
+                               boolean onlySet) throws WebdavException {
     try {
       Element root = doc.getDocumentElement();
 
-      if (!WebdavTags.propertyUpdate.nodeMatches(root)) {
+      if (!expectedRoot.nodeMatches(root)) {
         throw new WebdavBadRequest();
       }
 
       Collection<? extends Collection<Element>> setRemoveList = processUpdate(root);
+      Collection<SetPropertyResult> failures = new ArrayList<SetPropertyResult>();
 
       for (Collection<Element> sr: setRemoveList) {
         boolean setting = sr instanceof PropPatchMethod.PropertySetList;
 
+        // XXX - possibly inadequate
+        /* It's possible changes would conflict, so a later change may
+         * invalidate an earlier change.
+         */
+
+        SetPropertyResult spr;
+
         for (Element prop: sr) {
           if (setting) {
-            node.setProperty(prop);
+            spr = node.setProperty(prop);
           } else {
-            node.removeProperty(prop);
+            if (onlySet) {
+              throw new WebdavBadRequest();
+            }
+            spr = node.removeProperty(prop);
+          }
+
+          if (spr.status != HttpServletResponse.SC_OK) {
+            failures.add(spr);
           }
         }
       }
+
+      if (!failures.isEmpty()) {
+        // XXX failRequest();
+        startEmit(resp);
+
+        resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+        resp.setContentType("text/xml; charset=UTF-8");
+
+        openTag(WebdavTags.multistatus);
+
+        openTag(WebdavTags.response);
+        addHref(node);
+        for (SetPropertyResult spr: failures) {
+          openTag(WebdavTags.propstat);
+          openTag(WebdavTags.prop);
+          emptyTag(spr.prop);
+          closeTag(WebdavTags.prop);
+          addStatus(spr.status, spr.message);
+          closeTag(WebdavTags.propstat);
+        }
+        closeTag(WebdavTags.response);
+        closeTag(WebdavTags.multistatus);
+
+        flush();
+
+        return false;
+      }
+
+      return true;
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {

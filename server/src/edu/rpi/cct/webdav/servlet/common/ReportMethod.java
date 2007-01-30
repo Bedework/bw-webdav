@@ -130,7 +130,7 @@ public class ReportMethod extends MethodBase {
 
       openTag(WebdavTags.propstat);
 
-      addStatus(status);
+      addStatus(status, null);
 
       closeTag(WebdavTags.propstat);
     } else {

@@ -267,6 +267,7 @@ public abstract class WebdavServlet extends HttpServlet {
       title = "Request parameters";
 
       log.debug(title + " - global info and uris");
+      log.debug("getRemoteAddr = " + req.getRemoteAddr());
       log.debug("getRequestURI = " + req.getRequestURI());
       log.debug("getRemoteUser = " + req.getRemoteUser());
       log.debug("getRequestedSessionId = " + req.getRequestedSessionId());

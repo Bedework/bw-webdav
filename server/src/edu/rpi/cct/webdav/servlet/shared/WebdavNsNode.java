@@ -194,21 +194,40 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract CurrentAccess getCurrentAccess() throws WebdavException;
 
+  /** Result from setting or removing property
+   *
+   */
+  public static class SetPropertyResult {
+    /** */
+    public Element prop;
+    /** */
+    public int status = HttpServletResponse.SC_OK;
+    /** */
+    public String message;
+
+    /**
+     * @param prop
+     */
+    public SetPropertyResult(Element prop) {
+      this.prop = prop;
+    }
+  }
+
   /** Remove the given property for this node.
    *
    * @param val   Element defining property to remove
-   * @return boolean   true for removed, false for already absent
+   * @return SetPropertyResult  status
    * @throws WebdavException
    */
-  public abstract boolean removeProperty(Element val) throws WebdavException;
+  public abstract SetPropertyResult removeProperty(Element val) throws WebdavException;
 
   /** Set the given property for this node.
    *
    * @param val   Element defining property to set
-   * @return boolean   true for created
+   * @return SetPropertyResult  status
    * @throws WebdavException
    */
-  public abstract boolean setProperty(Element val) throws WebdavException;
+  public abstract SetPropertyResult setProperty(Element val) throws WebdavException;
 
   /* ====================================================================
    *                   Property methods

@@ -349,10 +349,13 @@ public abstract class MethodBase {
     }
   }
 
-  protected void addStatus(int status) throws WebdavException {
+  protected void addStatus(int status, String message) throws WebdavException {
     try {
-      property(WebdavTags.status, "HTTP/1.1 " + status + " " +
-               WebdavStatusCode.getMessage(status));
+      if (message == null) {
+        message = WebdavStatusCode.getMessage(status);
+      }
+
+      property(WebdavTags.status, "HTTP/1.1 " + status + " " + message);
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {
@@ -639,6 +642,18 @@ public abstract class MethodBase {
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
+  }
+
+  /** Emit an empty tag corresponding to a node
+  *
+  * @param nd
+  * @throws WebdavException
+  */
+  public void emptyTag(Node nd) throws WebdavException {
+    String ns = nd.getNamespaceURI();
+    String ln = nd.getLocalName();
+
+    emptyTag(new QName(ns, ln));
   }
 
   /** Emit a property

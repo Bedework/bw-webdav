@@ -274,7 +274,7 @@ public class PropFindMethod extends MethodBase {
       }
     }
 
-    addStatus(node.getStatus());
+    addStatus(node.getStatus(), null);
 
     closeTag(WebdavTags.propstat);
   }
