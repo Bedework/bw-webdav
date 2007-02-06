@@ -263,13 +263,14 @@ public abstract class WebdavServlet extends HttpServlet
   }
 
   private void tryWait(HttpServletRequest req, boolean in) throws Throwable {
+    Waiter wtr = null;
     synchronized (waiters) {
       String sessid = req.getRequestedSessionId();
       if (sessid == null) {
         return;
       }
 
-      Waiter wtr = waiters.get(sessid);
+      wtr = waiters.get(sessid);
       if (wtr == null) {
         if (!in) {
           return;
@@ -280,7 +281,9 @@ public abstract class WebdavServlet extends HttpServlet
         waiters.put(sessid, wtr);
         return;
       }
+    }
 
+    synchronized (wtr) {
       if (!in) {
         wtr.notify();
         return;
