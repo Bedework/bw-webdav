@@ -703,6 +703,29 @@ public abstract class WebdavNsIntf implements Serializable {
    *                Property value methods
    * ==================================================================== */
 
+  /**
+   * @param node
+   * @throws WebdavException
+   */
+  public void emitSupportedReportSet(WebdavNsNode node) throws WebdavException {
+    try {
+      xml.openTag(WebdavTags.supportedReportSet);
+
+      Collection<QName> supportedReports = node.getSupportedReports();
+
+      for (QName qn: supportedReports) {
+        xml.openTag(WebdavTags.supportedReport);
+        xml.openTag(WebdavTags.report);
+        xml.emptyTag(qn);
+        xml.closeTag(WebdavTags.report);
+        xml.closeTag(WebdavTags.supportedReport);
+      }
+      xml.closeTag(WebdavTags.supportedReportSet);
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
   /** Open a propstat response.
    *
    * @throws WebdavException

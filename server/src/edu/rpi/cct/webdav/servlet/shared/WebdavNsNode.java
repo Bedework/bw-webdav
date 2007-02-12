@@ -122,6 +122,8 @@ public abstract class WebdavNsNode implements Serializable {
   private final static HashMap<QName, PropertyTagEntry> propertyNames =
     new HashMap<QName, PropertyTagEntry>();
 
+  private final static Collection<QName> supportedReports = new ArrayList<QName>();
+
   /** */
   public static final class PropertyTagEntry {
     /** */
@@ -163,6 +165,13 @@ public abstract class WebdavNsNode implements Serializable {
     //addPropEntry(propertyNames, WebdavTags.principalCollectionSet, false);
     addPropEntry(propertyNames, WebdavTags.resourcetype, true);
     addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet);
+
+    /* Supported reports */
+
+    supportedReports.add(WebdavTags.expandProperty);          // Version
+    supportedReports.add(WebdavTags.aclPrincipalPropSet);     // Acl
+    supportedReports.add(WebdavTags.principalMatch);          // Acl
+    supportedReports.add(WebdavTags.principalPropertySearch); // Acl
   }
 
   /* ....................................................................
@@ -380,6 +389,12 @@ public abstract class WebdavNsNode implements Serializable {
         return true;
       }
 
+      if (tag.equals(WebdavTags.supportedReportSet)) {
+        // versioning
+        intf.emitSupportedReportSet(this);
+        return true;
+      }
+
       // Not known
       return false;
     } catch (WebdavException wde) {
@@ -415,7 +430,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @return Collection of PropertyTagEntry
    * @throws WebdavException
    */
-  public Collection<PropertyTagEntry> getPropertyNames()throws WebdavException {
+  public Collection<PropertyTagEntry> getPropertyNames() throws WebdavException {
     if (!isPrincipal()) {
       return propertyNames.values();
     }
@@ -424,6 +439,18 @@ public abstract class WebdavNsNode implements Serializable {
 
     res.addAll(propertyNames.values());
     res.add(new PropertyTagEntry(WebdavTags.principalURL));
+
+    return res;
+  }
+
+  /** Return a set of Qname defining reports this node supports.
+   *
+   * @return Collection of QName
+   * @throws WebdavException
+   */
+  public Collection<QName> getSupportedReports() throws WebdavException {
+    Collection<QName> res = new ArrayList<QName>();
+    res.addAll(supportedReports);
 
     return res;
   }
