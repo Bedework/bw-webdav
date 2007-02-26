@@ -132,7 +132,7 @@ public class CopyMethod extends MethodBase {
         toNodeType = WebdavNsIntf.nodeTypeEntity;
       }
 
-      WebdavNsNode to = intf.getNode(dest,
+      WebdavNsNode to = intf.getNode(intf.getUri(dest),
                                      WebdavNsIntf.existanceMay, toNodeType);
 
       intf.copyMove(req, resp, from, to, copy, overwrite, depth);
