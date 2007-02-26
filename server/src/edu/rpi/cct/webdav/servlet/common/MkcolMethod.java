@@ -90,7 +90,7 @@ public class MkcolMethod extends MethodBase {
                                             WebdavNsIntf.existanceNot,
                                             WebdavNsIntf.nodeTypeCollection);
 
-    getNsIntf().makeCollection(req, node);
+    getNsIntf().makeCollection(req, resp, node);
 
     /*
     if (doc != null) {
@@ -102,8 +102,6 @@ public class MkcolMethod extends MethodBase {
       }
     }
     */
-
-    resp.setStatus(HttpServletResponse.SC_CREATED);
   }
 
   /* ====================================================================

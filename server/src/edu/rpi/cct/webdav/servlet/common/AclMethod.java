@@ -90,8 +90,6 @@ public class AclMethod extends MethodBase {
       return;
     }
 
-    startEmit(resp);
-
     WebdavNsIntf.AclInfo ainfo = processDoc(doc, getResourceUri(req));
 
     processResp(req, resp, ainfo);
@@ -128,7 +126,9 @@ public class AclMethod extends MethodBase {
           throw new WebdavBadRequest();
         }
 
-        processAcl(ainfo, curnode);
+        if (!processAcl(ainfo, curnode)) {
+          break;
+        }
       }
 
       return ainfo;
@@ -150,12 +150,12 @@ public class AclMethod extends MethodBase {
 
          protected and inherited are for acl display
    */
-  private void processAcl(WebdavNsIntf.AclInfo ainfo, Node nd) throws WebdavException {
+  private boolean processAcl(WebdavNsIntf.AclInfo ainfo, Node nd) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
     Element[] children = getChildren(nd);
 
-    if (children.length != 2) {
+    if (children.length < 2) {
       throw new WebdavBadRequest();
     }
 
@@ -174,31 +174,37 @@ public class AclMethod extends MethodBase {
       throw new WebdavBadRequest();
     }
 
-    intf.parseAcePrincipal(ainfo, curnode, inverted);
-
-    /* Require grant or deny */
-
-    curnode = children[1];
-
-    boolean grant = false;
-
-    if (WebdavTags.grant.nodeMatches(curnode)) {
-      grant = true;
-    } else if (!WebdavTags.deny.nodeMatches(curnode)) {
-      throw new WebdavBadRequest();
+    if (!intf.parseAcePrincipal(ainfo, curnode, inverted)) {
+      return false;
     }
 
-    children = getChildren(curnode);
-
-    for (int i = 0; i < children.length; i++) {
+    /* Recognize grant or deny */
+    for (int i = 1; i < children.length; i++) {
       curnode = children[i];
 
-      if (!WebdavTags.privilege.nodeMatches(curnode)) {
-        throw new WebdavBadRequest();
+      boolean denial = false;
+
+      if (WebdavTags.deny.nodeMatches(curnode)) {
+        denial = true;
+      } else if (!WebdavTags.grant.nodeMatches(curnode)) {
+        ainfo.errorTag = WebdavTags.noAceConflict;
+        return false;
       }
 
-      intf.parsePrivilege(ainfo, curnode, grant);
+      Element[] pchildren = getChildren(curnode);
+
+      for (int pi = 0; pi < pchildren.length; pi++) {
+        Element pnode = pchildren[pi];
+
+        if (!WebdavTags.privilege.nodeMatches(pnode)) {
+          throw new WebdavBadRequest();
+        }
+
+        intf.parsePrivilege(ainfo, pnode, denial);
+      }
     }
+
+    return true;
   }
 
   private void processResp(HttpServletRequest req,
@@ -206,7 +212,19 @@ public class AclMethod extends MethodBase {
                           WebdavNsIntf.AclInfo ainfo) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
-    intf.updateAccess(ainfo);
+    if (ainfo.errorTag == null) {
+      intf.updateAccess(ainfo);
+      return;
+    }
+
+    startEmit(resp);
+    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+    openTag(WebdavTags.error);
+    emptyTag(ainfo.errorTag);
+    closeTag(WebdavTags.error);
+
+    flush();
   }
 }
 

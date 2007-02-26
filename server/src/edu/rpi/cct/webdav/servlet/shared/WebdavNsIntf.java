@@ -558,13 +558,15 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract void acceptMkcolContent(HttpServletRequest req)
       throws WebdavException;
 
-  /** Create an empty collection at the given location..
+  /** Create an empty collection at the given location. Status is set on return
    *
    * @param req       HttpServletRequest
+   * @param resp      HttpServletResponse
    * @param node             node to create
    * @throws WebdavException
    */
   public abstract void makeCollection(HttpServletRequest req,
+                                      HttpServletResponse resp,
                                       WebdavNsNode node)
       throws WebdavException;
 
@@ -628,6 +630,8 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Object class passed around as we parse access.
    */
   public static class AclInfo {
+    /** Set non-null if error occurred -- see Acl 8.1.1 */
+    public QName errorTag;
   }
 
   /** Get an AclInfo object .
@@ -654,10 +658,11 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param ainfo
    * @param nd       The principal element
    * @param inverted boolean true if principal element was containjed in invert
+   * @return false on error
    * @throws WebdavException
    */
-  public abstract void parseAcePrincipal(AclInfo ainfo, Node nd,
-                                         boolean inverted) throws WebdavException;
+  public abstract boolean parseAcePrincipal(AclInfo ainfo, Node nd,
+                                            boolean inverted) throws WebdavException;
 
   /** Parse the webdav privilege element.
    * The supplied node is the privilege webdav element
@@ -863,15 +868,13 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (tag.equals(WebdavTags.principalCollectionSet)) {
         // access 5.7
-        xml.openTag(WebdavTags.prop);
         xml.openTag(WebdavTags.principalCollectionSet);
 
         for (String s: getPrincipalCollectionSet(node.getUri())) {
-          xml.property(tag, s);
+          xml.property(WebdavTags.href, s);
         }
 
         xml.closeTag(WebdavTags.principalCollectionSet);
-        xml.closeTag(WebdavTags.prop);
         return status;
       }
 
