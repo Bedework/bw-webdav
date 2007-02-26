@@ -570,6 +570,26 @@ public abstract class WebdavNsIntf implements Serializable {
                                       WebdavNsNode node)
       throws WebdavException;
 
+  /** Copy or move a resource at the given location to another location.
+   * Status is set on return
+   *
+   * @param req       HttpServletRequest
+   * @param resp      HttpServletResponse
+   * @param from      Source
+   * @param to        Destination
+   * @param copy      true for copying
+   * @param overwrite true to overwrite destination
+   * @param depth     0 for entity, infinity for collection.
+   * @throws WebdavException
+   */
+  public abstract void copyMove(HttpServletRequest req,
+                                HttpServletResponse resp,
+                                WebdavNsNode from,
+                                WebdavNsNode to,
+                                boolean copy,
+                                boolean overwrite,
+                                int depth) throws WebdavException;
+
   /* ====================================================================
    *                  Access methods
    * ==================================================================== */

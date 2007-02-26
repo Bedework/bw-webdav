@@ -64,8 +64,10 @@ import javax.servlet.http.HttpServletRequest;
  *   @author Mike Douglass   douglm@rpi.edu
  */
 public class Headers {
-  protected final static int depthInfinity = Integer.MAX_VALUE;
-  protected final static int depthNone = Integer.MIN_VALUE;
+  /** */
+  public final static int depthInfinity = Integer.MAX_VALUE;
+  /** */
+  public final static int depthNone = Integer.MIN_VALUE;
 
   /** Get the depth header
    *

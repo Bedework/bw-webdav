@@ -55,6 +55,9 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNotFound;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,9 +72,74 @@ public class CopyMethod extends MethodBase {
   public void init() {
   }
 
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+   */
   public void doMethod(HttpServletRequest req,
                        HttpServletResponse resp) throws WebdavException {
+    process(req, resp, true);
+  }
 
+  protected void process(HttpServletRequest req,
+                         HttpServletResponse resp,
+                         boolean copy) throws WebdavException {
+    if (debug) {
+      if (copy) {
+        trace("CopyMethod: doMethod");
+      } else {
+        trace("MoveMethod: doMethod");
+      }
+    }
+
+    try {
+      String dest = req.getHeader("Destination");
+      if (dest == null) {
+        if (debug) {
+          debugMsg("No Destination");
+        }
+        throw new WebdavNotFound("No Destination");
+      }
+
+      int depth = Headers.depth(req);
+      /*
+      if (depth == Headers.depthNone) {
+        depth = Headers.depthInfinity;
+      }
+      */
+
+      String ow = req.getHeader("Overwrite");
+      boolean overwrite;
+      if (ow == null) {
+        overwrite = true;
+      } else if ("T".equals(ow)) {
+        overwrite = true;
+      } else if ("F".equals(ow)) {
+        overwrite = false;
+      } else {
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+
+      WebdavNsIntf intf = getNsIntf();
+      WebdavNsNode from = intf.getNode(getResourceUri(req),
+                                       WebdavNsIntf.existanceMust,
+                                       WebdavNsIntf.nodeTypeUnknown);
+
+      int toNodeType;
+      if (from.getCollection()) {
+        toNodeType = WebdavNsIntf.nodeTypeCollection;
+      } else {
+        toNodeType = WebdavNsIntf.nodeTypeEntity;
+      }
+
+      WebdavNsNode to = intf.getNode(dest,
+                                     WebdavNsIntf.existanceMay, toNodeType);
+
+      intf.copyMove(req, resp, from, to, copy, overwrite, depth);
+    } catch (WebdavException we) {
+      throw we;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
   }
 }
-

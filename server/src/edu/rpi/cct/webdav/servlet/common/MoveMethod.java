@@ -63,16 +63,13 @@ import javax.servlet.http.HttpServletResponse;
  *
  *   @author Mike Douglass   douglm@rpi.edu
  */
-public class MoveMethod extends MethodBase {
+public class MoveMethod extends CopyMethod {
   /* (non-Javadoc)
-   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
+   * @see edu.rpi.cct.webdav.servlet.common.CopyMethod#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
    */
-  public void init() {
-  }
-
   public void doMethod(HttpServletRequest req,
                         HttpServletResponse resp) throws WebdavException {
-
+    process(req, resp, false);
   }
 }
 
