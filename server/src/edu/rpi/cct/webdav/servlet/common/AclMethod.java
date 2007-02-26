@@ -117,10 +117,10 @@ public class AclMethod extends MethodBase {
         throw new WebdavBadRequest();
       }
 
-      Element[] children = getChildren(root);
+      Element[] aces = getChildren(root);
 
-      for (int i = 0; i < children.length; i++) {
-        Element curnode = children[i];
+      for (int i = 0; i < aces.length; i++) {
+        Element curnode = aces[i];
 
         if (!WebdavTags.ace.nodeMatches(curnode)) {
           throw new WebdavBadRequest();
