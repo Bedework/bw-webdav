@@ -578,6 +578,18 @@ public abstract class MethodBase {
     }
   }
 
+  protected boolean isEmpty(Element el) throws WebdavException {
+    try {
+      return XmlUtil.isEmpty(el);
+    } catch (Throwable t) {
+      if (debug) {
+        getLogger().error(this, t);
+      }
+
+      throw new WebdavBadRequest(t.getMessage());
+    }
+  }
+
   /* ====================================================================
    *                   XmlEmit wrappers
    * ==================================================================== */

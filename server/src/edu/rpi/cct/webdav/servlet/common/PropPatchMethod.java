@@ -277,12 +277,8 @@ public class PropPatchMethod extends MethodBase {
 
       if (CaldavTags.supportedCalendarComponentSet.nodeMatches(prop)) {
         // XXX Need to do something
-      } else {
-        String value = getElementContent(prop);
-
-        if (remove && (value != null)) {
-          throw new WebdavBadRequest();
-        }
+      } else if (remove && !isEmpty(prop)) {
+        throw new WebdavBadRequest();
       }
 
       plist.add(prop);

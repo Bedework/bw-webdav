@@ -138,6 +138,7 @@ public abstract class WebdavServlet extends HttpServlet
                          HttpServletResponse resp)
       throws ServletException, IOException {
     WebdavNsIntf intf = null;
+    boolean serverError = false;
 
     try {
       String debugStr = getInitParameter("debug");
@@ -176,23 +177,14 @@ public abstract class WebdavServlet extends HttpServlet
       }
     } catch (WebdavForbidden wdf) {
       resp.sendError(HttpServletResponse.SC_FORBIDDEN, wdf.getMessage());
-    } catch (WebdavException wde) {
-      int status = wde.getStatusCode();
-      if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-        getLogger().error(this, wde);
-      }
-      resp.sendError(wde.getStatusCode(), wde.getMessage());
     } catch (Throwable t) {
-      getLogger().error(this, t);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                     t.getMessage());
+      serverError = handleException(t, resp, serverError);
     } finally {
       if (intf != null) {
         try {
           intf.close();
         } catch (Throwable t) {
-          getLogger().error(this, t);
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          serverError = handleException(t, resp, serverError);
         }
       }
 
@@ -214,6 +206,36 @@ public abstract class WebdavServlet extends HttpServlet
         resp.setContentLength(bs.length);
         resp.getOutputStream().write(bs);
       }
+    }
+  }
+
+  /* Return true if it's a server error */
+  private boolean handleException(Throwable t,
+                                  HttpServletResponse resp,
+                                  boolean serverError) {
+    if (serverError) {
+      return true;
+    }
+
+    try {
+      if (t instanceof WebdavException) {
+        WebdavException wde = (WebdavException)t;
+
+        int status = wde.getStatusCode();
+        if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+          getLogger().error(this, wde);
+          serverError = true;
+        }
+        resp.sendError(wde.getStatusCode(), wde.getMessage());
+        return serverError;
+      }
+
+      getLogger().error(this, t);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return true;
+    } catch (Throwable t1) {
+      // Pretty much screwed if we get here
+      return true;
     }
   }
 
