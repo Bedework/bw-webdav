@@ -64,6 +64,10 @@ public class PrincipalMatchReport {
    */
   public boolean owner;
 
+  /** Match a resource which identifies the current user
+   */
+  public boolean whoami;
+
   /** Properties to return (none for empty collection)
    */
   public Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
@@ -122,6 +126,10 @@ public class PrincipalMatchReport {
 
         if (WebdavTags.owner.nodeMatches(ppchildren[0])) {
           owner = true;
+        } else if (WebdavTags.whoami.nodeMatches(ppchildren[0])) {
+          // XXX probably wrong - we should just store property name and
+          // use when processing.
+          whoami = true;
         } else {
           throw new WebdavBadRequest();
         }
@@ -195,6 +203,7 @@ public class PrincipalMatchReport {
 
       if (wdnodes != null) {
         for (WebdavNsNode nd: wdnodes) {
+          xml.openTag(WebdavTags.response);
           intf.addHref(nd);
 
           for (WebdavProperty prop: props) {
@@ -202,6 +211,7 @@ public class PrincipalMatchReport {
           }
 
           intf.addStatus(HttpServletResponse.SC_OK);
+          xml.closeTag(WebdavTags.response);
         }
       }
 

@@ -238,6 +238,12 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract SetPropertyResult setProperty(Element val) throws WebdavException;
 
+  /** Trailing "/" on uri?
+   *
+   * @return boolean
+   */
+  public abstract boolean trailSlash();
+
   /* ====================================================================
    *                   Property methods
    * ==================================================================== */

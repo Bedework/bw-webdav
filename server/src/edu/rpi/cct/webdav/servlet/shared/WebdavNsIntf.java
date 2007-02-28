@@ -434,8 +434,11 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Must be entity. */
   public static final int nodeTypeEntity = 1;
 
+  /** Must be a principal. */
+  public static final int nodeTypePrincipal = 2;
+
   /** Unknown. */
-  public static final int nodeTypeUnknown = 2;
+  public static final int nodeTypeUnknown = 3;
 
   /** Retrieves a node by uri, following any links.
    *
@@ -724,6 +727,15 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public abstract void emitSupportedPrivSet(WebdavNsNode node) throws WebdavException;
 
+  /** Return all the hrefs found in the access for th egiven node.
+   *
+   * @param node
+   * @return Collection of hrefs.
+   * @throws WebdavException
+   */
+  public abstract Collection<String> getAclPrincipalInfo(WebdavNsNode node)
+          throws WebdavException;
+
   /* ====================================================================
    *                Property value methods
    * ==================================================================== */
@@ -950,6 +962,16 @@ public abstract class WebdavNsIntf implements Serializable {
       }
 
       String url = urlPrefix + new URI(node.getEncodedUri()).toASCIIString();
+
+      if (url.endsWith("/")) {
+        if (!node.trailSlash()) {
+          url = url.substring(0, url.length() - 1);
+        }
+      } else {
+        if (node.trailSlash()) {
+          url = url + "/";
+        }
+      }
       xml.property(WebdavTags.href, url);
     } catch (WebdavException wde) {
       throw wde;

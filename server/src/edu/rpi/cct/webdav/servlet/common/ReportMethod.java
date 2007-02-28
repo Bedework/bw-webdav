@@ -25,6 +25,7 @@
 */
 package edu.rpi.cct.webdav.servlet.common;
 
+import edu.rpi.cct.webdav.servlet.common.PropFindMethod.PropRequest;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
@@ -51,6 +52,8 @@ public class ReportMethod extends MethodBase {
   private final static int reportTypeExpandProperty = 0;
   private final static int reportTypePrincipalPropertySearch = 1;
   private final static int reportTypePrincipalMatch = 2;
+  private final static int reportTypeAclPrincipalPropSet = 3;
+  private final static int reportTypePrincipalSearchPropertySet = 4;
 
   private int reportType;
 
@@ -61,6 +64,8 @@ public class ReportMethod extends MethodBase {
   protected PropFindMethod.PropRequest preq;
 
   protected PropFindMethod pm;
+
+  private PropRequest aclPrincipalProps;
 
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
@@ -159,7 +164,18 @@ public class ReportMethod extends MethodBase {
 
       Element root = doc.getDocumentElement();
 
+      if (reportType == reportTypeAclPrincipalPropSet) {
+        depth = defaultDepth(depth, 0);
+        checkDepth(depth, 0);
+        parseAclPrincipalProps(root, intf);
+        return;
+      }
+
       if (reportType == reportTypeExpandProperty) {
+        return;
+      }
+
+      if (reportType == reportTypePrincipalSearchPropertySet) {
         return;
       }
 
@@ -192,6 +208,42 @@ public class ReportMethod extends MethodBase {
     }
   }
 
+  /*
+   *  <!ELEMENT acl-principal-prop-set ANY>
+   *  ANY value: a sequence of one or more elements, with at most one
+   *             DAV:prop element.
+   *  prop: see RFC 2518, Section 12.11
+   *
+   */
+  private void parseAclPrincipalProps(Element root,
+                                      WebdavNsIntf intf) throws WebdavException {
+    try {
+      Element[] children = getChildren(root);
+      boolean hadProp = false;
+
+      for (int i = 0; i < children.length; i++) {
+        Element curnode = children[i];
+
+        if (WebdavTags.prop.nodeMatches(curnode)) {
+          if (hadProp) {
+            throw new WebdavBadRequest("More than one DAV:prop element");
+          }
+          aclPrincipalProps = pm.parseProps(curnode);
+
+          hadProp = true;
+        }
+      }
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      System.err.println(t.getMessage());
+      if (debug) {
+        t.printStackTrace();
+      }
+
+      throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+  }
 
   /*
    *  <!ELEMENT principal-property-search
@@ -202,6 +254,19 @@ public class ReportMethod extends MethodBase {
    *
    *  <!ELEMENT match #PCDATA >
    *
+   *  e.g
+   *  <principal-property-search>
+   *    <property-search>
+   *      <prop>
+   *        <displayname/>
+   *      </prop>
+   *      <match>myname</match>
+   *    </property-search>
+   *    <prop>
+   *      <displayname/>
+   *    </prop>
+   *    <apply-to-principal-collection-set/>
+   *  </principal-property-search>
    */
   private void parsePrincipalPropertySearch(Element root,
                                             int depth,
@@ -233,7 +298,7 @@ public class ReportMethod extends MethodBase {
           i++;
 
           if (i < children.length) {
-            if (!WebdavTags.applyToPrincipalCollectionSet.nodeMatches(curnode)) {
+            if (!WebdavTags.applyToPrincipalCollectionSet.nodeMatches(children[i])) {
               throw new WebdavBadRequest();
             }
 
@@ -271,6 +336,19 @@ public class ReportMethod extends MethodBase {
                            int depth) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
+    /* Build a collection of nodes for any user principals in the acl
+     * associated with the resource.
+     */
+
+    if (reportType == reportTypeAclPrincipalPropSet) {
+      processAclPrincipalPropSet(req, resp, intf);
+      return;
+    }
+
+    if (reportType == reportTypePrincipalSearchPropertySet) {
+      return;
+    }
+
     if (reportType == reportTypeExpandProperty) {
       processExpandProperty(req, resp, depth, intf);
       return;
@@ -302,6 +380,42 @@ public class ReportMethod extends MethodBase {
                                      int depth,
                                      WebdavNsIntf intf) throws WebdavException {
     return;
+  }
+
+  private void processAclPrincipalPropSet(HttpServletRequest req,
+                                          HttpServletResponse resp,
+                                          WebdavNsIntf intf) throws WebdavException {
+    String resourceUri = getResourceUri(req);
+    WebdavNsNode node = getNsIntf().getNode(resourceUri,
+                                            WebdavNsIntf.existanceMust,
+                                            WebdavNsIntf.nodeTypeUnknown);
+
+    Collection<String> hrefs = intf.getAclPrincipalInfo(node);
+
+    startEmit(resp);
+
+    resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+    resp.setContentType("text/xml; charset=UTF-8");
+
+    openTag(WebdavTags.multistatus);
+    if (!hrefs.isEmpty()) {
+      openTag(WebdavTags.response);
+
+      for (String href: hrefs) {
+        WebdavNsNode pnode = getNsIntf().getNode(href,
+                                                 WebdavNsIntf.existanceMay,
+                                                 WebdavNsIntf.nodeTypePrincipal);
+        if (pnode != null) {
+          pm.doNodeProperties(pnode, aclPrincipalProps);
+        }
+      }
+
+      closeTag(WebdavTags.response);
+    }
+
+    closeTag(WebdavTags.multistatus);
+
+    flush();
   }
 
   /**
@@ -358,6 +472,14 @@ public class ReportMethod extends MethodBase {
 
       if (WebdavTags.principalMatch.nodeMatches(root)) {
         return reportTypePrincipalMatch;
+      }
+
+      if (WebdavTags.aclPrincipalPropSet.nodeMatches(root)) {
+        return reportTypeAclPrincipalPropSet;
+      }
+
+      if (WebdavTags.principalSearchPropertySet.nodeMatches(root)) {
+        return reportTypePrincipalSearchPropertySet;
       }
 
       return -1;

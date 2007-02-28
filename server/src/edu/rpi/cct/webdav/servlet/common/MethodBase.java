@@ -363,62 +363,6 @@ public abstract class MethodBase {
     }
   }
 
-  /* * Get request content.
-   *
-   * @param req      Servlet request object
-   * @return String  Body of the request
-   * /
-  protected String getContent(HttpServletRequest req) throws WebdavException{
-    if (content != null) {
-      return content;
-    }
-
-    if (req.getContentLength() == 0) {
-      return null;
-    }
-
-    try {
-      String enc = req.getCharacterEncoding();
-      if (enc == null) {
-        enc = System.getProperty("file.encoding");
-      }
-
-      // Apparently we can get leading or trailing quotes
-      if (enc.startsWith("\"")) {
-        enc = enc.substring(1, enc.length());
-      }
-
-      if (enc.endsWith("\"")) {
-        enc = enc.substring(0, enc.length() - 1);
-      }
-
-      int segLen;
-      int totLen = 0;
-      StringBuffer sb = new StringBuffer();
-      InputStream is = req.getInputStream();
-
-      byte[] seg = new byte[4096];  // IBM page size
-
-      segLen = is.read(seg);
-      while (segLen != -1) {
-        String segStr = new String(seg, 0, segLen, enc);
-        sb.append(segStr);
-
-        segLen = is.read(seg);
-      }
-
-      content = sb.toString();
-
-      if (dumpContent) {
-        debugMsg(content);
-      }
-
-      return content;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
-  }*/
-
   private class DebugReader extends FilterReader {
     StringBuffer sb = new StringBuffer();
 
