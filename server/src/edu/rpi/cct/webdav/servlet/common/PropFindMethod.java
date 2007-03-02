@@ -91,7 +91,8 @@ public class PropFindMethod extends MethodBase {
       propAll
     }
 
-    ReqType reqType;
+    /** */
+    public ReqType reqType;
 
     PropRequest(ReqType reqType)  {
       this.reqType = reqType;
