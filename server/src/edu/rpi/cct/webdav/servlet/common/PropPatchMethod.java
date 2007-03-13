@@ -224,23 +224,23 @@ public class PropPatchMethod extends MethodBase {
       Element[] children = getChildren(node);
 
       for (int i = 0; i < children.length; i++) {
-        Element curnode = children[i];
+        Element srnode = children[i]; // set or remove
         PropertySetList plist;
 
-        if (WebdavTags.set.nodeMatches(curnode)) {
+        Element propnode = getOnlyChild(srnode);
+
+        if (!WebdavTags.prop.nodeMatches(propnode)) {
+          throw new WebdavBadRequest();
+        }
+
+        if (WebdavTags.set.nodeMatches(srnode)) {
           plist = new PropertySetList();
 
-          curnode = getOnlyChild(curnode);
-
-          if (!WebdavTags.prop.nodeMatches(curnode)) {
-            throw new WebdavBadRequest();
-          }
-
-          processPlist(plist, curnode, false);
-        } else if (WebdavTags.remove.nodeMatches(curnode)) {
+          processPlist(plist, propnode, false);
+        } else if (WebdavTags.remove.nodeMatches(srnode)) {
           plist = new PropertySetList();
 
-          processPlist(plist, curnode, true);
+          processPlist(plist, propnode, true);
         } else {
           throw new WebdavBadRequest();
         }

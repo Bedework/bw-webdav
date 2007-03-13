@@ -134,7 +134,10 @@ public class PropFindMethod extends MethodBase {
     }
 
     if (debug) {
-      trace("PropFindMethod: depth=" + depth + " type=" + parsedReq.reqType);
+      trace("PropFindMethod: depth=" + depth);
+      if (parsedReq != null) {
+        trace("                type=" + parsedReq.reqType);
+      }
     }
 
     startEmit(resp);
@@ -154,25 +157,21 @@ public class PropFindMethod extends MethodBase {
         throw new WebdavBadRequest();
       }
 
-      Element[] children = getChildren(root);
+      Element curnode = getOnlyChild(root);
 
-      for (int i = 0; i < children.length; i++) {
-        Element curnode = children[i];
-        String ns = curnode.getNamespaceURI();
+      String ns = curnode.getNamespaceURI();
 
-        addNs(ns);
+      addNs(ns);
 
-        if (debug) {
-          String nm = curnode.getLocalName();
+      if (debug) {
+        String nm = curnode.getLocalName();
 
-          trace("reqtype: " + nm + " ns: " + ns);
-        }
-
-        parsedReq = tryPropRequest(curnode);
-        if (parsedReq != null) {
-          break;
-        }
+        trace("reqtype: " + nm + " ns: " + ns);
       }
+
+      parsedReq = tryPropRequest(curnode);
+    } catch (WebdavException wde) {
+      throw wde;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
       if (debug) {

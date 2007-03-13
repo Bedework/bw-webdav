@@ -332,6 +332,7 @@ public abstract class WebdavNsNode implements Serializable {
       if (tag.equals(WebdavTags.getcontentlength)) {
         // dav 13.4
         if (!getAllowsGet()) {
+          xml.property(tag, "0");
           return true;
         }
         xml.property(tag, String.valueOf(getContentLen()));
