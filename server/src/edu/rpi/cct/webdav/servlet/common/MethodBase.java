@@ -69,6 +69,7 @@ import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -459,7 +460,19 @@ public abstract class MethodBase {
    *                   XmlUtil wrappers
    * ==================================================================== */
 
-  protected Element[] getChildren(Node nd) throws WebdavException {
+  protected Collection<Element> getChildren(Node nd) throws WebdavException {
+    try {
+      return XmlUtil.getElements(nd);
+    } catch (Throwable t) {
+      if (debug) {
+        getLogger().error(this, t);
+      }
+
+      throw new WebdavBadRequest(t.getMessage());
+    }
+  }
+
+  protected Element[] getChildrenArray(Node nd) throws WebdavException {
     try {
       return XmlUtil.getElementsArray(nd);
     } catch (Throwable t) {

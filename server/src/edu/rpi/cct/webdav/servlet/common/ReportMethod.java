@@ -218,7 +218,7 @@ public class ReportMethod extends MethodBase {
   private void parseAclPrincipalProps(Element root,
                                       WebdavNsIntf intf) throws WebdavException {
     try {
-      Element[] children = getChildren(root);
+      Element[] children = getChildrenArray(root);
       boolean hadProp = false;
 
       for (int i = 0; i < children.length; i++) {
@@ -272,7 +272,7 @@ public class ReportMethod extends MethodBase {
                                             int depth,
                                             WebdavNsIntf intf) throws WebdavException {
     try {
-      Element[] children = getChildren(root);
+      Element[] children = getChildrenArray(root);
 
       pps = new PrincipalPropertySearch();
 
@@ -284,7 +284,7 @@ public class ReportMethod extends MethodBase {
 
           pps.propertySearches.add(ps);
 
-          Element[] pschildren = getChildren(curnode);
+          Element[] pschildren = getChildrenArray(curnode);
 
           if (pschildren.length != 2) {
             throw new WebdavBadRequest();

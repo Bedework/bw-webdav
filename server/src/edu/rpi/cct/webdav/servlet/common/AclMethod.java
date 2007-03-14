@@ -117,7 +117,7 @@ public class AclMethod extends MethodBase {
         throw new WebdavBadRequest();
       }
 
-      Element[] aces = getChildren(root);
+      Element[] aces = getChildrenArray(root);
 
       for (int i = 0; i < aces.length; i++) {
         Element curnode = aces[i];
@@ -153,7 +153,7 @@ public class AclMethod extends MethodBase {
   private boolean processAcl(WebdavNsIntf.AclInfo ainfo, Node nd) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
-    Element[] children = getChildren(nd);
+    Element[] children = getChildrenArray(nd);
 
     if (children.length < 2) {
       throw new WebdavBadRequest();
@@ -191,7 +191,7 @@ public class AclMethod extends MethodBase {
         return false;
       }
 
-      Element[] pchildren = getChildren(curnode);
+      Element[] pchildren = getChildrenArray(curnode);
 
       for (int pi = 0; pi < pchildren.length; pi++) {
         Element pnode = pchildren[pi];

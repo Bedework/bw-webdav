@@ -221,7 +221,7 @@ public class PropPatchMethod extends MethodBase {
     ArrayList<Collection<Element>> res = new ArrayList<Collection<Element>>();
 
     try {
-      Element[] children = getChildren(node);
+      Element[] children = getChildrenArray(node);
 
       for (int i = 0; i < children.length; i++) {
         Element srnode = children[i]; // set or remove
@@ -270,7 +270,7 @@ public class PropPatchMethod extends MethodBase {
    */
   private void processPlist(Collection<Element> plist, Element node,
                             boolean remove) throws WebdavException {
-    Element[] props = getChildren(node);
+    Element[] props = getChildrenArray(node);
 
     for (int i = 0; i < props.length; i++) {
       Element prop = props[i];
