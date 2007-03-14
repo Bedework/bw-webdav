@@ -60,7 +60,10 @@ import edu.rpi.cmt.access.Acl.CurrentAccess;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
 
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
+
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
@@ -97,6 +100,10 @@ public abstract class WebdavNsNode implements Serializable {
   /** Suitable for display
    */
   //protected String name;
+
+  protected String urlPrefix;
+
+  protected String path;
 
   /** True if this node is a collection
    */
@@ -186,9 +193,16 @@ public abstract class WebdavNsNode implements Serializable {
 
   /** Constructor
    *
+   * @param urlPrefix - needed for building hrefs.
+   * @param path - resource path
+   * @param collection - true if this is a collection
    * @param debug
    */
-  public WebdavNsNode(boolean debug) {
+  public WebdavNsNode(String urlPrefix, String path,
+                      boolean collection, boolean debug) {
+    this.urlPrefix = urlPrefix;
+    this.path = path;
+    this.collection = collection;
     this.debug = debug;
   }
 
@@ -244,9 +258,71 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract boolean trailSlash();
 
+  /**
+   * @return String url prefix
+   */
+  public String getUrlPrefix() {
+    return urlPrefix;
+  }
+
+  /**
+   * @return String
+   */
+  public String getPath() {
+    return path;
+  }
+
   /* ====================================================================
    *                   Property methods
    * ==================================================================== */
+
+  /**
+   * @param xml
+   * @throws WebdavException
+   */
+  public void generateHref(XmlEmit xml) throws WebdavException {
+    try {
+      String url = getUrlPrefix() + new URI(getEncodedUri()).toASCIIString();
+      xml.property(WebdavTags.href, url);
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  /**
+   * @param xml
+   * @param uri
+   * @throws WebdavException
+   */
+  public void generateHref(XmlEmit xml, String uri) throws WebdavException {
+    generateUrl(xml, WebdavTags.href, uri);
+  }
+
+  /**
+   * @param xml
+   * @param tag
+   * @param uri
+   * @throws WebdavException
+   */
+  public void generateUrl(XmlEmit xml, QName tag, String uri) throws WebdavException {
+    try {
+      String enc = new URI(null, null, uri, null).toString();
+      enc = new URI(enc).toASCIIString();  // XXX ???????
+
+      StringBuffer sb = new StringBuffer(getUrlPrefix());
+
+      if (!enc.startsWith("/")) {
+        sb.append("/");
+      }
+
+      sb.append(enc);
+      xml.property(tag, sb.toString());
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
 
   /**
    */
@@ -382,11 +458,17 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.resourcetype)) {
         // dav 13.9
-        if (getCollection()) {
-          xml.propertyTagVal(WebdavTags.resourcetype,
-                             WebdavTags.collection);
+        xml.openTag(WebdavTags.resourcetype);
+
+        if (isPrincipal()) {
+          xml.emptyTag(WebdavTags.principal);
         }
 
+        if (isCollection()) {
+          xml.emptyTag(WebdavTags.collection);
+        }
+
+        xml.closeTag(WebdavTags.resourcetype);
         return true;
       }
 
@@ -514,18 +596,10 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   /**
-   * @param val boolean true for a collection
-   * @throws WebdavException
-   */
-  public void setCollection(boolean val) throws WebdavException {
-    collection = val;
-  }
-
-  /**
    * @return boolean true for a collection
    * @throws WebdavException
    */
-  public boolean getCollection() throws WebdavException {
+  public boolean isCollection() throws WebdavException {
     return collection;
   }
 
@@ -593,6 +667,42 @@ public abstract class WebdavNsNode implements Serializable {
   public String getTargetUri() throws WebdavException {
     init(false);
     return targetUri;
+  }
+
+  /** Return a collection of property objects
+   *
+   * <p>Default is to return an empty Collection
+   *
+   * @param ns      String interface namespace.
+   * @return Collection (possibly empty) of WebdavProperty objects
+   * @throws WebdavException
+   */
+  public Collection<WebdavProperty> getProperties(String ns) throws WebdavException {
+    return new ArrayList<WebdavProperty>();
+  }
+
+  /** Returns an InputStream for the content.
+   *
+   * @return Reader       A reader for the content.
+   * @throws WebdavException
+   */
+  public Reader getContent() throws WebdavException {
+    String cont = getContentString();
+
+    if (cont == null) {
+      return null;
+    }
+
+    return new StringReader(cont);
+  }
+
+  /** Return string content
+   *
+   * @return String       content.
+   * @throws WebdavException
+   */
+  public String getContentString() throws WebdavException {
+    return null;
   }
 
   /* ====================================================================

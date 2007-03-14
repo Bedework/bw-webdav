@@ -116,7 +116,7 @@ public class GetMethod extends MethodBase {
       String contentType;
       int contentLength;
 
-      if (node.getCollection()) {
+      if (node.isCollection()) {
         if (getNsIntf().getDirectoryBrowsingDisallowed()) {
           throw new WebdavException(HttpServletResponse.SC_FORBIDDEN);
         }
@@ -279,7 +279,7 @@ public class GetMethod extends MethodBase {
 
         sb.line("<tr>");
 
-        if (node.getCollection()) {
+        if (node.isCollection()) {
           /* folder */
         } else {
           /* calendar? */

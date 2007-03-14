@@ -239,7 +239,7 @@ public class PrincipalMatchReport {
       return nodes;
     }
 
-    if (!node.getCollection()) {
+    if (!node.isCollection()) {
       nodes.add(node);
       return nodes;
     }

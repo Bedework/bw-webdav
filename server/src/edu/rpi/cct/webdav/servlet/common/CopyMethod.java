@@ -126,7 +126,7 @@ public class CopyMethod extends MethodBase {
                                        WebdavNsIntf.nodeTypeUnknown);
 
       int toNodeType;
-      if (from.getCollection()) {
+      if (from.isCollection()) {
         toNodeType = WebdavNsIntf.nodeTypeCollection;
       } else {
         toNodeType = WebdavNsIntf.nodeTypeEntity;

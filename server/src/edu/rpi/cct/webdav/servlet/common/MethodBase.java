@@ -57,7 +57,6 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
-import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
@@ -66,7 +65,6 @@ import edu.rpi.sss.util.xml.XmlUtil;
 import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -99,8 +97,6 @@ public abstract class MethodBase {
   /** namespace interface for this request
    */
   protected WebdavNsIntf nsIntf;
-
-  private String urlPrefix;
 
   private String resourceUri;
 
@@ -173,7 +169,6 @@ public abstract class MethodBase {
     this.dumpContent = dumpContent;
 
 //    config = servlet.getServletConfig();
-    urlPrefix = WebdavUtils.getUrlPrefix(nsIntf.getRequest());
     xml = nsIntf.getXmlEmit();
 
     // content = null;
@@ -188,13 +183,6 @@ public abstract class MethodBase {
    */
   public WebdavNsIntf getNsIntf() {
     return nsIntf;
-  }
-
-  /**
-   * @return String url prefix
-   */
-  public String getUrlPrefix() {
-    return urlPrefix;
   }
 
   /** Get the decoded and fixed resource URI
@@ -331,21 +319,6 @@ public abstract class MethodBase {
   protected void checkDepth(int depth, int min, int max) throws WebdavException {
     if ((depth < min) || (depth > max)) {
       throw new WebdavBadRequest();
-    }
-  }
-
-  protected void addHref(WebdavNsNode node) throws WebdavException {
-    try {
-      if (debug) {
-        trace("Adding href " + getUrlPrefix() + node.getEncodedUri());
-      }
-
-      String url = getUrlPrefix() + new URI(node.getEncodedUri()).toASCIIString();
-      property(WebdavTags.href, url);
-    } catch (WebdavException wde) {
-      throw wde;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
     }
   }
 

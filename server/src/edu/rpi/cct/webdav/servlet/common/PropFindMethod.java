@@ -258,7 +258,7 @@ public class PropFindMethod extends MethodBase {
    */
   public void doNodeProperties(WebdavNsNode node,
                                 PropRequest pr) throws WebdavException {
-    addHref(node);
+    node.generateHref(xml);
 
     openTag(WebdavTags.propstat);
 

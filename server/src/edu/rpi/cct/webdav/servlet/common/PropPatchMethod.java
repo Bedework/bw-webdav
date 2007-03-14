@@ -174,7 +174,7 @@ public class PropPatchMethod extends MethodBase {
         openTag(WebdavTags.multistatus);
 
         openTag(WebdavTags.response);
-        addHref(node);
+        node.generateHref(xml);
         for (SetPropertyResult spr: failures) {
           openTag(WebdavTags.propstat);
           openTag(WebdavTags.prop);
