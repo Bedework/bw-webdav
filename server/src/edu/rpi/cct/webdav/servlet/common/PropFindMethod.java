@@ -69,7 +69,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Collection;
-import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -298,11 +297,7 @@ public class PropFindMethod extends MethodBase {
       return;
     }
 
-    Iterator children = getNsIntf().getChildren(node);
-
-    while (children.hasNext()) {
-      WebdavNsNode child = (WebdavNsNode)children.next();
-
+    for (WebdavNsNode child: getNsIntf().getChildren(node)) {
       doNodeAndChildren(child, curDepth, maxDepth);
     }
   }

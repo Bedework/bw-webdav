@@ -72,7 +72,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -488,10 +487,10 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Returns the immediate children of a node.
    *
    * @param node             node in question
-   * @return Iterator        over WebdavNsNode children
+   * @return Collection      of WebdavNsNode children
    * @throws WebdavException
    */
-  public abstract Iterator<WebdavNsNode> getChildren(WebdavNsNode node)
+  public abstract Collection<WebdavNsNode> getChildren(WebdavNsNode node)
       throws WebdavException;
 
   /** Returns the parent of a node.

@@ -54,6 +54,8 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.sss.util.xml.QName;
+
 import javax.servlet.http.HttpServletResponse;
 
 /** NotFound exception thrown by webdav classes
@@ -72,5 +74,22 @@ public class WebdavNotFound extends WebdavException {
    */
   public WebdavNotFound(String msg) {
     super(HttpServletResponse.SC_NOT_FOUND, msg);
+  }
+
+  /** Constructor
+   *
+   * @param errorTag
+   */
+  public WebdavNotFound(QName errorTag) {
+    super(HttpServletResponse.SC_NOT_FOUND, errorTag);
+  }
+
+  /** Constructor
+   *
+   * @param errorTag
+   * @param msg
+   */
+  public WebdavNotFound(QName errorTag, String msg) {
+    super(HttpServletResponse.SC_NOT_FOUND, errorTag, msg);
   }
 }

@@ -54,6 +54,8 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.sss.util.xml.QName;
+
 import javax.servlet.http.HttpServletResponse;
 
 /** Base exception thrown by webdav classes
@@ -64,6 +66,7 @@ public class WebdavException extends Throwable {
   /** > 0 if set
    */
   int statusCode = -1;
+  QName errorTag;
 
   /** Constructor
    *
@@ -105,6 +108,28 @@ public class WebdavException extends Throwable {
     statusCode = st;
   }
 
+  /** Constructor
+   *
+   * @param st
+   * @param errorTag
+   */
+  public WebdavException(int st, QName errorTag) {
+    statusCode = st;
+    this.errorTag = errorTag;
+  }
+
+  /** Constructor
+   *
+   * @param st
+   * @param errorTag
+   * @param msg
+   */
+  public WebdavException(int st, QName errorTag, String msg) {
+    super(msg);
+    statusCode = st;
+    this.errorTag = errorTag;
+  }
+
   /** Set the status
    * @param val int status
    */
@@ -118,5 +143,13 @@ public class WebdavException extends Throwable {
    */
   public int getStatusCode() {
     return statusCode;
+  }
+
+  /** Get the errorTag
+   *
+   * @return QName
+   */
+  public QName getErrorTag() {
+    return errorTag;
   }
 }

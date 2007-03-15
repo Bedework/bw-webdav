@@ -62,7 +62,6 @@ import java.io.CharArrayReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -271,10 +270,7 @@ public class GetMethod extends MethodBase {
               "cellspacing=\"0\"" +
               " cellpadding=\"4\"");
 
-      Iterator<WebdavNsNode> children = getNsIntf().getChildren(node);
-
-      while (children.hasNext()) {
-        WebdavNsNode child = children.next();
+      for (WebdavNsNode child: getNsIntf().getChildren(node)) {
         /* icon would be nice */
 
         sb.line("<tr>");

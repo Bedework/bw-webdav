@@ -54,6 +54,8 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.sss.util.xml.QName;
+
 import javax.servlet.http.HttpServletResponse;
 
 /** Forbidden exception thrown by webdav classes
@@ -72,5 +74,22 @@ public class WebdavForbidden extends WebdavException {
    */
   public WebdavForbidden(String msg) {
     super(HttpServletResponse.SC_FORBIDDEN, msg);
+  }
+
+  /** Constructor
+   *
+   * @param errorTag
+   */
+  public WebdavForbidden(QName errorTag) {
+    super(HttpServletResponse.SC_FORBIDDEN, errorTag);
+  }
+
+  /** Constructor
+   *
+   * @param errorTag
+   * @param msg
+   */
+  public WebdavForbidden(QName errorTag, String msg) {
+    super(HttpServletResponse.SC_FORBIDDEN, errorTag, msg);
   }
 }

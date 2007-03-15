@@ -54,14 +54,19 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
+import org.bedework.davdefs.WebdavTags;
+
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.sss.util.servlets.io.CharArrayWrappedResponse;
+import edu.rpi.sss.util.xml.QName;
+import edu.rpi.sss.util.xml.XmlEmit;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
@@ -176,7 +181,7 @@ public abstract class WebdavServlet extends HttpServlet
         method.doMethod(req, resp);
       }
     } catch (WebdavForbidden wdf) {
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN, wdf.getMessage());
+      sendError(wdf, resp);
     } catch (Throwable t) {
       serverError = handleException(t, resp, serverError);
     } finally {
@@ -226,18 +231,49 @@ public abstract class WebdavServlet extends HttpServlet
           getLogger().error(this, wde);
           serverError = true;
         }
-        resp.sendError(wde.getStatusCode(), wde.getMessage());
+        sendError(wde, resp);
         return serverError;
       }
 
       getLogger().error(this, t);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      sendError(t, resp);
       return true;
     } catch (Throwable t1) {
       // Pretty much screwed if we get here
       return true;
     }
   }
+
+  private void sendError(Throwable t, HttpServletResponse resp) {
+    try {
+      if (t instanceof WebdavException) {
+        WebdavException wde = (WebdavException)t;
+        QName errorTag = wde.getErrorTag();
+
+        if (errorTag != null) {
+          XmlEmit xml = new XmlEmit();
+          xml.addNs(WebdavTags.namespace);
+
+          StringWriter sw = new StringWriter();
+          xml.startEmit(sw);
+          xml.openTag(WebdavTags.error);
+          xml.emptyTag(errorTag);
+          xml.closeTag(WebdavTags.error);
+          xml.flush();
+
+          resp.sendError(wde.getStatusCode(), sw.toString());
+        } else {
+          resp.sendError(wde.getStatusCode(), wde.getMessage());
+        }
+      } else {
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                       t.getMessage());
+      }
+    } catch (Throwable t1) {
+      // Pretty much screwed if we get here
+    }
+  }
+
 
   /** Add methods for this namespace
    *

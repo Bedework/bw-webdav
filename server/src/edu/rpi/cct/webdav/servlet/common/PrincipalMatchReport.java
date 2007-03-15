@@ -35,7 +35,6 @@ import edu.rpi.sss.util.xml.XmlEmit;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -244,11 +243,7 @@ public class PrincipalMatchReport {
       return nodes;
     }
 
-    Iterator children = intf.getChildren(node);
-
-    while (children.hasNext()) {
-      WebdavNsNode child = (WebdavNsNode)children.next();
-
+    for (WebdavNsNode child: intf.getChildren(node)) {
       nodes.addAll(doNodeAndChildren(child));
     }
 
