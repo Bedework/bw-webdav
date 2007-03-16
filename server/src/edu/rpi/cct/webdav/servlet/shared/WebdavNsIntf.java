@@ -171,7 +171,7 @@ public abstract class WebdavNsIntf implements Serializable {
     anonymous = (account == null) || (account.length() == 0);
     urlPrefix = WebdavUtils.getUrlPrefix(req);
 
-    addNamespace();
+    addNamespace(xml);
   }
 
   /**
@@ -354,9 +354,10 @@ public abstract class WebdavNsIntf implements Serializable {
    *
    * <p>Something more like "http://ahost.rpi.edu/webdav/"
    *
+   * @param xml
    * @throws WebdavException
    */
-  public void addNamespace() throws WebdavException {
+  public void addNamespace(XmlEmit xml) throws WebdavException {
     try {
       xml.addNs(WebdavTags.namespace);
     } catch (Throwable t) {

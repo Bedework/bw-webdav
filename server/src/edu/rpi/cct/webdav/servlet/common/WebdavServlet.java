@@ -67,6 +67,7 @@ import edu.rpi.sss.util.xml.XmlEmit;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
@@ -181,15 +182,15 @@ public abstract class WebdavServlet extends HttpServlet
         method.doMethod(req, resp);
       }
     } catch (WebdavForbidden wdf) {
-      sendError(wdf, resp);
+      sendError(intf, wdf, resp);
     } catch (Throwable t) {
-      serverError = handleException(t, resp, serverError);
+      serverError = handleException(intf, t, resp, serverError);
     } finally {
       if (intf != null) {
         try {
           intf.close();
         } catch (Throwable t) {
-          serverError = handleException(t, resp, serverError);
+          serverError = handleException(intf, t, resp, serverError);
         }
       }
 
@@ -215,7 +216,7 @@ public abstract class WebdavServlet extends HttpServlet
   }
 
   /* Return true if it's a server error */
-  private boolean handleException(Throwable t,
+  private boolean handleException(WebdavNsIntf intf, Throwable t,
                                   HttpServletResponse resp,
                                   boolean serverError) {
     if (serverError) {
@@ -231,12 +232,12 @@ public abstract class WebdavServlet extends HttpServlet
           getLogger().error(this, wde);
           serverError = true;
         }
-        sendError(wde, resp);
+        sendError(intf, wde, resp);
         return serverError;
       }
 
       getLogger().error(this, t);
-      sendError(t, resp);
+      sendError(intf, t, resp);
       return true;
     } catch (Throwable t1) {
       // Pretty much screwed if we get here
@@ -244,24 +245,23 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  private void sendError(Throwable t, HttpServletResponse resp) {
+  private void sendError(WebdavNsIntf intf, Throwable t,
+                         HttpServletResponse resp) {
     try {
       if (t instanceof WebdavException) {
         WebdavException wde = (WebdavException)t;
         QName errorTag = wde.getErrorTag();
 
         if (errorTag != null) {
-          XmlEmit xml = new XmlEmit();
-          xml.addNs(WebdavTags.namespace);
+          emitError(intf, errorTag, resp.getWriter());
 
           StringWriter sw = new StringWriter();
-          xml.startEmit(sw);
-          xml.openTag(WebdavTags.error);
-          xml.emptyTag(errorTag);
-          xml.closeTag(WebdavTags.error);
-          xml.flush();
+          emitError(intf, errorTag, sw);
 
-          resp.sendError(wde.getStatusCode(), sw.toString());
+          try {
+            resp.sendError(wde.getStatusCode(), sw.toString());
+          } catch (Throwable t1) {
+          }
         } else {
           resp.sendError(wde.getStatusCode(), wde.getMessage());
         }
@@ -274,7 +274,20 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
+  private void emitError(WebdavNsIntf intf, QName errorTag, Writer wtr) {
+    try {
+      XmlEmit xml = new XmlEmit();
+      intf.addNamespace(xml);
 
+      xml.startEmit(wtr);
+      xml.openTag(WebdavTags.error);
+      xml.emptyTag(errorTag);
+      xml.closeTag(WebdavTags.error);
+      xml.flush();
+    } catch (Throwable t1) {
+      // Pretty much screwed if we get here
+    }
+  }
   /** Add methods for this namespace
    *
    */
