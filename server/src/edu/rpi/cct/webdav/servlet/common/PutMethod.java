@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
@@ -112,9 +113,18 @@ public class PutMethod extends MethodBase {
       resp.setHeader("ETag", node.getEtagValue(true));
       resp.setHeader("Location", intf.getLocation(pcr.node));
 
+    } catch (WebdavForbidden wdf) {
+      resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      throw wdf;
     } catch (WebdavException we) {
+      if (debug) {
+        error(we);
+      }
       throw we;
     } catch (Throwable t) {
+      if (debug) {
+        error(t);
+      }
       throw new WebdavException(t);
     }
   }

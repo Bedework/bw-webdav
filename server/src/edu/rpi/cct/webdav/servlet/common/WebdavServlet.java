@@ -253,14 +253,15 @@ public abstract class WebdavServlet extends HttpServlet
         QName errorTag = wde.getErrorTag();
 
         if (errorTag != null) {
-          emitError(intf, errorTag, resp.getWriter());
+          resp.setStatus(wde.getStatusCode());
+          if (!emitError(intf, errorTag, resp.getWriter())) {
+            StringWriter sw = new StringWriter();
+            emitError(intf, errorTag, sw);
 
-          StringWriter sw = new StringWriter();
-          emitError(intf, errorTag, sw);
-
-          try {
-            resp.sendError(wde.getStatusCode(), sw.toString());
-          } catch (Throwable t1) {
+            try {
+              resp.sendError(wde.getStatusCode(), sw.toString());
+            } catch (Throwable t1) {
+            }
           }
         } else {
           resp.sendError(wde.getStatusCode(), wde.getMessage());
@@ -274,7 +275,7 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  private void emitError(WebdavNsIntf intf, QName errorTag, Writer wtr) {
+  private boolean emitError(WebdavNsIntf intf, QName errorTag, Writer wtr) {
     try {
       XmlEmit xml = new XmlEmit();
       intf.addNamespace(xml);
@@ -284,8 +285,11 @@ public abstract class WebdavServlet extends HttpServlet
       xml.emptyTag(errorTag);
       xml.closeTag(WebdavTags.error);
       xml.flush();
+
+      return true;
     } catch (Throwable t1) {
       // Pretty much screwed if we get here
+      return false;
     }
   }
   /** Add methods for this namespace
@@ -465,5 +469,9 @@ public abstract class WebdavServlet extends HttpServlet
    */
   public void logIt(String msg) {
     getLogger().info(msg);
+  }
+
+  protected void error(Throwable t) {
+    getLogger().error(this, t);
   }
 }
