@@ -132,6 +132,8 @@ public class AclMethod extends MethodBase {
       }
 
       return ainfo;
+    } catch (WebdavException wde) {
+      throw wde;
     } catch (Throwable t) {
       error(t.getMessage());
       if (debug) {
