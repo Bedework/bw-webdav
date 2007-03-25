@@ -236,22 +236,6 @@ public abstract class WebdavNsNode implements Serializable {
     }
   }
 
-  /** Remove the given property for this node.
-   *
-   * @param val   Element defining property to remove
-   * @return SetPropertyResult  status
-   * @throws WebdavException
-   */
-  public abstract SetPropertyResult removeProperty(Element val) throws WebdavException;
-
-  /** Set the given property for this node.
-   *
-   * @param val   Element defining property to set
-   * @return SetPropertyResult  status
-   * @throws WebdavException
-   */
-  public abstract SetPropertyResult setProperty(Element val) throws WebdavException;
-
   /** Trailing "/" on uri?
    *
    * @return boolean
@@ -334,6 +318,58 @@ public abstract class WebdavNsNode implements Serializable {
     /**
      */
     public String val;
+  }
+
+  /** Remove the given property for this node.
+   *
+   * @param val   Element defining property to remove
+   * @param spr   Holds reult of removing property
+   * @return boolean  true if property recognized.
+   * @throws WebdavException
+   */
+  public boolean removeProperty(Element val,
+                                SetPropertyResult spr) throws WebdavException {
+    try {
+      if (WebdavTags.getetag.nodeMatches(val)) {
+        spr.status = HttpServletResponse.SC_FORBIDDEN;
+        return true;
+      }
+
+      if (WebdavTags.getlastmodified.nodeMatches(val)) {
+        spr.status = HttpServletResponse.SC_FORBIDDEN;
+        return true;
+      }
+
+      return false;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  /** Set the given property for this node.
+   *
+   * @param val   Element defining property to set
+   * @param spr   Holds reult of removing property
+   * @return boolean  true if property recognized.
+   * @throws WebdavException
+   */
+  public boolean setProperty(Element val,
+                             SetPropertyResult spr) throws WebdavException {
+    try {
+      if (WebdavTags.getetag.nodeMatches(val)) {
+        spr.status = HttpServletResponse.SC_FORBIDDEN;
+        return true;
+      }
+
+      if (WebdavTags.getlastmodified.nodeMatches(val)) {
+        spr.status = HttpServletResponse.SC_FORBIDDEN;
+        return true;
+      }
+
+      return false;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
   }
 
   /** Emit the property indicated by the tag.

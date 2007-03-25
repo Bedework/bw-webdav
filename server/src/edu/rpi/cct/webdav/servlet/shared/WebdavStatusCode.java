@@ -65,6 +65,9 @@ public class WebdavStatusCode {
   /** multi-status OK response */
   public final static int SC_MULTI_STATUS = 207;
 
+  /** */
+  public final static int SC_FAILED_DEPENDENCY = 424;
+
   private final static HashMap<Integer, String> msgtext = new HashMap<Integer, String>();
 
   static {

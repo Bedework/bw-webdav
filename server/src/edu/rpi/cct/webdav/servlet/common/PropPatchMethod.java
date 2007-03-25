@@ -137,6 +137,7 @@ public class PropPatchMethod extends MethodBase {
 
       Collection<? extends Collection<Element>> setRemoveList = processUpdate(root);
       Collection<SetPropertyResult> failures = new ArrayList<SetPropertyResult>();
+      Collection<SetPropertyResult> successes = new ArrayList<SetPropertyResult>();
 
       for (Collection<Element> sr: setRemoveList) {
         boolean setting = sr instanceof PropPatchMethod.PropertySetList;
@@ -146,20 +147,28 @@ public class PropPatchMethod extends MethodBase {
          * invalidate an earlier change.
          */
 
-        SetPropertyResult spr;
-
         for (Element prop: sr) {
+          SetPropertyResult spr = new SetPropertyResult(prop);
+
+          boolean recognized;
+
           if (setting) {
-            spr = node.setProperty(prop);
+            recognized = node.setProperty(prop, spr);
           } else {
             if (onlySet) {
               throw new WebdavBadRequest();
             }
-            spr = node.removeProperty(prop);
+            recognized = node.removeProperty(prop, spr);
+          }
+
+          if (!recognized) {
+            spr.status = HttpServletResponse.SC_NOT_FOUND;
           }
 
           if (spr.status != HttpServletResponse.SC_OK) {
             failures.add(spr);
+          } else {
+            successes.add(spr);
           }
         }
       }
@@ -181,6 +190,14 @@ public class PropPatchMethod extends MethodBase {
           emptyTag(spr.prop);
           closeTag(WebdavTags.prop);
           addStatus(spr.status, spr.message);
+          closeTag(WebdavTags.propstat);
+        }
+        for (SetPropertyResult spr: successes) {
+          openTag(WebdavTags.propstat);
+          openTag(WebdavTags.prop);
+          emptyTag(spr.prop);
+          closeTag(WebdavTags.prop);
+          addStatus(WebdavStatusCode.SC_FAILED_DEPENDENCY, "Failed Dependency");
           closeTag(WebdavTags.propstat);
         }
         closeTag(WebdavTags.response);
