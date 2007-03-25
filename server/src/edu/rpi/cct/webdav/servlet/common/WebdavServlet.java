@@ -253,20 +253,32 @@ public abstract class WebdavServlet extends HttpServlet
         QName errorTag = wde.getErrorTag();
 
         if (errorTag != null) {
+          if (debug) {
+            debugMsg("setStatus(" + wde.getStatusCode() + ")");
+          }
           resp.setStatus(wde.getStatusCode());
           if (!emitError(intf, errorTag, resp.getWriter())) {
             StringWriter sw = new StringWriter();
             emitError(intf, errorTag, sw);
 
             try {
+              if (debug) {
+                debugMsg("setStatus(" + wde.getStatusCode() + ")");
+              }
               resp.sendError(wde.getStatusCode(), sw.toString());
             } catch (Throwable t1) {
             }
           }
         } else {
+          if (debug) {
+            debugMsg("setStatus(" + wde.getStatusCode() + ")");
+          }
           resp.sendError(wde.getStatusCode(), wde.getMessage());
         }
       } else {
+        if (debug) {
+          debugMsg("setStatus(" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + ")");
+        }
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                        t.getMessage());
       }
