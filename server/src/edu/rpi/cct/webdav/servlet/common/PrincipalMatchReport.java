@@ -67,6 +67,9 @@ public class PrincipalMatchReport {
    */
   public boolean whoami;
 
+  /** Property we're supposed to match on */
+  public Element principalProperty;
+
   /** Properties to return (none for empty collection)
    */
   public Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
@@ -130,7 +133,7 @@ public class PrincipalMatchReport {
           // use when processing.
           whoami = true;
         } else {
-          throw new WebdavBadRequest();
+          principalProperty = ppchildren[0];
         }
       } else if (WebdavTags.self.nodeMatches(curnode)) {
         if (debug) {
