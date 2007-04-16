@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
+import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNotFound;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
@@ -134,6 +135,10 @@ public class CopyMethod extends MethodBase {
 
       WebdavNsNode to = intf.getNode(intf.getUri(dest),
                                      WebdavNsIntf.existanceMay, toNodeType);
+
+      if (from.equals(to)) {
+        throw new WebdavForbidden("source and destination equal");
+      }
 
       intf.copyMove(req, resp, from, to, copy, overwrite, depth);
     } catch (WebdavException we) {
