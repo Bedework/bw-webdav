@@ -402,16 +402,6 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public abstract boolean getAccessControl();
 
-  /** Return the complete URL describing the location of the object
-   * represented by the node
-   *
-   * @param node             node in question
-   * @return String      url
-   * @throws WebdavException
-   */
-  public abstract String getLocation(WebdavNsNode node)
-      throws WebdavException;
-
   //ENUM
 
   /** Must not exist */
@@ -973,6 +963,38 @@ public abstract class WebdavNsIntf implements Serializable {
         }
       }
       xml.property(WebdavTags.href, url);
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  /** Return the complete URL describing the location of the object
+   * represented by the node
+   *
+   * @param node             node in question
+   * @return String      url
+   * @throws WebdavException
+   */
+  public String getLocation(WebdavNsNode node) throws WebdavException {
+    try {
+      if (debug) {
+        trace("Get url " + urlPrefix + node.getEncodedUri());
+      }
+
+      String url = urlPrefix + new URI(node.getEncodedUri()).toASCIIString();
+
+      if (url.endsWith("/")) {
+        if (!node.trailSlash()) {
+          url = url.substring(0, url.length() - 1);
+        }
+      } else {
+        if (node.trailSlash()) {
+          url = url + "/";
+        }
+      }
+      return url;
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {

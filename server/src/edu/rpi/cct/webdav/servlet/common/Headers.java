@@ -57,7 +57,10 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 
+import org.apache.log4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /** Retrieve and process Webdav header values
  *
@@ -107,6 +110,20 @@ public class Headers {
     }
 
     throw new WebdavBadRequest();
+  }
+
+  /** Create a location header
+   *
+   * @param resp
+   * @param url
+   * @param debug
+   */
+  public static void makeLocation(HttpServletResponse resp,
+                                  String url, boolean debug) {
+    if (debug) {
+      Logger.getLogger(Headers.class).debug("Location:" + url);
+    }
+    resp.setHeader("Location", url);
   }
 
   /** Look for the If-None-Match header

@@ -170,6 +170,7 @@ public abstract class WebdavNsNode implements Serializable {
     //addPropEntry(propertyNames, WebdavTags.inheritedAclSet, false);
     addPropEntry(propertyNames, WebdavTags.owner);
     //addPropEntry(propertyNames, WebdavTags.principalCollectionSet, false);
+    addPropEntry(propertyNames, WebdavTags.principalURL);
     addPropEntry(propertyNames, WebdavTags.resourcetype, true);
     addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet);
 
@@ -297,8 +298,17 @@ public abstract class WebdavNsNode implements Serializable {
 
       StringBuffer sb = new StringBuffer(getUrlPrefix());
 
-      if (!enc.startsWith("/")) {
-        sb.append("/");
+//      if (!enc.startsWith("/")) {
+//        sb.append("/");
+//      }
+      if (enc.endsWith("/")) {
+        if (!trailSlash()) {
+          enc = enc.substring(0, enc.length() - 1);
+        }
+      } else {
+        if (trailSlash()) {
+          enc = enc + "/";
+        }
       }
 
       sb.append(enc);
@@ -492,9 +502,17 @@ public abstract class WebdavNsNode implements Serializable {
         return true;
       }
 
+      if (tag.equals(WebdavTags.principalURL)) {
+        xml.openTag(tag);
+        generateUrl(xml, WebdavTags.href, getEncodedUri());
+        xml.closeTag(tag);
+
+        return true;
+      }
+
       if (tag.equals(WebdavTags.resourcetype)) {
         // dav 13.9
-        xml.openTag(WebdavTags.resourcetype);
+        xml.openTag(tag);
 
         if (isPrincipal()) {
           xml.emptyTag(WebdavTags.principal);
@@ -504,7 +522,7 @@ public abstract class WebdavNsNode implements Serializable {
           xml.emptyTag(WebdavTags.collection);
         }
 
-        xml.closeTag(WebdavTags.resourcetype);
+        xml.closeTag(tag);
         return true;
       }
 
@@ -563,7 +581,6 @@ public abstract class WebdavNsNode implements Serializable {
     Collection<PropertyTagEntry> res = new ArrayList<PropertyTagEntry>();
 
     res.addAll(propertyNames.values());
-    res.add(new PropertyTagEntry(WebdavTags.principalURL));
 
     return res;
   }

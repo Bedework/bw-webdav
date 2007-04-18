@@ -111,7 +111,9 @@ public class PutMethod extends MethodBase {
       resp.setContentLength(0);
 
       resp.setHeader("ETag", node.getEtagValue(true));
+      /* Apparently frowned upon
       resp.setHeader("Location", intf.getLocation(pcr.node));
+      */
 
     } catch (WebdavForbidden wdf) {
       resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
