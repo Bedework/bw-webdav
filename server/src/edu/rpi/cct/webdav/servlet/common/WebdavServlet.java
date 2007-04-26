@@ -352,12 +352,13 @@ public abstract class WebdavServlet extends HttpServlet
   private void tryWait(HttpServletRequest req, boolean in) throws Throwable {
     Waiter wtr = null;
     synchronized (waiters) {
-      String sessid = req.getRequestedSessionId();
-      if (sessid == null) {
+      //String key = req.getRequestedSessionId();
+      String key = req.getRemoteUser();
+      if (key == null) {
         return;
       }
 
-      wtr = waiters.get(sessid);
+      wtr = waiters.get(key);
       if (wtr == null) {
         if (!in) {
           return;
@@ -365,19 +366,20 @@ public abstract class WebdavServlet extends HttpServlet
 
         wtr = new Waiter();
         wtr.active = true;
-        waiters.put(sessid, wtr);
+        waiters.put(key, wtr);
         return;
       }
     }
 
     synchronized (wtr) {
       if (!in) {
+        wtr.active = false;
         wtr.notify();
         return;
       }
 
       wtr.waiting++;
-      if (wtr.active) {
+      while (wtr.active) {
         if (debug) {
           log.debug("in: waiters=" + wtr.waiting);
         }
@@ -385,6 +387,7 @@ public abstract class WebdavServlet extends HttpServlet
         wtr.wait();
       }
       wtr.waiting--;
+      wtr.active = true;
     }
   }
 
