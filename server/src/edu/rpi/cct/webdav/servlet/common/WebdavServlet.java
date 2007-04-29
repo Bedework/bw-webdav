@@ -106,7 +106,7 @@ public abstract class WebdavServlet extends HttpServlet
   protected HashMap<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
 
   /* Try to serialize requests from a single session
-   * Thisis very imperfect.
+   * This is very imperfect.
    */
   static class Waiter {
     boolean active;
