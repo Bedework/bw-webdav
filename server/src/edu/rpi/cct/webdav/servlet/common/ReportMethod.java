@@ -133,11 +133,7 @@ public class ReportMethod extends MethodBase {
     if (status != HttpServletResponse.SC_OK) {
       node.generateHref(xml);
 
-      openTag(WebdavTags.propstat);
-
       addStatus(status, null);
-
-      closeTag(WebdavTags.propstat);
     } else {
       pm.doNodeProperties(node, preq);
     }
