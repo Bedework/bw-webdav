@@ -208,11 +208,8 @@ public class PrincipalMatchReport {
           xml.openTag(WebdavTags.response);
           intf.addHref(nd);
 
-          for (WebdavProperty prop: props) {
-            nd.generatePropertyValue(prop.getTag(), intf, false);
-          }
+          mb.doPropFind(nd, props);
 
-          intf.addStatus(HttpServletResponse.SC_OK);
           xml.closeTag(WebdavTags.response);
         }
       }

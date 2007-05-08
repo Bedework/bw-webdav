@@ -68,7 +68,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -293,25 +292,7 @@ public class PropFindMethod extends MethodBase {
 
     // Named properties
 
-    Collection<WebdavProperty> unknowns = doPropFind(node, pr);
-
-    if (!unknowns.isEmpty()) {
-      openTag(WebdavTags.propstat);
-      openTag(WebdavTags.prop);
-
-      for (WebdavProperty prop: unknowns) {
-        try {
-          xml.emptyTag(prop.getTag());
-        } catch (Throwable t) {
-          throw new WebdavException(t);
-        }
-      }
-
-      closeTag(WebdavTags.prop);
-      addStatus(HttpServletResponse.SC_NOT_FOUND, null);
-
-      closeTag(WebdavTags.propstat);
-    }
+    doPropFind(node, pr.props);
   }
 
   private void doNodeAndChildren(WebdavNsNode node,
@@ -334,44 +315,6 @@ public class PropFindMethod extends MethodBase {
     for (WebdavNsNode child: getNsIntf().getChildren(node)) {
       doNodeAndChildren(child, curDepth, maxDepth);
     }
-  }
-
-  /** Build the response for a single node for a propfind request
-   *
-   * @param node
-   * @param preq
-   * @return Collection<WebdavProperty>
-   * @throws WebdavException
-   */
-  private Collection<WebdavProperty> doPropFind(WebdavNsNode node,
-                                                PropRequest preq) throws WebdavException {
-    WebdavNsIntf intf = getNsIntf();
-    Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
-    boolean open = false;
-
-    for (WebdavProperty pr: preq.props) {
-      if (!intf.knownProperty(node, pr)) {
-        unknowns.add(pr);
-      } else  {
-        if (!open) {
-          openTag(WebdavTags.propstat);
-          openTag(WebdavTags.prop);
-          open = true;
-        }
-
-        addNs(pr.getTag().getNamespaceURI());
-        intf.generatePropValue(node, pr, false);
-      }
-    }
-
-    if (open) {
-      closeTag(WebdavTags.prop);
-      addStatus(node.getStatus(), null);
-
-      closeTag(WebdavTags.propstat);
-    }
-
-    return unknowns;
   }
 
   /* Build the response for a single node for a propnames request

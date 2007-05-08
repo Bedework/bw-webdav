@@ -57,6 +57,8 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
+import edu.rpi.cct.webdav.servlet.shared.WebdavProperty;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
@@ -453,6 +455,60 @@ public abstract class MethodBase {
 
     synchronized (httpDateFormatter) {
       return httpDateFormatter.format(val) + "GMT";
+    }
+  }
+
+  /** Build the response for a single node for a propfind request
+   *
+   * @param node
+   * @param props
+   * @throws WebdavException
+   */
+  public void doPropFind(WebdavNsNode node,
+                         Collection<WebdavProperty> props) throws WebdavException {
+    WebdavNsIntf intf = getNsIntf();
+    Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
+    boolean open = false;
+
+    for (WebdavProperty pr: props) {
+      if (!intf.knownProperty(node, pr)) {
+        unknowns.add(pr);
+      } else  {
+        if (!open) {
+          openTag(WebdavTags.propstat);
+          openTag(WebdavTags.prop);
+          open = true;
+        }
+
+        addNs(pr.getTag().getNamespaceURI());
+        intf.generatePropValue(node, pr, false);
+      }
+    }
+
+    if (open) {
+      closeTag(WebdavTags.prop);
+      addStatus(node.getStatus(), null);
+
+      closeTag(WebdavTags.propstat);
+    }
+
+
+    if (!unknowns.isEmpty()) {
+      openTag(WebdavTags.propstat);
+      openTag(WebdavTags.prop);
+
+      for (WebdavProperty prop: unknowns) {
+        try {
+          xml.emptyTag(prop.getTag());
+        } catch (Throwable t) {
+          throw new WebdavException(t);
+        }
+      }
+
+      closeTag(WebdavTags.prop);
+      addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+
+      closeTag(WebdavTags.propstat);
     }
   }
 
