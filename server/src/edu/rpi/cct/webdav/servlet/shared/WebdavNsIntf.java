@@ -836,6 +836,42 @@ public abstract class WebdavNsIntf implements Serializable {
                                         null);
   }
 
+  /** Properties we can process */
+  private static final QName[] knownProperties = {
+    //    WebdavTags.lockdiscovery,
+    //    WebdavTags.source,
+    //    WebdavTags.supportedlock,
+    //    WebdavTags.aclRestrictions,
+    //    WebdavTags.inheritedAclSet,
+    WebdavTags.principalCollectionSet,
+  };
+
+  /** Return true if a call to generatePropValue will return a value.
+   *
+   * @param node
+   * @param pr
+   * @return boolean
+   */
+  public boolean knownProperty(WebdavNsNode node,
+                               WebdavProperty pr) {
+    QName tag = pr.getTag();
+    String ns = tag.getNamespaceURI();
+
+    if (!ns.equals(WebdavTags.namespace)) {
+      return false;
+    }
+
+    for (int i = 0; i < knownProperties.length; i++) {
+      if (tag.equals(knownProperties[i])) {
+        return true;
+      }
+    }
+
+    /* Try the node for a value */
+
+    return node.knownProperty(tag);
+  }
+
   /** Generate a response for a single webdav property. This should be overrriden
    * to handle other namespaces.
    *

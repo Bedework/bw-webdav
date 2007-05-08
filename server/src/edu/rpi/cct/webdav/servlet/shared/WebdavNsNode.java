@@ -382,6 +382,15 @@ public abstract class WebdavNsNode implements Serializable {
     }
   }
 
+  /** Return true if a call to generatePropertyValue will return a value.
+   *
+   * @param tag
+   * @return boolean
+   */
+  public boolean knownProperty(QName tag) {
+    return propertyNames.get(tag) != null;
+  }
+
   /** Emit the property indicated by the tag.
    *
    * @param tag  QName defining property

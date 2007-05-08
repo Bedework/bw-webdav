@@ -68,6 +68,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -259,25 +260,58 @@ public class PropFindMethod extends MethodBase {
                                 PropRequest pr) throws WebdavException {
     node.generateHref(xml);
 
-    openTag(WebdavTags.propstat);
+    if ((pr == null) || (!node.getExists())) {
+      openTag(WebdavTags.propstat);
+      addStatus(node.getStatus(), null);
+      closeTag(WebdavTags.propstat);
+      return;
+    }
 
-    if ((pr != null) && (node.getExists())) {
+    if ((pr.reqType == PropRequest.ReqType.propName) ||
+        (pr.reqType == PropRequest.ReqType.propAll)) {
+      openTag(WebdavTags.propstat);
+
       if (debug) {
         trace("doNodeProperties type=" + pr.reqType);
       }
 
-      if (pr.reqType == PropRequest.ReqType.prop) {
-        doPropFind(node, pr);
-      } else if (pr.reqType == PropRequest.ReqType.propName) {
+      if (pr.reqType == PropRequest.ReqType.propName) {
         doPropNames(node);
       } else if (pr.reqType == PropRequest.ReqType.propAll) {
         doPropAll(node);
       }
+      addStatus(node.getStatus(), null);
+
+      closeTag(WebdavTags.propstat);
+
+      return;
     }
 
-    addStatus(node.getStatus(), null);
+    if (pr.reqType != PropRequest.ReqType.prop) {
+      throw new WebdavBadRequest();
+    }
 
-    closeTag(WebdavTags.propstat);
+    // Named properties
+
+    Collection<WebdavProperty> unknowns = doPropFind(node, pr);
+
+    if (!unknowns.isEmpty()) {
+      openTag(WebdavTags.propstat);
+      openTag(WebdavTags.prop);
+
+      for (WebdavProperty prop: unknowns) {
+        try {
+          xml.emptyTag(prop.getTag());
+        } catch (Throwable t) {
+          throw new WebdavException(t);
+        }
+      }
+
+      closeTag(WebdavTags.prop);
+      addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+
+      closeTag(WebdavTags.propstat);
+    }
   }
 
   private void doNodeAndChildren(WebdavNsNode node,
@@ -306,19 +340,38 @@ public class PropFindMethod extends MethodBase {
    *
    * @param node
    * @param preq
+   * @return Collection<WebdavProperty>
    * @throws WebdavException
    */
-  private void doPropFind(WebdavNsNode node, PropRequest preq) throws WebdavException {
+  private Collection<WebdavProperty> doPropFind(WebdavNsNode node,
+                                                PropRequest preq) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
-
-    openTag(WebdavTags.prop);
+    Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
+    boolean open = false;
 
     for (WebdavProperty pr: preq.props) {
-      addNs(pr.getTag().getNamespaceURI());
-      intf.generatePropValue(node, pr, false);
+      if (!intf.knownProperty(node, pr)) {
+        unknowns.add(pr);
+      } else  {
+        if (!open) {
+          openTag(WebdavTags.propstat);
+          openTag(WebdavTags.prop);
+          open = true;
+        }
+
+        addNs(pr.getTag().getNamespaceURI());
+        intf.generatePropValue(node, pr, false);
+      }
     }
 
-    closeTag(WebdavTags.prop);
+    if (open) {
+      closeTag(WebdavTags.prop);
+      addStatus(node.getStatus(), null);
+
+      closeTag(WebdavTags.propstat);
+    }
+
+    return unknowns;
   }
 
   /* Build the response for a single node for a propnames request
