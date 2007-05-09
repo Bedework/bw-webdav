@@ -206,7 +206,7 @@ public class PrincipalMatchReport {
       if (wdnodes != null) {
         for (WebdavNsNode nd: wdnodes) {
           xml.openTag(WebdavTags.response);
-          intf.addHref(nd);
+          nd.generateHref(xml);
 
           mb.doPropFind(nd, props);
 
