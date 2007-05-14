@@ -60,7 +60,6 @@ import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
-import edu.rpi.cct.webdav.servlet.common.PrincipalMatchReport;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
@@ -587,22 +586,15 @@ public abstract class WebdavNsIntf implements Serializable {
    *                  Access methods
    * ==================================================================== */
 
-  /** Return the prefix - starting with "/" - which identifies principal urls
-   *
-   * @return String prefix
-   * @throws WebdavException
-   */
-  public abstract String getPrincipalPrefix() throws WebdavException;
-
   /** Given a PrincipalMatchReport returns a Collection of matching nodes.
    *
-   * @param resourceUri
-   * @param pmatch PrincipalMatchReport object
+   * @param resourceUri - url to base search on.
+   * @param principalUrl - url of principal or null for current user
    * @return Collection of WebdavNsNode
    * @throws WebdavException
    */
-  public abstract Collection<WebdavNsNode> principalMatch(String resourceUri,
-                                                          PrincipalMatchReport pmatch)
+  public abstract Collection<WebdavNsNode> getGroups(String resourceUri,
+                                                     String principalUrl)
           throws WebdavException;
 
   /** Given a uri returns a Collection of uris that allow search operations on
@@ -632,13 +624,6 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract String makeUserHref(String id) throws WebdavException;
-
-  /**
-   * @param id
-   * @return String href
-   * @throws WebdavException
-   */
-  public abstract String makeGroupHref(String id) throws WebdavException;
 
   /** Object class passed around as we parse access.
    */
@@ -855,11 +840,6 @@ public abstract class WebdavNsIntf implements Serializable {
   public boolean knownProperty(WebdavNsNode node,
                                WebdavProperty pr) {
     QName tag = pr.getTag();
-    String ns = tag.getNamespaceURI();
-
-    if (!ns.equals(WebdavTags.namespace)) {
-      return false;
-    }
 
     for (int i = 0; i < knownProperties.length; i++) {
       if (tag.equals(knownProperties[i])) {

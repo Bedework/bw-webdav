@@ -267,8 +267,9 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public void generateHref(XmlEmit xml) throws WebdavException {
     try {
-      String url = getUrlPrefix() + new URI(getEncodedUri()).toASCIIString();
-      xml.property(WebdavTags.href, url);
+      generateUrl(xml, WebdavTags.href, uri);
+//      String url = getUrlPrefix() + new URI(getEncodedUri()).toASCIIString();
+//      xml.property(WebdavTags.href, url);
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {
@@ -301,13 +302,15 @@ public abstract class WebdavNsNode implements Serializable {
 //      if (!enc.startsWith("/")) {
 //        sb.append("/");
 //      }
-      if (enc.endsWith("/")) {
-        if (!trailSlash()) {
-          enc = enc.substring(0, enc.length() - 1);
-        }
-      } else {
-        if (trailSlash()) {
-          enc = enc + "/";
+      if (getExists()) {
+        if (enc.endsWith("/")) {
+          if (!trailSlash()) {
+            enc = enc.substring(0, enc.length() - 1);
+          }
+        } else {
+          if (trailSlash()) {
+            enc = enc + "/";
+          }
         }
       }
 

@@ -195,7 +195,9 @@ public class PrincipalMatchReport {
       Collection<WebdavNsNode> wdnodes = null;
 
       if (self) {
-        wdnodes = intf.principalMatch(resourceUri, this);
+        /* Return all groups of which this account is a member
+         */
+        wdnodes = intf.getGroups(resourceUri, null);
       } else {
         // Search for nodes matching the principal-property element.
         wdnodes = doNodeAndChildren(intf.getNode(resourceUri,
