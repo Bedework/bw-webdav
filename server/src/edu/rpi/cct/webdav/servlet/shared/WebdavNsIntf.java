@@ -443,21 +443,6 @@ public abstract class WebdavNsIntf implements Serializable {
                                        int nodeType)
       throws WebdavException;
 
-  /** Retrieves a node by encoded uri, following any links. That si the uri
-   * will have the usual encoding applied.
-   *
-   * @param uri              String encoded uri of the node to retrieve
-   * @param existance        Say's something about the state of existance
-   * @param nodeType         Say's something about the type of node
-   * @return WebdavNsNode    node specified by the URI or the node aliased by
-   *                         the node at the URI.
-   * @throws WebdavException
-   */
-  public abstract WebdavNsNode getNodeEncoded(String uri,
-                                              int existance,
-                                              int nodeType)
-      throws WebdavException;
-
   /** Stores/updates an object.
    *
    * @param node             node in question

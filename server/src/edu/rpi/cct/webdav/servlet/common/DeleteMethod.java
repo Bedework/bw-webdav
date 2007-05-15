@@ -84,7 +84,7 @@ public class DeleteMethod extends MethodBase {
                                        WebdavNsIntf.existanceMust,
                                        WebdavNsIntf.nodeTypeUnknown);
 
-      if (node == null) {
+      if ((node == null) || !node.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
