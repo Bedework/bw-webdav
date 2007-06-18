@@ -33,11 +33,11 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
+import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bedework.davdefs.WebdavTags;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

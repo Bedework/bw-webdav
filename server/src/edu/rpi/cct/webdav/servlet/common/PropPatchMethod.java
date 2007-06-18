@@ -54,9 +54,6 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
-import org.bedework.davdefs.CaldavTags;
-import org.bedework.davdefs.WebdavTags;
-
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
@@ -64,6 +61,8 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode.SetPropertyResult;
 import edu.rpi.sss.util.xml.QName;
+import edu.rpi.sss.util.xml.tagdefs.CaldavTags;
+import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import java.util.ArrayList;
 import java.util.Collection;

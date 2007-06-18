@@ -59,6 +59,7 @@ import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
+import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import java.io.Reader;
 import java.io.Serializable;
@@ -72,7 +73,6 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.bedework.davdefs.WebdavTags;
 import org.w3c.dom.Element;
 
 /** Represents a node in the underlying namespace for which this
@@ -441,7 +441,7 @@ public abstract class WebdavNsNode implements Serializable {
           char[] privileges = ps.getPrivileges();
 
           AccessXmlUtil.emitCurrentPrivSet(xml, intf.getPrivTags(),
-                                           new WebdavTags(), privileges);
+                                           privileges);
         }
 
         return true;

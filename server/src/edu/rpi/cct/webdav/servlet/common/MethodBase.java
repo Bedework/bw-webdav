@@ -63,6 +63,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
+import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import java.io.FilterReader;
 import java.io.IOException;
@@ -79,7 +80,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.log4j.Logger;
-import org.bedework.davdefs.WebdavTags;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -414,8 +414,6 @@ public abstract class MethodBase {
       return null;
     }
 
-    Reader rdr = null;
-
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
@@ -429,23 +427,7 @@ public abstract class MethodBase {
     } catch (Throwable t) {
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       throw new WebdavException(t);
-    } finally {
-      if (rdr != null) {
-        try {
-          rdr.close();
-        } catch (Throwable t) {}
-      }
     }
-  }
-
-  /** See if nore matches tag
-   *
-   * @param nd
-   * @param tag
-   * @return boolean true for match
-   */
-  public static boolean nodeMatches(Node nd, QName tag) {
-    return tag.nodeMatches(nd);
   }
 
   protected String formatHTTPDate(Timestamp val) {
