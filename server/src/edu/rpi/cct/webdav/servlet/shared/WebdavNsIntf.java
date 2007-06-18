@@ -58,10 +58,12 @@ import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
+import edu.rpi.cct.webdav.servlet.common.AccessUtil;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
+import edu.rpi.cmt.access.Acl;
 
 import java.io.Reader;
 import java.io.Serializable;
@@ -202,6 +204,13 @@ public abstract class WebdavNsIntf implements Serializable {
   public String getDavHeader(WebdavNsNode node) throws WebdavException {
     return "1";
   }
+
+  /** Get an object suitable for use in parsing acls and generating access.
+   *
+   * @return AccessUtil implementation.
+   * @throws WebdavException
+   */
+  public abstract AccessUtil getAccessUtil() throws WebdavException;
 
   /**
    * @return Collection of method names.
@@ -612,61 +621,23 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Object class passed around as we parse access.
    */
   public static class AclInfo {
+    /** uri of object */
+    public String what;
+
     /** Set non-null if error occurred -- see Acl 8.1.1 */
     public QName errorTag;
+
+    /** The resulting Acl */
+    public Acl acl;
+
+    /** Constructor
+     *
+     * @param uri
+     */
+    public AclInfo(String uri) {
+      what = uri;
+    }
   }
-
-  /** Get an AclInfo object .
-   *
-   * @param uri       String uri of entity
-   * @return AclInfo  The object
-   * @throws WebdavException
-   */
-  public abstract AclInfo startAcl(String uri) throws WebdavException;
-
-  /** Parse the webdav acl principal element.which webdav-acl defines as
-   * <pre>
-   *    <!ELEMENT principal (href) | all | authenticated | unauthenticated |
-   *                        property | self)>
-   *
-   *    <!ELEMENT all EMPTY>
-   *    <!ELEMENT authenticated EMPTY>
-   *    <!ELEMENT unauthenticated EMPTY>
-   *    <!ELEMENT property ANY>
-   *    <!ELEMENT self EMPTY>
-   * </pre>
-   * Other protocols/implemenmtations may wish to extend this.
-   *
-   * @param ainfo
-   * @param nd       The principal element
-   * @param inverted boolean true if principal element was containjed in invert
-   * @return false on error
-   * @throws WebdavException
-   */
-  public abstract boolean parseAcePrincipal(AclInfo ainfo, Node nd,
-                                            boolean inverted) throws WebdavException;
-
-  /** Parse the webdav privilege element.
-   * The supplied node is the privilege webdav element
-     <!ELEMENT read EMPTY>
-     <!ELEMENT write EMPTY>
-     <!ELEMENT write-properties EMPTY>
-     <!ELEMENT write-content EMPTY>
-     <!ELEMENT unlock EMPTY>
-     <!ELEMENT read-acl EMPTY>
-     <!ELEMENT read-current-user-privilege-set EMPTY>
-     <!ELEMENT write-acl EMPTY>
-     <!ELEMENT bind EMPTY>
-     <!ELEMENT unbind EMPTY>
-     <!ELEMENT all EMPTY>
-   *
-   * @param ainfo
-   * @param nd       The privilege element
-   * @param grant    boolean true for granting priv, false for deny
-   * @throws WebdavException
-   */
-  public abstract void parsePrivilege(AclInfo ainfo, Node nd,
-                                      boolean grant) throws WebdavException;
 
   /**
    * @param ainfo
@@ -679,12 +650,6 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract void emitAcl(WebdavNsNode node) throws WebdavException;
-
-  /**
-   * @param node
-   * @throws WebdavException
-   */
-  public abstract void emitSupportedPrivSet(WebdavNsNode node) throws WebdavException;
 
   /** Return all the hrefs found in the access for th egiven node.
    *
@@ -915,30 +880,6 @@ public abstract class WebdavNsIntf implements Serializable {
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
-  }
-
-  /** xml rpivilege tags */
-  private static final QName[] privTags = {
-    WebdavTags.all,              // privAll = 0;
-    WebdavTags.read,             // privRead = 1;
-    WebdavTags.readAcl,          // privReadAcl = 2;
-    WebdavTags.readCurrentUserPrivilegeSet,  // privReadCurrentUserPrivilegeSet = 3;
-    null,                        // privReadFreeBusy = 4;
-    WebdavTags.write,            // privWrite = 5;
-    WebdavTags.writeAcl,         // privWriteAcl = 6;
-    WebdavTags.writeProperties,  // privWriteProperties = 7;
-    WebdavTags.writeContent,     // privWriteContent = 8;
-    WebdavTags.bind,             // privBind = 9;
-    WebdavTags.unbind,           // privUnbind = 10;
-    WebdavTags.unlock,           // privUnlock = 11;
-    null                         // privNone = 12;
-  };
-
-  /**
-   * @return QName[]
-   */
-  public QName[] getPrivTags() {
-    return privTags;
   }
 
   /**

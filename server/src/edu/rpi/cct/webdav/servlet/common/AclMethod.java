@@ -58,6 +58,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavServerError;
+import edu.rpi.cmt.access.AccessException;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,7 +66,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /** Class to handle WebDav ACLs
  *
@@ -105,34 +105,23 @@ public class AclMethod extends MethodBase {
     try {
       WebdavNsIntf intf = getNsIntf();
 
-      WebdavNsIntf.AclInfo ainfo = intf.startAcl(uri);
+      WebdavNsIntf.AclInfo ainfo = new WebdavNsIntf.AclInfo(uri);
 
       Element root = doc.getDocumentElement();
 
-      /* We expect an acl root element containing 0 or more ace elemnts
-         <!ELEMENT acl (ace)* >
-       */
-      if (!WebdavTags.acl.nodeMatches(root)) {
-        throw new WebdavBadRequest();
-      }
+      AccessUtil autil = intf.getAccessUtil();
 
-      Element[] aces = getChildrenArray(root);
+      ainfo.acl = autil.getAcl(root);
 
-      for (int i = 0; i < aces.length; i++) {
-        Element curnode = aces[i];
-
-        if (!WebdavTags.ace.nodeMatches(curnode)) {
-          throw new WebdavBadRequest();
-        }
-
-        if (!processAcl(ainfo, curnode)) {
-          break;
-        }
+      if (autil.getErrorTag() != null) {
+        ainfo.errorTag = autil.getErrorTag();
       }
 
       return ainfo;
     } catch (WebdavException wde) {
       throw wde;
+    } catch (AccessException ae) {
+      throw new WebdavBadRequest(ae.getMessage());
     } catch (Throwable t) {
       error(t.getMessage());
       if (debug) {
@@ -141,71 +130,6 @@ public class AclMethod extends MethodBase {
 
       throw new WebdavServerError();
     }
-  }
-
-  /* Process an acl<br/>
-         <!ELEMENT ace ((principal | invert), (grant|deny), protected?,
-                         inherited?)>
-         <!ELEMENT grant (privilege+)>
-         <!ELEMENT deny (privilege+)>
-
-         protected and inherited are for acl display
-   */
-  private boolean processAcl(WebdavNsIntf.AclInfo ainfo, Node nd) throws WebdavException {
-    WebdavNsIntf intf = getNsIntf();
-
-    Element[] children = getChildrenArray(nd);
-
-    if (children.length < 2) {
-      throw new WebdavBadRequest();
-    }
-
-    Element curnode = children[0];
-    boolean inverted = false;
-
-    /* Require principal or invert */
-
-    if (WebdavTags.principal.nodeMatches(curnode)) {
-    } else if (WebdavTags.invert.nodeMatches(curnode)) {
-      /*  <!ELEMENT invert principal>       */
-
-      inverted = true;
-      curnode = getOnlyChild(curnode);
-    } else {
-      throw new WebdavBadRequest();
-    }
-
-    if (!intf.parseAcePrincipal(ainfo, curnode, inverted)) {
-      return false;
-    }
-
-    /* Recognize grant or deny */
-    for (int i = 1; i < children.length; i++) {
-      curnode = children[i];
-
-      boolean denial = false;
-
-      if (WebdavTags.deny.nodeMatches(curnode)) {
-        denial = true;
-      } else if (!WebdavTags.grant.nodeMatches(curnode)) {
-        ainfo.errorTag = WebdavTags.noAceConflict;
-        return false;
-      }
-
-      Element[] pchildren = getChildrenArray(curnode);
-
-      for (int pi = 0; pi < pchildren.length; pi++) {
-        Element pnode = pchildren[pi];
-
-        if (!WebdavTags.privilege.nodeMatches(pnode)) {
-          throw new WebdavBadRequest();
-        }
-
-        intf.parsePrivilege(ainfo, pnode, denial);
-      }
-    }
-
-    return true;
   }
 
   private void processResp(HttpServletRequest req,

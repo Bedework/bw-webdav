@@ -440,7 +440,8 @@ public abstract class WebdavNsNode implements Serializable {
           PrivilegeSet ps = ca.privileges;
           char[] privileges = ps.getPrivileges();
 
-          AccessXmlUtil.emitCurrentPrivSet(xml, intf.getPrivTags(),
+          AccessXmlUtil.emitCurrentPrivSet(xml,
+                                           intf.getAccessUtil().getPrivTags(),
                                            privileges);
         }
 
@@ -540,7 +541,7 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.supportedPrivilegeSet)) {
         // access 5.2
-        intf.emitSupportedPrivSet(this);
+        intf.getAccessUtil().emitSupportedPrivSet();
         return true;
       }
 
