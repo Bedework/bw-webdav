@@ -172,42 +172,45 @@ public class PropPatchMethod extends MethodBase {
         }
       }
 
-      if (!failures.isEmpty()) {
-        // XXX failRequest();
-        startEmit(resp);
+      if (failures.isEmpty()) {
+        node.update();
 
-        resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
-        resp.setContentType("text/xml; charset=UTF-8");
-
-        openTag(WebdavTags.multistatus);
-
-        openTag(WebdavTags.response);
-        node.generateHref(xml);
-        for (SetPropertyResult spr: failures) {
-          openTag(WebdavTags.propstat);
-          openTag(WebdavTags.prop);
-          emptyTag(spr.prop);
-          closeTag(WebdavTags.prop);
-          addStatus(spr.status, spr.message);
-          closeTag(WebdavTags.propstat);
-        }
-        for (SetPropertyResult spr: successes) {
-          openTag(WebdavTags.propstat);
-          openTag(WebdavTags.prop);
-          emptyTag(spr.prop);
-          closeTag(WebdavTags.prop);
-          addStatus(WebdavStatusCode.SC_FAILED_DEPENDENCY, "Failed Dependency");
-          closeTag(WebdavTags.propstat);
-        }
-        closeTag(WebdavTags.response);
-        closeTag(WebdavTags.multistatus);
-
-        flush();
-
-        return false;
+        /* No response for success */
+        return true;
       }
 
-      return true;
+      /* Fail whole request for any failure */
+      startEmit(resp);
+
+      resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+      resp.setContentType("text/xml; charset=UTF-8");
+
+      openTag(WebdavTags.multistatus);
+
+      openTag(WebdavTags.response);
+      node.generateHref(xml);
+      for (SetPropertyResult spr: failures) {
+        openTag(WebdavTags.propstat);
+        openTag(WebdavTags.prop);
+        emptyTag(spr.prop);
+        closeTag(WebdavTags.prop);
+        addStatus(spr.status, spr.message);
+        closeTag(WebdavTags.propstat);
+      }
+      for (SetPropertyResult spr: successes) {
+        openTag(WebdavTags.propstat);
+        openTag(WebdavTags.prop);
+        emptyTag(spr.prop);
+        closeTag(WebdavTags.prop);
+        addStatus(WebdavStatusCode.SC_FAILED_DEPENDENCY, "Failed Dependency");
+        closeTag(WebdavTags.propstat);
+      }
+      closeTag(WebdavTags.response);
+      closeTag(WebdavTags.multistatus);
+
+      flush();
+
+      return false;
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {

@@ -218,6 +218,12 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract CurrentAccess getCurrentAccess() throws WebdavException;
 
+  /** Update this node after changes.
+   *
+   * @throws WebdavException
+   */
+  public abstract void update() throws WebdavException;
+
   /** Result from setting or removing property
    *
    */
