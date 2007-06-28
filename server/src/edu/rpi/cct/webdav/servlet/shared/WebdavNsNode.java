@@ -525,6 +525,11 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.resourcetype)) {
         // dav 13.9
+        if (!isPrincipal() && !isCollection()) {
+          xml.emptyTag(tag);
+          return true;
+        }
+
         xml.openTag(tag);
 
         if (isPrincipal()) {

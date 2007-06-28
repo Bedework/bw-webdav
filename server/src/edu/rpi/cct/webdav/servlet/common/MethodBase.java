@@ -463,7 +463,9 @@ public abstract class MethodBase {
         }
 
         addNs(pr.getTag().getNamespaceURI());
-        intf.generatePropValue(node, pr, false);
+        if (!intf.generatePropValue(node, pr, false)) {
+          unknowns.add(pr);
+        }
       }
     }
 
