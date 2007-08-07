@@ -101,7 +101,10 @@ public class PropPatchMethod extends MethodBase {
                                             WebdavNsIntf.nodeTypeUnknown);
 
     if (doc != null) {
-      processDoc(req, resp, doc, node, WebdavTags.propertyUpdate, false);
+      if (processDoc(req, resp, doc, node, WebdavTags.propertyUpdate, false)) {
+        node.update();
+      }
+
     }
   }
 
@@ -173,8 +176,6 @@ public class PropPatchMethod extends MethodBase {
       }
 
       if (failures.isEmpty()) {
-        node.update();
-
         /* No response for success */
         return true;
       }
