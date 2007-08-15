@@ -510,12 +510,14 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param node              node in question.
    * @param contentRdr        Reader for content
    * @param create            true if this is a probably creation
+   * @param ifEtag            if non-null etag must match
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
   public abstract PutContentResult putContent(WebdavNsNode node,
                                               Reader contentRdr,
-                                              boolean create)
+                                              boolean create,
+                                              String ifEtag)
       throws WebdavException;
 
   /** Create a new node.

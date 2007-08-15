@@ -126,7 +126,7 @@ public class Headers {
     resp.setHeader("Location", url);
   }
 
-  /** Look for the If-None-Match header
+  /** Look for the If-None-Match * header
    *
    * @param req    HttpServletRequest
    * @return boolean true if present
@@ -137,6 +137,28 @@ public class Headers {
     String hdrStr = req.getHeader("If-None-Match");
 
     return "*".equals(hdrStr);
+  }
+
+  /** Look for the If-None-Match header
+   *
+   * @param req    HttpServletRequest
+   * @return String null if not present
+   * @throws WebdavException
+   */
+  public static String ifNoneMatch(HttpServletRequest req)
+          throws WebdavException {
+    return req.getHeader("If-None-Match");
+  }
+
+  /** Look for the If-Match header
+   *
+   * @param req    HttpServletRequest
+   * @return String null if not present
+   * @throws WebdavException
+   */
+  public static String ifMatch(HttpServletRequest req)
+          throws WebdavException {
+    return req.getHeader("If-Match");
   }
 
   /** The following is instantiated for If headers

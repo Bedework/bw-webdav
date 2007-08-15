@@ -107,6 +107,14 @@ public class GetMethod extends MethodBase {
         return;
       }
 
+      String etag = Headers.ifNoneMatch(req);
+
+      if ((etag != null) && (!node.isCollection()) &&
+          (etag.equals(node.getEtagValue(true)))) {
+        resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+        return;
+      }
+
       Writer out;
 
       /** Get the content now to set up length, type etc.
