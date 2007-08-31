@@ -729,6 +729,10 @@ public abstract class MethodBase {
     getLogger().error(msg);
   }
 
+  protected void warn(String msg) {
+    getLogger().warn(msg);
+  }
+
   protected void logIt(String msg) {
     getLogger().info(msg);
   }
