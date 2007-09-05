@@ -577,6 +577,19 @@ public abstract class WebdavNsIntf implements Serializable {
                                 boolean overwrite,
                                 int depth) throws WebdavException;
 
+  /** Handle a special resource uri for GET.
+   * Status is set on return
+   *
+   * @param req       HttpServletRequest
+   * @param resp      HttpServletResponse
+   * @param resourceUri
+   * @return boolean true if it was a special uri and is processed
+   * @throws WebdavException
+   */
+  public abstract boolean specialUri(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     String resourceUri) throws WebdavException;
+
   /* ====================================================================
    *                  Access methods
    * ==================================================================== */

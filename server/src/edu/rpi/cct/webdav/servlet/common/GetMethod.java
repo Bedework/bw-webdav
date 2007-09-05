@@ -95,6 +95,10 @@ public class GetMethod extends MethodBase {
     }
 
     try {
+      if (getNsIntf().specialUri(req, resp, getResourceUri(req))) {
+        return;
+      }
+
       //String reqContentType = req.getContentType();
       //boolean reqHtml = "text/html".equals(reqContentType);
 
