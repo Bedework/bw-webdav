@@ -303,7 +303,7 @@ public abstract class WebdavNsNode implements Serializable {
       String enc = new URI(null, null, uri, null).toString();
       enc = new URI(enc).toASCIIString();  // XXX ???????
 
-      StringBuffer sb = new StringBuffer(getUrlPrefix());
+      StringBuilder sb = new StringBuilder(getUrlPrefix());
 
 //      if (!enc.startsWith("/")) {
 //        sb.append("/");
@@ -318,6 +318,10 @@ public abstract class WebdavNsNode implements Serializable {
             enc = enc + "/";
           }
         }
+      }
+
+      if ((sb.charAt(sb.length() - 1) != '/')  && (!enc.startsWith("/"))) {
+        sb.append("/");
       }
 
       sb.append(enc);
@@ -441,7 +445,13 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.currentUserPrivilegeSet)) {
         // access 5.3
-        PrivilegeSet ps = getCurrentAccess().privileges;
+        CurrentAccess ca = getCurrentAccess();
+        if (ca == null) {
+          xml.emptyTag(tag);
+          return true;
+        }
+
+        PrivilegeSet ps = ca.privileges;
         char[] privileges = ps.getPrivileges();
 
         AccessXmlUtil.emitCurrentPrivSet(xml,
