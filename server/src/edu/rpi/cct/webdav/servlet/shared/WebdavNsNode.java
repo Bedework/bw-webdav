@@ -54,6 +54,7 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
 import edu.rpi.cmt.access.AccessXmlUtil;
 import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
@@ -65,6 +66,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
@@ -100,8 +102,6 @@ public abstract class WebdavNsNode implements Serializable {
   /** Suitable for display
    */
   //protected String name;
-
-  protected String urlPrefix;
 
   protected String path;
 
@@ -192,16 +192,135 @@ public abstract class WebdavNsNode implements Serializable {
 
   protected String targetUri;
 
+  protected UrlHandler urlHandler;
+
+
+  /** Prefix or unprefix urls - or not depending on internal state
+   *
+   * @author douglm
+   */
+  public static class UrlHandler {
+    private String urlPrefix;
+
+    private boolean relative;
+
+    private String context;
+
+    /** If relative we assume urls are relative to the host + port.
+     * Internally we need to strip off the host + port + context.
+     *
+     * @param req
+     * @param relative
+     * @throws WebdavException
+     */
+    public UrlHandler(HttpServletRequest req,
+                      boolean relative) throws WebdavException {
+      this.relative = relative;
+
+      try {
+        urlPrefix = req.getRequestURL().toString();
+
+        int pos = urlPrefix.indexOf(req.getContextPath());
+
+        if (pos > 0) {
+          urlPrefix = urlPrefix.substring(0, pos);
+        }
+
+        context = req.getContextPath();
+        if ((context == null) || (context.equals("."))) {
+          context = "";
+        }
+      } catch (Throwable t) {
+        Logger.getLogger(WebdavUtils.class).warn(
+            "Unable to get url from " + req);
+        throw new WebdavException(t);
+      }
+    }
+
+    /** Return an appropriately prefixed url. The parameter url will be
+     * absolute or relative. If relative it may be prefixed with the context
+     * path which we need to remove.
+     *
+     * <p>We're doing this because some clients don't handle absolute urls
+     * (a violation of the spec)
+     *
+     * @param val
+     * @return String
+     * @throws WebdavException
+     */
+    public String prefix(String val) throws WebdavException {
+      try {
+        if (val.startsWith("mailto:")) {
+          return val;
+        }
+
+        String enc = new URI(null, null, val, null).toString();
+        enc = new URI(enc).toASCIIString();  // XXX ???????
+
+        StringBuilder sb = new StringBuilder();
+
+        if (!relative) {
+          sb.append(getUrlPrefix());
+          sb.append("/");
+          sb.append(context);
+        } else {
+          if (!context.startsWith("/")) {
+            sb.append("/");
+          }
+          sb.append(context);
+
+        }
+
+        if (!enc.startsWith("/")) {
+          if ((sb.length() == 0) || (sb.charAt(sb.length() - 1) != '/')) {
+            sb.append("/");
+          }
+        }
+
+        sb.append(enc);
+
+        return sb.toString();
+      } catch (Throwable t) {
+        throw new WebdavException(t);
+      }
+    }
+
+    /** Remove any vestige of the host, port or context
+     *
+     * @param val
+     * @return String
+     * @throws WebdavException
+     */
+    public String unprefix(String val) throws WebdavException {
+      if (val.startsWith(getUrlPrefix())) {
+        val = val.substring(getUrlPrefix().length());
+      }
+
+      if (val.startsWith(context)) {
+        val = val.substring(context.length());
+      }
+
+      return val;
+    }
+
+    /**
+     * @return String url prefix (host + port, no context)
+     */
+    public String getUrlPrefix() {
+      return urlPrefix;
+    }
+  }
+
   /** Constructor
    *
-   * @param urlPrefix - needed for building hrefs.
+   * @param urlHandler - needed for building hrefs.
    * @param path - resource path
    * @param collection - true if this is a collection
    * @param debug
    */
-  public WebdavNsNode(String urlPrefix, String path,
+  public WebdavNsNode(UrlHandler urlHandler, String path,
                       boolean collection, boolean debug) {
-    this.urlPrefix = urlPrefix;
+    this.urlHandler = urlHandler;
     this.path = path;
     this.collection = collection;
     this.debug = debug;
@@ -250,13 +369,6 @@ public abstract class WebdavNsNode implements Serializable {
   public abstract boolean trailSlash();
 
   /**
-   * @return String url prefix
-   */
-  public String getUrlPrefix() {
-    return urlPrefix;
-  }
-
-  /**
    * @return String
    */
   public String getPath() {
@@ -300,10 +412,15 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public void generateUrl(XmlEmit xml, QName tag, String uri) throws WebdavException {
     try {
+      /*
       String enc = new URI(null, null, uri, null).toString();
       enc = new URI(enc).toASCIIString();  // XXX ???????
 
-      StringBuilder sb = new StringBuilder(getUrlPrefix());
+      StringBuilder sb = new StringBuilder();
+
+      if (!relativeUrls) {
+        sb.append(getUrlPrefix());
+      }
 
 //      if (!enc.startsWith("/")) {
 //        sb.append("/");
@@ -320,12 +437,30 @@ public abstract class WebdavNsNode implements Serializable {
         }
       }
 
-      if ((sb.charAt(sb.length() - 1) != '/')  && (!enc.startsWith("/"))) {
-        sb.append("/");
+      if (!enc.startsWith("/")) {
+        if ((sb.length() == 0) || (sb.charAt(sb.length() - 1) != '/')) {
+          sb.append("/");
+        }
       }
 
       sb.append(enc);
       xml.property(tag, sb.toString());
+      */
+      String prefixed = urlHandler.prefix(uri);
+
+      if (getExists()) {
+        if (prefixed.endsWith("/")) {
+          if (!trailSlash()) {
+            prefixed = prefixed.substring(0, prefixed.length() - 1);
+          }
+        } else {
+          if (trailSlash()) {
+            prefixed = prefixed + "/";
+          }
+        }
+      }
+
+      xml.property(tag, prefixed);
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
