@@ -54,25 +54,16 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
-import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /** Class called to handle HEAD
  *
  *   @author Mike Douglass   douglm@rpi.edu
  */
-public class HeadMethod extends MethodBase {
+public class HeadMethod extends GetMethod {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
   public void init() {
-  }
-
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
-
+    doContent = false;
   }
 }
 

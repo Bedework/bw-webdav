@@ -61,7 +61,6 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import java.io.CharArrayReader;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -74,8 +73,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GetMethod extends MethodBase {
   protected boolean doContent;
-
-  private ArrayList ranges;
 
   /** size of buffer used for copying content to response.
    */
@@ -154,51 +151,22 @@ public class GetMethod extends MethodBase {
         resp.addHeader("Last-Modified", node.getLastmodDate().toString());
       }
 
-      if (ranges == null) {
-        /* Entire content
-         */
-        resp.setContentType(contentType);
-        resp.setContentLength(contentLength);
+      resp.setContentType(contentType);
+      resp.setContentLength(contentLength);
 
-        if (doContent) {
-          if (in == null) {
-            if (debug) {
-              debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
-            }
-
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-          } else {
-            if (debug) {
-              debugMsg("send content - length=" + node.getContentLen());
-            }
-
-            writeContent(in, out);
-          }
-        }
-      } else if (doContent && (in == null)) {
-        if (debug) {
-          debugMsg("status-2: " + HttpServletResponse.SC_NO_CONTENT);
-        }
-
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-      } else {
-        //FIXME not fully implemented
-        if (debug) {
-          debugMsg("status: " + HttpServletResponse.SC_PARTIAL_CONTENT);
-        }
-
-        resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-
-        if (ranges.size() == 1) {
-          // send a single chunk
+      if (doContent) {
+        if (in == null) {
           if (debug) {
-            debugMsg("send multi-part - single element");
+            debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
           }
+
+          resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } else {
-          // need to send it as some sort of multi-part thing
           if (debug) {
-            debugMsg("send multi-part");
+            debugMsg("send content - length=" + node.getContentLen());
           }
+
+          writeContent(in, out);
         }
       }
     } catch (WebdavException we) {
@@ -207,14 +175,6 @@ public class GetMethod extends MethodBase {
       throw new WebdavException(t);
     }
   }
-
-  /* Process the range headers in the request.
-   *
-   * <p>We can ignore these and for the moment we will
-   * /
-  private void parseRanges(HttpServletRequest req) throws WebdavException {
-    ranges = null;
-  }*/
 
   private void writeContent(Reader in, Writer out)
       throws WebdavException {
@@ -242,7 +202,6 @@ public class GetMethod extends MethodBase {
       } catch (Throwable t) {}
     }
   }
-
 
   /** Return a String giving an HTML representation of the directory.
    *
