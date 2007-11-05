@@ -261,7 +261,10 @@ public abstract class WebdavNsNode implements Serializable {
 
         if (!relative) {
           sb.append(getUrlPrefix());
-          sb.append("/");
+          if ((sb.charAt(sb.length() - 1) != '/') &&
+              (!context.startsWith("/"))) {
+            sb.append("/");
+          }
           sb.append(context);
         } else {
           if (!context.startsWith("/")) {
