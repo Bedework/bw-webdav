@@ -895,35 +895,6 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
-  /**
-   * @param node
-   * @throws WebdavException
-   */
-  public void addHref(WebdavNsNode node) throws WebdavException {
-    try {
-      if (debug) {
-        trace("Adding href " + urlPrefix + node.getEncodedUri());
-      }
-
-      String url = urlPrefix + new URI(node.getEncodedUri()).toASCIIString();
-
-      if (url.endsWith("/")) {
-        if (!node.trailSlash()) {
-          url = url.substring(0, url.length() - 1);
-        }
-      } else {
-        if (node.trailSlash()) {
-          url = url + "/";
-        }
-      }
-      xml.property(WebdavTags.href, url);
-    } catch (WebdavException wde) {
-      throw wde;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
-  }
-
   /** Return the complete URL describing the location of the object
    * represented by the node
    *
