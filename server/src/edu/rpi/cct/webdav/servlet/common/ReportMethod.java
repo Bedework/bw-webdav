@@ -42,7 +42,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /** Class called to handle POST
  *
@@ -432,14 +431,11 @@ public class ReportMethod extends MethodBase {
 
     String resourceUri = getResourceUri(req);
 
-    Collection principals = intf.getPrincipals(resourceUri, pps);
+    Collection<? extends WebdavNsNode> principals = intf.getPrincipals(resourceUri, pps);
 
     openTag(WebdavTags.multistatus);
 
-    Iterator it = principals.iterator();
-    while (it.hasNext()) {
-      WebdavNsNode node = (WebdavNsNode)it.next();
-
+    for (WebdavNsNode node: principals) {
       doNodeProperties(node);
     }
 

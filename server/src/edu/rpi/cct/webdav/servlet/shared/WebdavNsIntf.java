@@ -622,7 +622,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return Collection of WebdavNsNode
    * @throws WebdavException
    */
-  public abstract Collection getPrincipals(String resourceUri,
+  public abstract Collection<? extends WebdavNsNode> getPrincipals(String resourceUri,
                                            PrincipalPropertySearch pps)
           throws WebdavException;
 
