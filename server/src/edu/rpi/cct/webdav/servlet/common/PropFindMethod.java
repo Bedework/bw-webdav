@@ -61,6 +61,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavProperty;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode.PropertyTagEntry;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.w3c.dom.Document;
@@ -151,7 +152,7 @@ public class PropFindMethod extends MethodBase {
     try {
       Element root = doc.getDocumentElement();
 
-      if (!WebdavTags.propfind.nodeMatches(root)) {
+      if (!XmlUtil.nodeMatches(root, WebdavTags.propfind)) {
         throw new WebdavBadRequest();
       }
 
@@ -188,15 +189,15 @@ public class PropFindMethod extends MethodBase {
    * @throws WebdavException
    */
   public PropRequest tryPropRequest(Node nd) throws WebdavException {
-    if (WebdavTags.allprop.nodeMatches(nd)) {
+    if (XmlUtil.nodeMatches(nd, WebdavTags.allprop)) {
       return new PropRequest(PropRequest.ReqType.propAll);
     }
 
-    if (WebdavTags.prop.nodeMatches(nd)) {
+    if (XmlUtil.nodeMatches(nd, WebdavTags.prop)) {
       return parseProps(nd);
     }
 
-    if (WebdavTags.propname.nodeMatches(nd)) {
+    if (XmlUtil.nodeMatches(nd, WebdavTags.propname)) {
       return new PropRequest(PropRequest.ReqType.propName);
     }
 

@@ -33,6 +33,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import javax.servlet.http.HttpServletRequest;
@@ -219,7 +220,7 @@ public class ReportMethod extends MethodBase {
       for (int i = 0; i < children.length; i++) {
         Element curnode = children[i];
 
-        if (WebdavTags.prop.nodeMatches(curnode)) {
+        if (XmlUtil.nodeMatches(curnode, WebdavTags.prop)) {
           if (hadProp) {
             throw new WebdavBadRequest("More than one DAV:prop element");
           }
@@ -274,7 +275,7 @@ public class ReportMethod extends MethodBase {
       for (int i = 0; i < children.length; i++) {
         Element curnode = children[i];
 
-        if (WebdavTags.propertySearch.nodeMatches(curnode)) {
+        if (XmlUtil.nodeMatches(curnode, WebdavTags.propertySearch)) {
           PropertySearch ps = new PropertySearch();
 
           pps.propertySearches.add(ps);
@@ -287,13 +288,13 @@ public class ReportMethod extends MethodBase {
 
           ps.props = intf.parseProp(pschildren[0]);
           ps.match = pschildren[1];
-        } else if (WebdavTags.prop.nodeMatches(curnode)) {
+        } else if (XmlUtil.nodeMatches(curnode, WebdavTags.prop)) {
           pps.pr = pm.parseProps(curnode);
           preq = pps.pr;
           i++;
 
           if (i < children.length) {
-            if (!WebdavTags.applyToPrincipalCollectionSet.nodeMatches(children[i])) {
+            if (!XmlUtil.nodeMatches(children[i], WebdavTags.applyToPrincipalCollectionSet)) {
               throw new WebdavBadRequest();
             }
 
@@ -454,23 +455,23 @@ public class ReportMethod extends MethodBase {
     try {
       Element root = doc.getDocumentElement();
 
-      if (WebdavTags.expandProperty.nodeMatches(root)) {
+      if (XmlUtil.nodeMatches(root, WebdavTags.expandProperty)) {
         return reportTypeExpandProperty;
       }
 
-      if (WebdavTags.principalPropertySearch.nodeMatches(root)) {
+      if (XmlUtil.nodeMatches(root, WebdavTags.principalPropertySearch)) {
         return reportTypePrincipalPropertySearch;
       }
 
-      if (WebdavTags.principalMatch.nodeMatches(root)) {
+      if (XmlUtil.nodeMatches(root, WebdavTags.principalMatch)) {
         return reportTypePrincipalMatch;
       }
 
-      if (WebdavTags.aclPrincipalPropSet.nodeMatches(root)) {
+      if (XmlUtil.nodeMatches(root, WebdavTags.aclPrincipalPropSet)) {
         return reportTypeAclPrincipalPropSet;
       }
 
-      if (WebdavTags.principalSearchPropertySet.nodeMatches(root)) {
+      if (XmlUtil.nodeMatches(root, WebdavTags.principalSearchPropertySet)) {
         return reportTypePrincipalSearchPropertySet;
       }
 

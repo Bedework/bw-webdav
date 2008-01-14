@@ -61,6 +61,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode.SetPropertyResult;
 import edu.rpi.sss.util.xml.QName;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.CaldavTags;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
@@ -133,7 +134,7 @@ public class PropPatchMethod extends MethodBase {
     try {
       Element root = doc.getDocumentElement();
 
-      if (!expectedRoot.nodeMatches(root)) {
+      if (!XmlUtil.nodeMatches(root, expectedRoot)) {
         throw new WebdavBadRequest();
       }
 
@@ -249,15 +250,15 @@ public class PropPatchMethod extends MethodBase {
 
         Element propnode = getOnlyChild(srnode);
 
-        if (!WebdavTags.prop.nodeMatches(propnode)) {
+        if (!XmlUtil.nodeMatches(propnode, WebdavTags.prop)) {
           throw new WebdavBadRequest();
         }
 
-        if (WebdavTags.set.nodeMatches(srnode)) {
+        if (XmlUtil.nodeMatches(srnode, WebdavTags.set)) {
           plist = new PropertySetList();
 
           processPlist(plist, propnode, false);
-        } else if (WebdavTags.remove.nodeMatches(srnode)) {
+        } else if (XmlUtil.nodeMatches(srnode, WebdavTags.remove)) {
           plist = new PropertySetList();
 
           processPlist(plist, propnode, true);
@@ -295,7 +296,7 @@ public class PropPatchMethod extends MethodBase {
     for (int i = 0; i < props.length; i++) {
       Element prop = props[i];
 
-      if (CaldavTags.supportedCalendarComponentSet.nodeMatches(prop)) {
+      if (XmlUtil.nodeMatches(prop, CaldavTags.supportedCalendarComponentSet)) {
         // XXX Need to do something
       } else if (remove && !isEmpty(prop)) {
         throw new WebdavBadRequest();

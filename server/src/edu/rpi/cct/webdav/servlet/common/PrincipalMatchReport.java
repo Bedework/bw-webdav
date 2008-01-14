@@ -32,6 +32,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavProperty;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.XmlEmit;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import java.util.ArrayList;
@@ -118,7 +119,7 @@ public class PrincipalMatchReport {
 
       Element curnode = children[0];
 
-      if (WebdavTags.principalProperty.nodeMatches(curnode)) {
+      if (XmlUtil.nodeMatches(curnode, WebdavTags.principalProperty)) {
         /* Only match owner for the moment */
         Element[] ppchildren = intf.getChildren(curnode);
 
@@ -126,16 +127,16 @@ public class PrincipalMatchReport {
           throw new WebdavBadRequest();
         }
 
-        if (WebdavTags.owner.nodeMatches(ppchildren[0])) {
+        if (XmlUtil.nodeMatches(ppchildren[0], WebdavTags.owner)) {
           owner = true;
-        } else if (WebdavTags.whoami.nodeMatches(ppchildren[0])) {
+        } else if (XmlUtil.nodeMatches(ppchildren[0], WebdavTags.whoami)) {
           // XXX probably wrong - we should just store property name and
           // use when processing.
           whoami = true;
         } else {
           principalProperty = ppchildren[0];
         }
-      } else if (WebdavTags.self.nodeMatches(curnode)) {
+      } else if (XmlUtil.nodeMatches(curnode, WebdavTags.self)) {
         if (debug) {
           trace("ReportMethod: self");
         }
@@ -151,7 +152,7 @@ public class PrincipalMatchReport {
 
       curnode = children[1];
 
-      if (!WebdavTags.prop.nodeMatches(curnode)) {
+      if (!XmlUtil.nodeMatches(curnode, WebdavTags.prop)) {
         throw new WebdavBadRequest();
       }
 

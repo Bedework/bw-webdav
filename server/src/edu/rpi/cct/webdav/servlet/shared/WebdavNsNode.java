@@ -60,6 +60,7 @@ import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
 import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import java.io.Reader;
@@ -495,12 +496,12 @@ public abstract class WebdavNsNode implements Serializable {
   public boolean removeProperty(Element val,
                                 SetPropertyResult spr) throws WebdavException {
     try {
-      if (WebdavTags.getetag.nodeMatches(val)) {
+      if (XmlUtil.nodeMatches(val, WebdavTags.getetag)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
         return true;
       }
 
-      if (WebdavTags.getlastmodified.nodeMatches(val)) {
+      if (XmlUtil.nodeMatches(val, WebdavTags.getlastmodified)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
         return true;
       }
@@ -521,12 +522,12 @@ public abstract class WebdavNsNode implements Serializable {
   public boolean setProperty(Element val,
                              SetPropertyResult spr) throws WebdavException {
     try {
-      if (WebdavTags.getetag.nodeMatches(val)) {
+      if (XmlUtil.nodeMatches(val, WebdavTags.getetag)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
         return true;
       }
 
-      if (WebdavTags.getlastmodified.nodeMatches(val)) {
+      if (XmlUtil.nodeMatches(val, WebdavTags.getlastmodified)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
         return true;
       }
