@@ -59,7 +59,6 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.sss.util.servlets.io.CharArrayWrappedResponse;
-import edu.rpi.sss.util.xml.QName;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
@@ -78,6 +77,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 

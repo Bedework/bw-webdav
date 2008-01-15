@@ -54,9 +54,8 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.sss.util.xml.QName;
-
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
 
 /** Base exception thrown by webdav classes
  *

@@ -54,9 +54,9 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.sss.util.xml.QName;
-
 import java.io.Serializable;
+
+import javax.xml.namespace.QName;
 
 /** One of these for each property in a request.
  *
