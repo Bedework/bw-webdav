@@ -515,8 +515,8 @@ public abstract class WebdavNsNode implements Serializable {
   /** Set the given property for this node.
    *
    * @param val   Element defining property to set
-   * @param spr   Holds reult of removing property
-   * @return boolean  true if property recognized.
+   * @param spr   Holds result of setting property
+   * @return boolean  true if property recognized and processed.
    * @throws WebdavException
    */
   public boolean setProperty(Element val,

@@ -191,22 +191,34 @@ public class PropPatchMethod extends MethodBase {
 
       openTag(WebdavTags.response);
       node.generateHref(xml);
+
+      int status = 0;
+      String msg = null;
+
+      openTag(WebdavTags.propstat);
       for (SetPropertyResult spr: failures) {
-        openTag(WebdavTags.propstat);
         openTag(WebdavTags.prop);
         emptyTag(spr.prop);
         closeTag(WebdavTags.prop);
-        addStatus(spr.status, spr.message);
-        closeTag(WebdavTags.propstat);
+        status = spr.status;
+        msg = spr.message;
       }
-      for (SetPropertyResult spr: successes) {
+      addStatus(status, msg);
+      closeTag(WebdavTags.propstat);
+
+      // The successes are failed because of the failurs
+
+      if (!successes.isEmpty()) {
         openTag(WebdavTags.propstat);
-        openTag(WebdavTags.prop);
-        emptyTag(spr.prop);
-        closeTag(WebdavTags.prop);
+        for (SetPropertyResult spr: successes) {
+          openTag(WebdavTags.prop);
+          emptyTag(spr.prop);
+          closeTag(WebdavTags.prop);
+        }
         addStatus(WebdavStatusCode.SC_FAILED_DEPENDENCY, "Failed Dependency");
         closeTag(WebdavTags.propstat);
       }
+
       closeTag(WebdavTags.response);
       closeTag(WebdavTags.multistatus);
 
