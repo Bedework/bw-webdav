@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.shared;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
 
 /** Base exception thrown by webdav classes
  *
@@ -73,5 +74,13 @@ public class WebdavBadRequest extends WebdavException {
    */
   public WebdavBadRequest(String msg) {
     super(HttpServletResponse.SC_BAD_REQUEST, msg);
+  }
+
+  /** Constructor
+   *
+   * @param errorTag
+   */
+  public WebdavBadRequest(QName errorTag) {
+    super(HttpServletResponse.SC_BAD_REQUEST, errorTag);
   }
 }
