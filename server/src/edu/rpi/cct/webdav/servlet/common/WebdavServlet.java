@@ -160,7 +160,7 @@ public abstract class WebdavServlet extends HttpServlet
 
       intf = getNsIntf(req);
 
-      if (dumpContent) {
+      if (debug && dumpContent) {
         resp = new CharArrayWrappedResponse(resp,
                                             getLogger(), debug);
       }
@@ -197,7 +197,7 @@ public abstract class WebdavServlet extends HttpServlet
         tryWait(req, false);
       } catch (Throwable t) {}
 
-      if (dumpContent) {
+      if (debug && dumpContent) {
         CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
         String str = wresp.toString();
 
