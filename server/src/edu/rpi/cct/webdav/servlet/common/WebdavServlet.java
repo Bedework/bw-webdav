@@ -160,6 +160,13 @@ public abstract class WebdavServlet extends HttpServlet
 
       intf = getNsIntf(req);
 
+      if (req.getCharacterEncoding() == null) {
+        req.setCharacterEncoding("UTF-8");
+        if (debug) {
+          debugMsg("No charset specified in request; forced to UTF-8");
+        }
+      }
+
       if (debug && dumpContent) {
         resp = new CharArrayWrappedResponse(resp,
                                             getLogger(), debug);
@@ -211,6 +218,14 @@ public abstract class WebdavServlet extends HttpServlet
         resp.setContentLength(bs.length);
         resp.getOutputStream().write(bs);
       }
+
+      /* WebDAV is stateless - toss away the session */
+      try {
+        HttpSession sess = req.getSession(false);
+        if (sess != null) {
+          sess.invalidate();
+        }
+      } catch (Throwable t) {}
     }
   }
 
