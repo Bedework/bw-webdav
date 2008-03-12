@@ -69,10 +69,13 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -938,6 +941,87 @@ public abstract class WebdavNsIntf implements Serializable {
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
+  }
+
+  /** Return a path, beginning with a "/", after "." and ".." are removed.
+   * If the parameter path attempts to go above the root we return null.
+   *
+   * Other than the backslash thing why not use URI?
+   *
+   * @param path      String path to be fixed
+   * @return String   fixed path
+   * @throws WebdavException
+   */
+  public static String fixPath(String path) throws WebdavException {
+    if (path == null) {
+      return null;
+    }
+
+    String decoded;
+    try {
+      decoded = URLDecoder.decode(path, "UTF8");
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+
+    if (decoded == null) {
+      return (null);
+    }
+
+    /** Make any backslashes into forward slashes.
+     */
+    if (decoded.indexOf('\\') >= 0) {
+      decoded = decoded.replace('\\', '/');
+    }
+
+    /** Ensure a leading '/'
+     */
+    if (!decoded.startsWith("/")) {
+      decoded = "/" + decoded;
+    }
+
+    /** Remove all instances of '//'.
+     */
+    while (decoded.indexOf("//") >= 0) {
+      decoded = decoded.replaceAll("//", "/");
+    }
+
+    if (decoded.indexOf("/.") < 0) {
+      return decoded;
+    }
+
+    /** Somewhere we may have /./ or /../
+     */
+
+    StringTokenizer st = new StringTokenizer(decoded, "/");
+
+    ArrayList<String> al = new ArrayList<String>();
+    while (st.hasMoreTokens()) {
+      String s = st.nextToken();
+
+      if (s.equals(".")) {
+        // ignore
+      } else if (s.equals("..")) {
+        // Back up 1
+        if (al.size() == 0) {
+          // back too far
+          return null;
+        }
+
+        al.remove(al.size() - 1);
+      } else {
+        al.add(s);
+      }
+    }
+
+    /** Reconstruct */
+    StringBuffer sb = new StringBuffer();
+    for (String s: al) {
+      sb.append('/');
+      sb.append(s);
+    }
+
+    return sb.toString();
   }
 
   /* ====================================================================
