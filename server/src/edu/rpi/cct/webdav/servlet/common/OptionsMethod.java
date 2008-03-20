@@ -99,7 +99,7 @@ public class OptionsMethod extends MethodBase {
 
       // This probably needs changes
 
-      StringBuffer methods = new StringBuffer();
+      StringBuilder methods = new StringBuilder();
       for (String name: getNsIntf().getMethodNames()) {
         if (methods.length() > 0) {
           methods.append(", ");
