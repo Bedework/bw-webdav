@@ -961,7 +961,7 @@ public abstract class WebdavNsIntf implements Serializable {
     try {
       decoded = URLDecoder.decode(path, "UTF8");
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new WebdavBadRequest("bad path: " + path);
     }
 
     if (decoded == null) {
