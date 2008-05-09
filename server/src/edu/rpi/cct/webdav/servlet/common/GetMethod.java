@@ -112,7 +112,7 @@ public class GetMethod extends MethodBase {
 
       if ((etag != null) && (!node.isCollection()) &&
           (etag.equals(node.getEtagValue(true)))) {
-        resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return;
       }
 
