@@ -219,17 +219,25 @@ public abstract class WebdavNsNode implements Serializable {
       this.relative = relative;
 
       try {
-        urlPrefix = req.getRequestURL().toString();
+        context = req.getContextPath();
+        if ((context == null) || (context.equals("."))) {
+          /* XXX Not at all sure why I did this.
+           * Context is "" for the root context anyway.
+           */
+          context = "";
+        }
 
-        int pos = urlPrefix.indexOf(req.getContextPath());
+        urlPrefix = req.getRequestURL().toString();
+        int pos;
+
+        if (context.length() > 0) {
+          pos = urlPrefix.indexOf(context);
+        } else {
+          pos = urlPrefix.indexOf(req.getRequestURI());
+        }
 
         if (pos > 0) {
           urlPrefix = urlPrefix.substring(0, pos);
-        }
-
-        context = req.getContextPath();
-        if ((context == null) || (context.equals("."))) {
-          context = "";
         }
       } catch (Throwable t) {
         Logger.getLogger(WebdavUtils.class).warn(
@@ -262,30 +270,10 @@ public abstract class WebdavNsNode implements Serializable {
 
         if (!relative) {
           sb.append(getUrlPrefix());
-          if (sb.charAt(sb.length() - 1) != '/') {
-            sb.append("/");
-          }
-
-          if (context.startsWith("/")) {
-            sb.append(context.substring(1));
-          } else {
-            sb.append(context);
-          }
-        } else {
-          if (!context.startsWith("/")) {
-            sb.append("/");
-          }
-          sb.append(context);
-
         }
 
-        if (!enc.startsWith("/")) {
-          if ((sb.length() == 0) || (sb.charAt(sb.length() - 1) != '/')) {
-            sb.append("/");
-          }
-        }
-
-        sb.append(enc);
+        append(sb, context);
+        append(sb, enc);
 
         return sb.toString();
       } catch (Throwable t) {
@@ -316,6 +304,30 @@ public abstract class WebdavNsNode implements Serializable {
      */
     public String getUrlPrefix() {
       return urlPrefix;
+    }
+
+    private boolean endsWithSlash(StringBuilder sb) {
+      if (sb.length() == 0) {
+        return false;
+      }
+
+      return sb.charAt(sb.length() - 1) == '/';
+    }
+
+    private void append(StringBuilder sb, String val) {
+      if (val.startsWith("/")) {
+        if (!endsWithSlash(sb)) {
+          sb.append(val);
+        } else {
+          sb.append(val.substring(1));
+        }
+      } else {
+        if (!endsWithSlash(sb)) {
+          sb.append("/");
+        }
+
+        sb.append(val);
+      }
     }
   }
 
