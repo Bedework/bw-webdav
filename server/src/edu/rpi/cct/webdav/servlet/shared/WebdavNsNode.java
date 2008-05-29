@@ -62,6 +62,8 @@ import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -920,7 +922,7 @@ public abstract class WebdavNsNode implements Serializable {
     return new ArrayList<WebdavProperty>();
   }
 
-  /** Returns an InputStream for the content.
+  /** Returns a Reader for the content.
    *
    * @return Reader       A reader for the content.
    * @throws WebdavException
@@ -935,6 +937,21 @@ public abstract class WebdavNsNode implements Serializable {
     return new StringReader(cont);
   }
 
+  /** Returns an InputStream for the content.
+   *
+   * @return InputStream       A reader for the content.
+   * @throws WebdavException
+   */
+  public InputStream getContentStream() throws WebdavException {
+    byte[] cont = getBinaryContent();
+
+    if (cont == null) {
+      return null;
+    }
+
+    return new ByteArrayInputStream(cont);
+  }
+
   /** Return string content
    *
    * @return String       content.
@@ -944,9 +961,24 @@ public abstract class WebdavNsNode implements Serializable {
     return null;
   }
 
+  /** Return binary content
+   *
+   * @return byte[]       content.
+   * @throws WebdavException
+   */
+  public byte[] getBinaryContent() throws WebdavException {
+    return null;
+  }
+
   /* ====================================================================
    *                   Required webdav properties
    * ==================================================================== */
+
+  /**
+   * @return boolean true if this is binary content
+   * @throws WebdavException
+   */
+  public abstract boolean getContentBinary() throws WebdavException;
 
   /**
    * @return String lang

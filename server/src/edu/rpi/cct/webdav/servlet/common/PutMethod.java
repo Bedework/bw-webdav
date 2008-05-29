@@ -99,11 +99,21 @@ public class PutMethod extends MethodBase {
 
       boolean create = Headers.ifNoneMatchAny(req);
       String ifEtag = Headers.ifMatch(req);
+      WebdavNsIntf.PutContentResult pcr;
 
-      WebdavNsIntf.PutContentResult pcr = intf.putContent(node,
-                                                          getReader(req),
-                                                          create,
-                                                          ifEtag);
+      if (node.getContentBinary()) {
+        pcr = intf.putBinaryContent(node,
+                                    req.getContentType(),
+                                    req.getInputStream(),
+                                    create,
+                                    ifEtag);
+      } else {
+        pcr = intf.putContent(node,
+                              req.getContentType(),
+                              getReader(req),
+                              create,
+                              ifEtag);
+      }
 
       if (pcr.created) {
         resp.setStatus(HttpServletResponse.SC_CREATED);

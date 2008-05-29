@@ -59,6 +59,8 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import java.io.CharArrayReader;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import javax.servlet.http.HttpServletRequest;
@@ -116,15 +118,23 @@ public class GetMethod extends MethodBase {
         return;
       }
 
-      Writer out;
+      Writer out = null;
+      Reader in = null;
+
+      /* For binary */
+      OutputStream streamOut = null;
+      InputStream streamIn = null;
 
       /** Get the content now to set up length, type etc.
        */
-      Reader in = null;
       String contentType;
       int contentLength;
 
-      if (node.isCollection()) {
+      if (node.getContentBinary()) {
+        streamIn = getNsIntf().getBinaryContent(node);
+        contentType = node.getContentType();
+        contentLength = node.getContentLen();
+      } else if (node.isCollection()) {
         if (getNsIntf().getDirectoryBrowsingDisallowed()) {
           throw new WebdavException(HttpServletResponse.SC_FORBIDDEN);
         }
@@ -140,9 +150,11 @@ public class GetMethod extends MethodBase {
       }
 
       if (doContent) {
-        out = resp.getWriter();
-      } else {
-        out = null;
+        if (node.getContentBinary()) {
+          streamOut = resp.getOutputStream();
+        } else {
+          out = resp.getWriter();
+        }
       }
 
       resp.setHeader("ETag", node.getEtagValue(true));
@@ -155,7 +167,7 @@ public class GetMethod extends MethodBase {
       resp.setContentLength(contentLength);
 
       if (doContent) {
-        if (in == null) {
+        if ((in == null) && (streamIn == null)) {
           if (debug) {
             debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
           }
@@ -166,7 +178,11 @@ public class GetMethod extends MethodBase {
             debugMsg("send content - length=" + node.getContentLen());
           }
 
-          writeContent(in, out);
+          if (node.getContentBinary()) {
+            streamContent(streamIn, streamOut);
+          } else {
+            writeContent(in, out);
+          }
         }
       }
     } catch (WebdavException we) {
@@ -180,6 +196,33 @@ public class GetMethod extends MethodBase {
       throws WebdavException {
     try {
       char[] buff = new char[bufferSize];
+      int len;
+
+      while (true) {
+        len = in.read(buff);
+
+        if (len < 0) {
+          break;
+        }
+
+        out.write(buff, 0, len);
+      }
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    } finally {
+      try {
+        in.close();
+      } catch (Throwable t) {}
+      try {
+        out.close();
+      } catch (Throwable t) {}
+    }
+  }
+
+  private void streamContent(InputStream in, OutputStream out)
+      throws WebdavException {
+    try {
+      byte[] buff = new byte[bufferSize];
       int len;
 
       while (true) {

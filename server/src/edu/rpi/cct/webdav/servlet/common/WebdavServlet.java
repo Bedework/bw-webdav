@@ -206,17 +206,22 @@ public abstract class WebdavServlet extends HttpServlet
 
       if (debug && dumpContent) {
         CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
-        String str = wresp.toString();
 
-        debugMsg("------------------------ Dump of response -------------------");
-        debugMsg(str);
-        debugMsg("---------------------- End dump of response -----------------");
+        if (wresp.getUsedOutputStream()) {
+          debugMsg("------------------------ response written to output stream -------------------");
+        } else {
+          String str = wresp.toString();
 
-        byte[] bs = str.getBytes();
-        resp = (HttpServletResponse)wresp.getResponse();
-        debugMsg("contentLength=" + bs.length);
-        resp.setContentLength(bs.length);
-        resp.getOutputStream().write(bs);
+          debugMsg("------------------------ Dump of response -------------------");
+          debugMsg(str);
+          debugMsg("---------------------- End dump of response -----------------");
+
+          byte[] bs = str.getBytes();
+          resp = (HttpServletResponse)wresp.getResponse();
+          debugMsg("contentLength=" + bs.length);
+          resp.setContentLength(bs.length);
+          resp.getOutputStream().write(bs);
+        }
       }
 
       /* WebDAV is stateless - toss away the session */

@@ -64,6 +64,7 @@ import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cmt.access.Acl;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URI;
@@ -489,13 +490,22 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract WebdavNsNode getParent(WebdavNsNode node)
       throws WebdavException;
 
-  /** Returns an InputStream for the content.
+  /** Returns a Reader for the content.
    *
    * @param node             node in question
    * @return Reader          A reader for the content.
    * @throws WebdavException
    */
   public abstract Reader getContent(WebdavNsNode node)
+      throws WebdavException;
+
+  /** Returns an InputStream for the binary content.
+   *
+   * @param node             node in question
+   * @return inputStream     A stream for the content.
+   * @throws WebdavException
+   */
+  public abstract InputStream getBinaryContent(WebdavNsNode node)
       throws WebdavException;
 
   /** Result for putContent
@@ -511,6 +521,7 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Set the content from a Reader
    *
    * @param node              node in question.
+   * @param contentType       null or value from content-type header
    * @param contentRdr        Reader for content
    * @param create            true if this is a probably creation
    * @param ifEtag            if non-null etag must match
@@ -518,7 +529,25 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract PutContentResult putContent(WebdavNsNode node,
+                                              String contentType,
                                               Reader contentRdr,
+                                              boolean create,
+                                              String ifEtag)
+      throws WebdavException;
+
+  /** Set the content from a Stream
+   *
+   * @param node              node in question.
+   * @param contentType       null or value from content-type header
+   * @param contentStream     Stream for content
+   * @param create            true if this is a probably creation
+   * @param ifEtag            if non-null etag must match
+   * @return PutContentResult result of creating
+   * @throws WebdavException
+   */
+  public abstract PutContentResult putBinaryContent(WebdavNsNode node,
+                                              String contentType,
+                                              InputStream contentStream,
                                               boolean create,
                                               String ifEtag)
       throws WebdavException;
