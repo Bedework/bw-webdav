@@ -162,6 +162,7 @@ public abstract class WebdavNsNode implements Serializable {
     addPropEntry(propertyNames, WebdavTags.acl);
     // addPropEntry(propertyNames, WebdavTags.aclRestrictons, false);
     addPropEntry(propertyNames, WebdavTags.creationdate, true);
+    addPropEntry(propertyNames, WebdavTags.currentUserPrincipal, true);
     addPropEntry(propertyNames, WebdavTags.currentUserPrivilegeSet);
     addPropEntry(propertyNames, WebdavTags.displayname, true);
     addPropEntry(propertyNames, WebdavTags.getcontentlanguage, true);
@@ -597,6 +598,20 @@ public abstract class WebdavNsNode implements Serializable {
         }
 
         xml.property(tag, val);
+        return true;
+      }
+
+      if (tag.equals(WebdavTags.currentUserPrincipal)) {
+        // draft-sanchez-webdav-current-principal-01
+
+        xml.openTag(tag);
+        if (intf.getAccount() == null) {
+          xml.emptyTag(WebdavTags.unauthenticated);
+        } else {
+          xml.property(WebdavTags.href, intf.makeUserHref(intf.getAccount()));
+        }
+        xml.closeTag(tag);
+
         return true;
       }
 
