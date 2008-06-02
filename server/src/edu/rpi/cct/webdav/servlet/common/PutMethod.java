@@ -101,15 +101,22 @@ public class PutMethod extends MethodBase {
       String ifEtag = Headers.ifMatch(req);
       WebdavNsIntf.PutContentResult pcr;
 
+      String[] contentTypePars = null;
+      String contentType = req.getContentType();
+
+      if (contentType != null) {
+        contentTypePars = contentType.split(";");
+      }
+
       if (node.getContentBinary()) {
         pcr = intf.putBinaryContent(node,
-                                    req.getContentType(),
+                                    contentTypePars,
                                     req.getInputStream(),
                                     create,
                                     ifEtag);
       } else {
         pcr = intf.putContent(node,
-                              req.getContentType(),
+                              contentTypePars,
                               getReader(req),
                               create,
                               ifEtag);

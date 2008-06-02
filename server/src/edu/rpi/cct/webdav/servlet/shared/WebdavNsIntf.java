@@ -521,7 +521,7 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Set the content from a Reader
    *
    * @param node              node in question.
-   * @param contentType       null or value from content-type header
+   * @param contentTypePars   null or values from content-type header
    * @param contentRdr        Reader for content
    * @param create            true if this is a probably creation
    * @param ifEtag            if non-null etag must match
@@ -529,7 +529,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract PutContentResult putContent(WebdavNsNode node,
-                                              String contentType,
+                                              String[] contentTypePars,
                                               Reader contentRdr,
                                               boolean create,
                                               String ifEtag)
@@ -538,7 +538,7 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Set the content from a Stream
    *
    * @param node              node in question.
-   * @param contentType       null or value from content-type header
+   * @param contentTypePars   null or values from content-type header
    * @param contentStream     Stream for content
    * @param create            true if this is a probably creation
    * @param ifEtag            if non-null etag must match
@@ -546,7 +546,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract PutContentResult putBinaryContent(WebdavNsNode node,
-                                              String contentType,
+                                                    String[] contentTypePars,
                                               InputStream contentStream,
                                               boolean create,
                                               String ifEtag)
