@@ -5,7 +5,7 @@
      Authors: Mike Douglass   douglm@rpi.edu
 -->
 
-<project name="bedework.webdav" default="bld.all">
+<project name="bedework.webdav" default="build">
   <property environment="env"/>
 
   <!-- These may already be set from calling dir -->
@@ -24,11 +24,23 @@
   <property name="build.dir" location="${project.home}/build"/>
   <property name="buildjar" location="${build.dir}/buildjar.xml"/>
 
+  <import file="${build.dir}/getJar.xml"/>
+
   <!-- =================================================================
        init:
        ================================================================= -->
 
   <target name="init" >
+    <delete dir="${lib.dir}" />
+    <mkdir dir="${lib.dir}" />
+
+    <getJar name="log4j" version="1.2.8" />
+    <getJar name="servletapi" version="2.4" />
+
+    <getJar name="bw-davio" version="3.5" project="davutil" />
+    <getJar name="rpiaccess" version="3.5" project="access" />
+    <getJar name="rpiutil" version="3.5" project="rpiutil" />
+
     <property name="org.bedework.webdavserver.base" location="${project.home}/server" />
 
     <mkdir dir="${dist.home}" />
