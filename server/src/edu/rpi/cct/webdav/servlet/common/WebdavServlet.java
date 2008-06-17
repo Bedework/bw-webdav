@@ -204,7 +204,11 @@ public abstract class WebdavServlet extends HttpServlet
         tryWait(req, false);
       } catch (Throwable t) {}
 
-      if (debug && dumpContent) {
+      if (debug && dumpContent &&
+          (resp instanceof CharArrayWrappedResponse)) {
+        /* instanceof check because we might get a subsequent exception before
+         * we wrap the response
+         */
         CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
 
         if (wresp.getUsedOutputStream()) {
