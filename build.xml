@@ -80,13 +80,7 @@
        generated stuff in the libraries.
        ================================================================= -->
   <target name="deep-clean" depends="clean">
-    <delete>
-      <fileset dir="${lib.dir}">
-        <include name="rpiutil-*.jar" />
-        <include name="rpiaccess-*.jar" />
-        <include name="bw-*.jar" />
-      </fileset>
-    </delete>
+    <delete dir="${lib.dir}" />
   </target>
 
   <!-- =================================================================
