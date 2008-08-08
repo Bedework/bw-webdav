@@ -91,7 +91,7 @@ public class PutMethod extends MethodBase {
         return;
       }
 
-      if (!node.getAllowsGet()) {
+      if (!node.getAllowsGet() || !intf.canPut(node)) {
         // If we can't GET - we can't PUT
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;

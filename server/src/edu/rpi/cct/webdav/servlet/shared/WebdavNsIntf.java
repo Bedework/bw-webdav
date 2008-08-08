@@ -216,6 +216,14 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public abstract AccessUtil getAccessUtil() throws WebdavException;
 
+  /** Return true if we can PUT this resource/entity
+  *
+  * @param node
+  * @return  boolean
+  * @throws WebdavException
+  */
+ public abstract boolean canPut(WebdavNsNode node) throws WebdavException;
+
   /**
    * @return Collection of method names.
    */
