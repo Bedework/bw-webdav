@@ -183,12 +183,12 @@ public class PrincipalMatchReport {
                       HttpServletResponse resp,
                       int depth) throws WebdavException {
     try {
+      resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+      resp.setContentType("text/xml; charset=UTF-8");
+
       XmlEmit xml = intf.getXmlEmit();
 
       xml.startEmit(resp.getWriter());
-
-      resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
-      resp.setContentType("text/xml; charset=UTF-8");
 
       xml.openTag(WebdavTags.multistatus);
 

@@ -388,10 +388,10 @@ public class ReportMethod extends MethodBase {
 
     Collection<String> hrefs = intf.getAclPrincipalInfo(node);
 
-    startEmit(resp);
-
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
+
+    startEmit(resp);
 
     openTag(WebdavTags.multistatus);
     if (!hrefs.isEmpty()) {
@@ -425,10 +425,10 @@ public class ReportMethod extends MethodBase {
                                               HttpServletResponse resp,
                                               int depth,
                                               WebdavNsIntf intf) throws WebdavException {
-    startEmit(resp);
-
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
+
+    startEmit(resp);
 
     String resourceUri = getResourceUri(req);
 

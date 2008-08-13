@@ -182,10 +182,11 @@ public class PropPatchMethod extends MethodBase {
       }
 
       /* Fail whole request for any failure */
-      startEmit(resp);
 
       resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
       resp.setContentType("text/xml; charset=UTF-8");
+
+      startEmit(resp);
 
       openTag(WebdavTags.multistatus);
 

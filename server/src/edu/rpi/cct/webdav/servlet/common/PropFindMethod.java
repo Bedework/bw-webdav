@@ -139,8 +139,6 @@ public class PropFindMethod extends MethodBase {
       }
     }
 
-    startEmit(resp);
-
     processResp(req, resp, depth);
   }
 
@@ -228,6 +226,8 @@ public class PropFindMethod extends MethodBase {
                           int depth) throws WebdavException {
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
+
+    startEmit(resp);
 
     String resourceUri = getResourceUri(req);
     if (debug) {

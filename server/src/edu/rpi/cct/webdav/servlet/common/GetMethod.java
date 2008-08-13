@@ -118,11 +118,9 @@ public class GetMethod extends MethodBase {
         return;
       }
 
-      Writer out = null;
       Reader in = null;
 
       /* For binary */
-      OutputStream streamOut = null;
       InputStream streamIn = null;
 
       /** Get the content now to set up length, type etc.
@@ -149,14 +147,6 @@ public class GetMethod extends MethodBase {
         contentLength = node.getContentLen();
       }
 
-      if (doContent) {
-        if (node.getContentBinary()) {
-          streamOut = resp.getOutputStream();
-        } else {
-          out = resp.getWriter();
-        }
-      }
-
       resp.setHeader("ETag", node.getEtagValue(true));
 
       if (node.getLastmodDate() != null) {
@@ -177,11 +167,14 @@ public class GetMethod extends MethodBase {
           if (debug) {
             debugMsg("send content - length=" + node.getContentLen());
           }
+          if (node.getContentBinary()) {
+          } else {
+          }
 
           if (node.getContentBinary()) {
-            streamContent(streamIn, streamOut);
+            streamContent(streamIn, resp.getOutputStream());
           } else {
-            writeContent(in, out);
+            writeContent(in, resp.getWriter());
           }
         }
       }
