@@ -273,9 +273,9 @@ public class GetMethod extends MethodBase {
 
       sb.line("  <hr>");
 
-      sb.line("  <table width=\"100%\" +" +
+      sb.line("  <table width=\"100%\" " +
               "cellspacing=\"0\"" +
-              " cellpadding=\"4\"");
+              " cellpadding=\"4\">");
 
       for (WebdavNsNode child: getNsIntf().getChildren(node)) {
         /* icon would be nice */
