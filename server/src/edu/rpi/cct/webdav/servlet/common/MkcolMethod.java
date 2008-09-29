@@ -74,6 +74,9 @@ public class MkcolMethod extends MethodBase {
   public void init() {
   }
 
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+   */
   public void doMethod(HttpServletRequest req,
                         HttpServletResponse resp) throws WebdavException {
     if (debug) {
