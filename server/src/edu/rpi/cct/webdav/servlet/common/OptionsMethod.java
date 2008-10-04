@@ -76,7 +76,7 @@ public class OptionsMethod extends MethodBase {
   public void doMethod(HttpServletRequest req,
                         HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("GetMethod: doMethod");
+      trace("OptionsMethod: doMethod");
     }
 
     try {
