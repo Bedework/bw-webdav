@@ -30,7 +30,7 @@
 
     <!-- ==================== Sources and classes ====================== -->
 
-    <fileset id="base.java.sources" dir="${source.home}" >
+    <fileset id="buildjar.java.sources" dir="${source.home}" >
       <include name="edu/rpi/cct/**/*.java"/>
     </fileset>
 
