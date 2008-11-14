@@ -178,7 +178,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public String getDavHeader(WebdavNsNode node) throws WebdavException {
-    return "1";
+    return "1, access-control, extended-mkcol";
   }
 
   /** Get an object suitable for use in parsing acls and generating access.

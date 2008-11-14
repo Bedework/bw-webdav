@@ -1,33 +1,5 @@
-/*
- Copyright (c) 2000-2005 University of Washington.  All rights reserved.
-
- Redistribution and use of this distribution in source and binary forms,
- with or without modification, are permitted provided that:
-
-   The above copyright notice and this permission notice appear in
-   all copies and supporting documentation;
-
-   The name, identifiers, and trademarks of the University of Washington
-   are not used in advertising or publicity without the express prior
-   written permission of the University of Washington;
-
-   Recipients acknowledge that this distribution is made available as a
-   research courtesy, "as is", potentially with defects, without
-   any obligation on the part of the University of Washington to
-   provide support, services, or repair;
-
-   THE UNIVERSITY OF WASHINGTON DISCLAIMS ALL WARRANTIES, EXPRESS OR
-   IMPLIED, WITH REGARD TO THIS SOFTWARE, INCLUDING WITHOUT LIMITATION
-   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-   PARTICULAR PURPOSE, AND IN NO EVENT SHALL THE UNIVERSITY OF
-   WASHINGTON BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL
-   DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-   PROFITS, WHETHER IN AN ACTION OF CONTRACT, TORT (INCLUDING
-   NEGLIGENCE) OR STRICT LIABILITY, ARISING OUT OF OR IN CONNECTION WITH
-   THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
 /* **********************************************************************
-    Copyright 2005 Rensselaer Polytechnic Institute. All worldwide rights reserved.
+    Copyright 2008 Rensselaer Polytechnic Institute. All worldwide rights reserved.
 
     Redistribution and use of this distribution in source and binary forms,
     with or without modification, are permitted provided that:
@@ -51,12 +23,12 @@
     special, consequential, or incidental damages related to the software,
     to the maximum extent the law permits.
 */
-
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
+import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,7 +39,7 @@ import org.w3c.dom.Document;
  *
  *   @author Mike Douglass   douglm@rpi.edu
  */
-public class MkcolMethod extends MethodBase {
+public class MkcolMethod extends PropPatchMethod {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
@@ -83,9 +55,9 @@ public class MkcolMethod extends MethodBase {
       trace("MkcolMethod: doMethod");
     }
 
-    /* Parse any content
+    /* Parse any content */
     Document doc = parseContent(req, resp);
-    */
+
     /* Create the node */
     String resourceUri = getResourceUri(req);
 
@@ -93,27 +65,12 @@ public class MkcolMethod extends MethodBase {
                                             WebdavNsIntf.existanceNot,
                                             WebdavNsIntf.nodeTypeCollection);
 
-    getNsIntf().makeCollection(req, resp, node);
+    node.setDefaults(WebdavTags.mkcol);
 
-    /*
-    if (doc != null) {
-      int st = processDoc(req, doc);
-
-      if (st != HttpServletResponse.SC_OK) {
-        resp.setStatus(st);
-        throw new WebdavException(st);
-      }
+    if ((doc == null) ||
+        processDoc(req, resp, doc, node, WebdavTags.mkcol, true)) {
+      // Make collection using properties sent in request
+      getNsIntf().makeCollection(req, resp, node);
     }
-    */
-  }
-
-  /* ====================================================================
-   *                   Private methods
-   * ==================================================================== */
-
-  protected int processDoc(HttpServletRequest req,
-                           Document doc) throws WebdavException {
-    throw new WebdavException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
   }
 }
-

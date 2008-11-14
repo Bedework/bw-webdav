@@ -55,6 +55,7 @@
 package edu.rpi.cct.webdav.servlet.shared;
 
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
+import edu.rpi.cmt.access.AccessPrincipal;
 import edu.rpi.cmt.access.AccessXmlUtil;
 import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
@@ -694,7 +695,7 @@ public abstract class WebdavNsNode implements Serializable {
       if (tag.equals(WebdavTags.owner)) {
         // access 5.1
         xml.openTag(tag);
-        xml.property(WebdavTags.href, intf.makeUserHref(getOwner()));
+        xml.property(WebdavTags.href, intf.makeUserHref(getOwner().getAccount()));
         xml.closeTag(tag);
 
         return true;
@@ -985,6 +986,13 @@ public abstract class WebdavNsNode implements Serializable {
     return null;
   }
 
+  /**
+   * @param methodTag - acts as a flag for the method type
+   * @throws WebdavException
+   */
+  public void setDefaults(QName methodTag) throws WebdavException {
+  }
+
   /* ====================================================================
    *                   Required webdav properties
    * ==================================================================== */
@@ -1046,10 +1054,10 @@ public abstract class WebdavNsNode implements Serializable {
 
   /** Should return a value suitable for WebdavNsIntf.makeUserHref
    *
-   * @return String owner
+   * @return AccessPrincipal owner
    * @throws WebdavException
    */
-  public abstract String getOwner() throws WebdavException;
+  public abstract AccessPrincipal getOwner() throws WebdavException;
 
   /* ********************************************************************
    *                        Protected methods
