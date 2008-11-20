@@ -317,6 +317,8 @@ public class GetMethod extends MethodBase {
       sb.line("</html>");
 
       return sb.toString();
+    } catch (WebdavException we) {
+      throw we;
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
