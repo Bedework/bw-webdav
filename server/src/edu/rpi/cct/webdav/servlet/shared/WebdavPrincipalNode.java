@@ -88,13 +88,15 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    * @param path - resource path
    * @param account
    * @param collection - true if this is a collection
+   * @param uri
    * @param debug
    * @throws WebdavException
    */
   public WebdavPrincipalNode(UrlHandler urlHandler, String path,
                              AccessPrincipal account,
-                             boolean collection, boolean debug) throws WebdavException {
-    super(urlHandler, path, collection, debug);
+                             boolean collection,
+                             String uri, boolean debug) throws WebdavException {
+    super(urlHandler, path, collection, uri, debug);
     this.account = account;
 //    if (displayName.startsWith("/")) {
 //      debugMsg(displayName);

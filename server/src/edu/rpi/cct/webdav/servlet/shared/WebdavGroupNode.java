@@ -39,13 +39,15 @@ public class WebdavGroupNode extends WebdavPrincipalNode {
    * @param path - resource path
    * @param account
    * @param collection - true if this is a collection
+   * @param uri
    * @param debug
    * @throws WebdavException
    */
   public WebdavGroupNode(UrlHandler urlHandler, String path,
                          AccessPrincipal account,
-                         boolean collection, boolean debug) throws WebdavException {
-    super(urlHandler, path, account, collection, debug);
+                         boolean collection,
+                         String uri, boolean debug) throws WebdavException {
+    super(urlHandler, path, account, collection, uri, debug);
     groupPrincipal = true;
   }
 }

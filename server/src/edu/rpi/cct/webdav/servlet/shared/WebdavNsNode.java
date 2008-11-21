@@ -340,13 +340,16 @@ public abstract class WebdavNsNode implements Serializable {
    * @param urlHandler - needed for building hrefs.
    * @param path - resource path
    * @param collection - true if this is a collection
+   * @param uri - the uri (XXX is that the same as the path?)
    * @param debug
    */
   public WebdavNsNode(UrlHandler urlHandler, String path,
-                      boolean collection, boolean debug) {
+                      boolean collection, String uri,
+                      boolean debug) {
     this.urlHandler = urlHandler;
     this.path = path;
     this.collection = collection;
+    this.uri = uri;
     this.debug = debug;
   }
 
