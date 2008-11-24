@@ -57,6 +57,7 @@ package edu.rpi.cct.webdav.servlet.shared;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cmt.access.AccessPrincipal;
+import edu.rpi.cmt.access.WhoDefs;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
@@ -98,6 +99,8 @@ public class WebdavPrincipalNode extends WebdavNsNode {
                              String uri, boolean debug) throws WebdavException {
     super(urlHandler, path, collection, uri, debug);
     this.account = account;
+    userPrincipal = account.getKind() == WhoDefs.whoTypeUser;
+    groupPrincipal = account.getKind() == WhoDefs.whoTypeGroup;
 //    if (displayName.startsWith("/")) {
 //      debugMsg(displayName);
 //    }
