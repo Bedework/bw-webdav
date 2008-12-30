@@ -325,7 +325,7 @@ public class GetMethod extends MethodBase {
   }
 
   private static class Sbuff {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     /**
      * @param ss
