@@ -627,7 +627,7 @@ public abstract class WebdavNsNode implements Serializable {
           return true;
         }
 
-        PrivilegeSet ps = ca.privileges;
+        PrivilegeSet ps = ca.getPrivileges();
         char[] privileges = ps.getPrivileges();
 
         AccessXmlUtil.emitCurrentPrivSet(xml,
