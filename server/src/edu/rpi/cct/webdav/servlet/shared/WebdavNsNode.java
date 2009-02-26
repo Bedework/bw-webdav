@@ -395,6 +395,17 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract boolean trailSlash();
 
+  /** Return a collection of children objects. For example, this is object
+   * represents a folder, they may be file objects or a mix of file and folder
+   * objects. These are not node objects.
+   *
+   * <p>Default is to return null
+   *
+   * @return Collection
+   * @throws WebdavException
+   */
+  public abstract Collection getChildren() throws WebdavException;
+
   /**
    * @return String
    */
@@ -1061,6 +1072,20 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public abstract AccessPrincipal getOwner() throws WebdavException;
+
+  /** The node may refer to a collection object which may in fact be an alias to
+   * another. For deletions we want to remove the alias itself.
+   *
+   * <p>Move and rename are also targetted at the alias.
+   *
+   * <p>Other operations are probably intended to work on the underlying target
+   * of the alias.
+   *
+   * @param deref true if we want to act upon the target of an alias.
+   * @return Collection this node represents
+   * @throws WebdavException
+   */
+  public abstract WdCollection getCollection(boolean deref) throws WebdavException;
 
   /* ********************************************************************
    *                        Protected methods

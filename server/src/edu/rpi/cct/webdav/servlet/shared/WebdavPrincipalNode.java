@@ -64,6 +64,7 @@ import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.w3c.dom.Element;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -142,6 +143,17 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    */
   public boolean trailSlash() {
     return true;
+  }
+
+  /* (non-Javadoc)
+   * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getChildren()
+   */
+  public Collection getChildren() throws WebdavException {
+    return null;
+  }
+
+  public WdCollection getCollection(boolean deref) throws WebdavException {
+    return null;
   }
 
   /* ====================================================================

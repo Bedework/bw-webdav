@@ -36,7 +36,7 @@ import java.util.Date;
  * @author douglm
  *
  */
-public class WdCollection implements Comparable<WdCollection> {
+public abstract class WdCollection implements Comparable<WdCollection> {
   /** The internal name of the collection
    */
   private String name;
@@ -45,6 +45,9 @@ public class WdCollection implements Comparable<WdCollection> {
 
   /* The path up to and including this object */
   private String path;
+
+  /* The path up to this object */
+  private String parentPath;
 
   private AccessPrincipal owner;
 
@@ -62,8 +65,9 @@ public class WdCollection implements Comparable<WdCollection> {
 
   /** Constructor
    *
+   * @throws WebdavException
    */
-  public WdCollection() {
+  public WdCollection() throws WebdavException {
     super();
 
     Date dt = new Date();
@@ -75,143 +79,210 @@ public class WdCollection implements Comparable<WdCollection> {
    *                      Bean methods
    * ==================================================================== */
 
+  /**
+   * @return true if this is an alias for another entity.
+   * @throws WebdavException
+   */
+  public abstract boolean isAlias() throws WebdavException;
+
+  /** If isAlias() and this is null system may have to resolve the alias in some
+   * way.
+   *
+   * @return WdCollection or null.
+   * @throws WebdavException
+   */
+  public abstract WdCollection getAliasTarget() throws WebdavException;
+
+  /* ====================================================================
+   *                      Bean methods
+   * ==================================================================== */
+
   /** Set the name
    *
    * @param val    String name
+   * @throws WebdavException
    */
-  public void setName(String val) {
+  public void setName(String val) throws WebdavException {
     name = val;
   }
 
   /** Get the name
    *
    * @return String   name
+   * @throws WebdavException
    */
-  public String getName() {
+  public String getName() throws WebdavException {
     return name;
   }
 
   /** Set the display name
    *
    * @param val    String display name
+   * @throws WebdavException
    */
-  public void setDisplayName(String val) {
+  public void setDisplayName(String val) throws WebdavException {
     displayName = val;
   }
 
   /** Get the display name
    *
    * @return String   display name
+   * @throws WebdavException
    */
-  public String getDisplayName() {
+  public String getDisplayName() throws WebdavException {
     return displayName;
   }
 
   /** Set the path to this collection
    *
    * @param val    String path
+   * @throws WebdavException
    */
-  public void setPath(String val) {
+  public void setPath(String val) throws WebdavException {
     path = val;
   }
 
   /** Get the path
    *
    * @return String   path
+   * @throws WebdavException
    */
-  public String getPath() {
+  public String getPath() throws WebdavException {
     return path;
+  }
+
+  /** Set the path to this collection
+   *
+   * @param val    String path
+   * @throws WebdavException
+   */
+  public void setParentPath(String val) throws WebdavException {
+    parentPath = val;
+  }
+
+  /** Get the path
+   *
+   * @return String   path
+   * @throws WebdavException
+   */
+  public String getParentPath() throws WebdavException {
+    return parentPath;
   }
 
   /**
    * @param val
+   * @throws WebdavException
    */
-  public void setOwner(AccessPrincipal val) {
+  public void setOwner(AccessPrincipal val) throws WebdavException {
     owner = val;
   }
 
   /**
    * @return AccessPrincipal
+   * @throws WebdavException
    */
-  public AccessPrincipal getOwner() {
+  public AccessPrincipal getOwner() throws WebdavException {
     return owner;
   }
 
   /**
    * @param val
+   * @throws WebdavException
    */
-  public void setCreated(String val) {
+  public void setCreated(String val) throws WebdavException {
     created = val;
   }
 
   /**
    * @return String created
+   * @throws WebdavException
    */
-  public String getCreated() {
+  public String getCreated() throws WebdavException {
     return created;
   }
 
   /**
    * @param val
+   * @throws WebdavException
    */
-  public void setLastmod(String val) {
+  public void setLastmod(String val) throws WebdavException {
     lastmod = val;
   }
 
   /**
    * @return String lastmod
+   * @throws WebdavException
    */
-  public String getLastmod() {
+  public String getLastmod() throws WebdavException {
     return lastmod;
   }
 
   /** Set the sequence
    *
    * @param val    sequence number
+   * @throws WebdavException
    */
-  public void setSequence(int val) {
+  public void setSequence(int val) throws WebdavException {
     sequence = val;
   }
 
   /** Get the sequence
    *
    * @return int    the sequence
+   * @throws WebdavException
    */
-  public int getSequence() {
+  public int getSequence() throws WebdavException {
     return sequence;
   }
 
   /** Set the description
    *
    * @param val    String description
+   * @throws WebdavException
    */
-  public void setDescription(String val) {
+  public void setDescription(String val) throws WebdavException {
     description = val;
   }
 
   /** Get the description
    *
    * @return String   description
+   * @throws WebdavException
    */
-  public String getDescription() {
+  public String getDescription() throws WebdavException {
     return description;
   }
 
+  /**
+   * @return a value to be used for etags or ctags
+   * @throws WebdavException
+   */
+  public String getTagValue() throws WebdavException {
+    return getLastmod() + "-" + getSequence();
+  }
+
   public int hashCode() {
-    return getPath().hashCode() * getName().hashCode();
+    try {
+      return getPath().hashCode() * getName().hashCode();
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
 
   public int compareTo(WdCollection that)  {
-    if (this == that) {
-      return 0;
-    }
+    try {
+      if (this == that) {
+        return 0;
+      }
 
-    int res = Util.cmpObjval(getPath(), that.getPath());
-    if (res != 0) {
-      return res;
-    }
+      int res = Util.cmpObjval(getPath(), that.getPath());
+      if (res != 0) {
+        return res;
+      }
 
-    return Util.cmpObjval(getName(), that.getName());
+      return Util.cmpObjval(getName(), that.getName());
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
-
 }
