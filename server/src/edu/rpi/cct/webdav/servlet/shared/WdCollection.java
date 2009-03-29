@@ -1,5 +1,5 @@
 /* **********************************************************************
-    Copyright 2005 Rensselaer Polytechnic Institute. All worldwide rights reserved.
+    Copyright 2009 Rensselaer Polytechnic Institute. All worldwide rights reserved.
 
     Redistribution and use of this distribution in source and binary forms,
     with or without modification, are permitted provided that:
@@ -25,264 +25,27 @@
 */
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.sss.util.DateTimeUtil;
-import edu.rpi.sss.util.Util;
-
-import java.util.Date;
-
 /** Class to represent a collection in WebDAV
  *
  * @author douglm
  *
  */
-public abstract class WdCollection implements Comparable<WdCollection> {
-  /** The internal name of the collection
-   */
-  private String name;
-
-  private String displayName;
-
-  /* The path up to and including this object */
-  private String path;
-
-  /* The path up to this object */
-  private String parentPath;
-
-  private AccessPrincipal owner;
-
-  /** UTC datetime */
-  private String created;
-
-  /** UTC datetime */
-  private String lastmod;
-
-  /** Ensure uniqueness - lastmod only down to second.
-   */
-  private int sequence;
-
-  private String description;
-
+public abstract class WdCollection extends WdEntity {
   /** Constructor
    *
    * @throws WebdavException
    */
   public WdCollection() throws WebdavException {
     super();
-
-    Date dt = new Date();
-    setLastmod(DateTimeUtil.isoDateTimeUTC(dt));
-    setCreated(DateTimeUtil.isoDateTimeUTC(dt));
   }
 
-  /* ====================================================================
-   *                      Bean methods
-   * ==================================================================== */
+  public String toString() {
+    StringBuilder sb = new StringBuilder("WdCollection{");
 
-  /**
-   * @return true if this is an alias for another entity.
-   * @throws WebdavException
-   */
-  public abstract boolean isAlias() throws WebdavException;
+    toStringSegment(sb);
 
-  /** If isAlias() and this is null system may have to resolve the alias in some
-   * way.
-   *
-   * @return WdCollection or null.
-   * @throws WebdavException
-   */
-  public abstract WdCollection getAliasTarget() throws WebdavException;
+    sb.append("}");
 
-  /* ====================================================================
-   *                      Bean methods
-   * ==================================================================== */
-
-  /** Set the name
-   *
-   * @param val    String name
-   * @throws WebdavException
-   */
-  public void setName(String val) throws WebdavException {
-    name = val;
-  }
-
-  /** Get the name
-   *
-   * @return String   name
-   * @throws WebdavException
-   */
-  public String getName() throws WebdavException {
-    return name;
-  }
-
-  /** Set the display name
-   *
-   * @param val    String display name
-   * @throws WebdavException
-   */
-  public void setDisplayName(String val) throws WebdavException {
-    displayName = val;
-  }
-
-  /** Get the display name
-   *
-   * @return String   display name
-   * @throws WebdavException
-   */
-  public String getDisplayName() throws WebdavException {
-    return displayName;
-  }
-
-  /** Set the path to this collection
-   *
-   * @param val    String path
-   * @throws WebdavException
-   */
-  public void setPath(String val) throws WebdavException {
-    path = val;
-  }
-
-  /** Get the path
-   *
-   * @return String   path
-   * @throws WebdavException
-   */
-  public String getPath() throws WebdavException {
-    return path;
-  }
-
-  /** Set the path to this collection
-   *
-   * @param val    String path
-   * @throws WebdavException
-   */
-  public void setParentPath(String val) throws WebdavException {
-    parentPath = val;
-  }
-
-  /** Get the path
-   *
-   * @return String   path
-   * @throws WebdavException
-   */
-  public String getParentPath() throws WebdavException {
-    return parentPath;
-  }
-
-  /**
-   * @param val
-   * @throws WebdavException
-   */
-  public void setOwner(AccessPrincipal val) throws WebdavException {
-    owner = val;
-  }
-
-  /**
-   * @return AccessPrincipal
-   * @throws WebdavException
-   */
-  public AccessPrincipal getOwner() throws WebdavException {
-    return owner;
-  }
-
-  /**
-   * @param val
-   * @throws WebdavException
-   */
-  public void setCreated(String val) throws WebdavException {
-    created = val;
-  }
-
-  /**
-   * @return String created
-   * @throws WebdavException
-   */
-  public String getCreated() throws WebdavException {
-    return created;
-  }
-
-  /**
-   * @param val
-   * @throws WebdavException
-   */
-  public void setLastmod(String val) throws WebdavException {
-    lastmod = val;
-  }
-
-  /**
-   * @return String lastmod
-   * @throws WebdavException
-   */
-  public String getLastmod() throws WebdavException {
-    return lastmod;
-  }
-
-  /** Set the sequence
-   *
-   * @param val    sequence number
-   * @throws WebdavException
-   */
-  public void setSequence(int val) throws WebdavException {
-    sequence = val;
-  }
-
-  /** Get the sequence
-   *
-   * @return int    the sequence
-   * @throws WebdavException
-   */
-  public int getSequence() throws WebdavException {
-    return sequence;
-  }
-
-  /** Set the description
-   *
-   * @param val    String description
-   * @throws WebdavException
-   */
-  public void setDescription(String val) throws WebdavException {
-    description = val;
-  }
-
-  /** Get the description
-   *
-   * @return String   description
-   * @throws WebdavException
-   */
-  public String getDescription() throws WebdavException {
-    return description;
-  }
-
-  /**
-   * @return a value to be used for etags or ctags
-   * @throws WebdavException
-   */
-  public String getTagValue() throws WebdavException {
-    return getLastmod() + "-" + getSequence();
-  }
-
-  public int hashCode() {
-    try {
-      return getPath().hashCode() * getName().hashCode();
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
-  }
-
-  public int compareTo(WdCollection that)  {
-    try {
-      if (this == that) {
-        return 0;
-      }
-
-      int res = Util.cmpObjval(getPath(), that.getPath());
-      if (res != 0) {
-        return res;
-      }
-
-      return Util.cmpObjval(getName(), that.getName());
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    return sb.toString();
   }
 }

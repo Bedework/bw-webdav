@@ -126,6 +126,11 @@ public class CopyMethod extends MethodBase {
                                        WebdavNsIntf.existanceMust,
                                        WebdavNsIntf.nodeTypeUnknown);
 
+      if ((from == null) || !from.getExists()) {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return;
+      }
+
       int toNodeType;
       if (from.isCollection()) {
         toNodeType = WebdavNsIntf.nodeTypeCollection;

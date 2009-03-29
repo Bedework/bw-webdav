@@ -101,6 +101,11 @@ public class PropPatchMethod extends MethodBase {
                                             WebdavNsIntf.existanceMust,
                                             WebdavNsIntf.nodeTypeUnknown);
 
+    if ((node == null) || !node.getExists()) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
     if (doc != null) {
       if (processDoc(req, resp, doc, node, WebdavTags.propertyUpdate, false)) {
         node.update();
