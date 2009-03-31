@@ -404,7 +404,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @return Collection
    * @throws WebdavException
    */
-  public abstract Collection getChildren() throws WebdavException;
+  public abstract Collection<? extends WdEntity> getChildren() throws WebdavException;
 
   /**
    * @return String

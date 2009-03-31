@@ -61,6 +61,13 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    */
   private int sequence;
 
+  /** UTC datetime */
+  private String prevLastmod;
+
+  /** Ensure uniqueness - lastmod only down to second.
+   */
+  private int prevSequence;
+
   private String description;
 
   /** Constructor
@@ -235,6 +242,41 @@ public abstract class WdEntity implements Comparable<WdEntity> {
     return sequence;
   }
 
+  /** Prev lastmod is the saved lastmod before any changes.
+   *
+   * @param val
+   * @throws WebdavException
+   */
+  public void setPrevLastmod(String val) throws WebdavException {
+    prevLastmod = val;
+  }
+
+  /**
+   * @return String lastmod
+   * @throws WebdavException
+   */
+  public String getPrevLastmod() throws WebdavException {
+    return prevLastmod;
+  }
+
+  /** Set the sequence
+   *
+   * @param val    sequence number
+   * @throws WebdavException
+   */
+  public void setPrevSequence(int val) throws WebdavException {
+    prevSequence = val;
+  }
+
+  /** Get the sequence
+   *
+   * @return int    the sequence
+   * @throws WebdavException
+   */
+  public int getPrevSequence() throws WebdavException {
+    return prevSequence;
+  }
+
   /** Set the description
    *
    * @param val    String description
@@ -259,6 +301,14 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    */
   public String getTagValue() throws WebdavException {
     return getLastmod() + "-" + getSequence();
+  }
+
+  /**
+   * @return a value to be used for etags or ctags
+   * @throws WebdavException
+   */
+  public String getPrevTagValue() throws WebdavException {
+    return getPrevLastmod() + "-" + getPrevSequence();
   }
 
   /**
