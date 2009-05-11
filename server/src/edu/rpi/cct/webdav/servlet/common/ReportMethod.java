@@ -398,7 +398,7 @@ public class ReportMethod extends MethodBase {
       openTag(WebdavTags.response);
 
       for (String href: hrefs) {
-        WebdavNsNode pnode = getNsIntf().getNode(href,
+        WebdavNsNode pnode = getNsIntf().getNode(getNsIntf().getUri(href),
                                                  WebdavNsIntf.existanceMay,
                                                  WebdavNsIntf.nodeTypePrincipal);
         if (pnode != null) {
