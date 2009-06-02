@@ -280,6 +280,7 @@ public abstract class WebdavServlet extends HttpServlet
             debugMsg("setStatus(" + wde.getStatusCode() + ")");
           }
           resp.setStatus(wde.getStatusCode());
+          resp.setContentType("text/xml; charset=UTF-8");
           if (!emitError(intf, errorTag, resp.getWriter())) {
             StringWriter sw = new StringWriter();
             emitError(intf, errorTag, sw);
