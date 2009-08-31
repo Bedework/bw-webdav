@@ -381,11 +381,17 @@ public abstract class WebdavNsNode implements Serializable {
     /** */
     public String message;
 
+    /** */
+    public QName rootElement;
+
     /**
      * @param prop
+     * @param rootElement allow nodes to determine what is tryingto set things
      */
-    public SetPropertyResult(Element prop) {
+    public SetPropertyResult(Element prop,
+                             QName rootElement) {
       this.prop = prop;
+      this.rootElement = rootElement;
     }
   }
 

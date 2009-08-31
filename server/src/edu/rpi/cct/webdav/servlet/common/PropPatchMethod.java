@@ -156,7 +156,7 @@ public class PropPatchMethod extends MethodBase {
          */
 
         for (Element prop: sr) {
-          SetPropertyResult spr = new SetPropertyResult(prop);
+          SetPropertyResult spr = new SetPropertyResult(prop, expectedRoot);
 
           boolean recognized;
 
