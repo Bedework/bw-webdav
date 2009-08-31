@@ -327,7 +327,7 @@ public abstract class MethodBase {
                                   HttpServletResponse resp)
       throws WebdavException{
     int len = req.getContentLength();
-    if (len <= 0) {
+    if (len == 0) {
       return null;
     }
 
