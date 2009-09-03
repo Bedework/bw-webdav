@@ -1028,7 +1028,7 @@ public abstract class WebdavNsIntf implements Serializable {
     }
 
     /** Reconstruct */
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (String s: al) {
       sb.append('/');
       sb.append(s);
