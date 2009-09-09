@@ -215,10 +215,10 @@ public class PropFindMethod extends MethodBase {
     if (node == null) {
       openTag(WebdavTags.response);
 
-      // XXX missing href
-      openTag(WebdavTags.propstat);
+      // XXX href value not encoded correctly
+      property(WebdavTags.href, resourceUri);
+
       addStatus(HttpServletResponse.SC_NOT_FOUND, null);
-      closeTag(WebdavTags.propstat);
 
       closeTag(WebdavTags.response);
     } else {
