@@ -283,7 +283,7 @@ public abstract class WebdavNsIntf implements Serializable {
   public String getUri(String href) throws WebdavException {
     try {
       if (href == null) {
-        throw new WebdavException("bad URI " + href);
+        throw new WebdavBadRequest("bad URI " + href);
       }
 
       String context = req.getContextPath();
@@ -315,7 +315,7 @@ public abstract class WebdavNsIntf implements Serializable {
       }
 
       if (path.charAt(pos) != '/') {
-        throw new WebdavException("bad URI " + href);
+        throw new WebdavBadRequest("bad URI " + href);
       }
 
       return path.substring(pos);
@@ -323,7 +323,7 @@ public abstract class WebdavNsIntf implements Serializable {
       if (debug) {
         error(t);
       }
-      throw new WebdavException(t);
+      throw new WebdavBadRequest("bad URI " + href);
     }
   }
 
