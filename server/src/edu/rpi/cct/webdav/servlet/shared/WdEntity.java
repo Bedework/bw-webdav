@@ -315,32 +315,36 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param sb
    */
   public void toStringSegment(StringBuilder sb) {
-    sb.append("name=");
-    sb.append(name);
+    try {
+      sb.append("name=");
+      sb.append(getName());
 
-    sb.append(", displayName");
-    sb.append(displayName);
+      sb.append(", displayName");
+      sb.append(getDisplayName());
 
-    sb.append(", path");
-    sb.append(path);
+      sb.append(", path");
+      sb.append(getPath());
 
-    sb.append(", parentPath");
-    sb.append(parentPath);
+      sb.append(", parentPath");
+      sb.append(getParentPath());
 
-    sb.append(", owner");
-    sb.append(owner);
+      sb.append(", owner");
+      sb.append(getOwner());
 
-    sb.append(", created");
-    sb.append(created);
+      sb.append(", created");
+      sb.append(getCreated());
 
-    sb.append(", lastmod");
-    sb.append(lastmod);
+      sb.append(", lastmod");
+      sb.append(getLastmod());
 
-    sb.append(", sequence");
-    sb.append(sequence);
+      sb.append(", sequence");
+      sb.append(getSequence());
 
-    sb.append(", description");
-    sb.append(description);
+      sb.append(", description");
+      sb.append(getDescription());
+    } catch (Throwable t) {
+      sb.append(t);
+    }
   }
 
   /* ====================================================================
