@@ -92,23 +92,7 @@ public class OptionsMethod extends MethodBase {
         return;
       }
 
-      addDavHeader(resp, node);
-
-      // Lisa say's we need this
-      resp.addHeader("MS-Author-Via", "DAV");
-
-      // This probably needs changes
-
-      StringBuilder methods = new StringBuilder();
-      for (String name: getNsIntf().getMethodNames()) {
-        if (methods.length() > 0) {
-          methods.append(", ");
-        }
-
-        methods.append(name);
-      }
-
-      resp.addHeader("Allow", methods.toString());
+      addHeaders(resp, node);
     } catch (WebdavException we) {
       throw we;
     } catch (Throwable t) {

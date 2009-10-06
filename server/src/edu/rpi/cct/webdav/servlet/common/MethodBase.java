@@ -256,6 +256,32 @@ public abstract class MethodBase {
     }
   }
 
+  protected void addHeaders(HttpServletResponse resp,
+                            WebdavNsNode node) throws WebdavException {
+    addDavHeader(resp, node);
+
+    // Lisa say's we need this
+    resp.addHeader("MS-Author-Via", "DAV");
+
+    // This probably needs changes
+
+    StringBuilder methods = new StringBuilder();
+    for (String name: getNsIntf().getMethodNames()) {
+      if (methods.length() > 0) {
+        methods.append(", ");
+      }
+
+      methods.append(name);
+    }
+
+    resp.addHeader("Allow", methods.toString());
+  }
+
+  protected void addDavHeader(HttpServletResponse resp,
+                              WebdavNsNode node) throws WebdavException {
+    resp.addHeader("DAV", getNsIntf().getDavHeader(node));
+  }
+
   private class DebugReader extends FilterReader {
     StringBuffer sb = new StringBuffer();
 
