@@ -36,13 +36,13 @@ import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle POST
  *
@@ -70,11 +70,13 @@ public class ReportMethod extends MethodBase {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
+  @Override
   public void init() {
   }
 
-  public void doMethod(HttpServletRequest req,
-                       HttpServletResponse resp) throws WebdavException {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("ReportMethod: doMethod");
     }
@@ -94,7 +96,7 @@ public class ReportMethod extends MethodBase {
       return;
     }
 
-    int depth = Headers.depth(req);
+    int depth = Headers.depth(req, 0);
 
     if (debug) {
       trace("ReportMethod: depth=" + depth);
@@ -108,10 +110,10 @@ public class ReportMethod extends MethodBase {
    * @param doc
    * @throws WebdavException
    */
-  protected void process(Document doc,
-                         int depth,
-                         HttpServletRequest req,
-                         HttpServletResponse resp) throws WebdavException {
+  protected void process(final Document doc,
+                         final int depth,
+                         final HttpServletRequest req,
+                         final HttpServletResponse resp) throws WebdavException {
     reportType = getReportType(doc);
 
     if (reportType < 0) {
@@ -125,7 +127,7 @@ public class ReportMethod extends MethodBase {
 
   /* Apply a node to a parsed request - or the other way - whatever.
    */
-  protected void doNodeProperties(WebdavNsNode node) throws WebdavException {
+  protected void doNodeProperties(final WebdavNsNode node) throws WebdavException {
     int status = node.getStatus();
 
     openTag(WebdavTags.response);
@@ -153,7 +155,7 @@ public class ReportMethod extends MethodBase {
    * @param doc
    * @throws WebdavException
    */
-  private void processDoc(Document doc,
+  private void processDoc(final Document doc,
                           int depth) throws WebdavException {
     try {
       WebdavNsIntf intf = getNsIntf();
@@ -211,8 +213,8 @@ public class ReportMethod extends MethodBase {
    *  prop: see RFC 2518, Section 12.11
    *
    */
-  private void parseAclPrincipalProps(Element root,
-                                      WebdavNsIntf intf) throws WebdavException {
+  private void parseAclPrincipalProps(final Element root,
+                                      final WebdavNsIntf intf) throws WebdavException {
     try {
       Element[] children = getChildrenArray(root);
       boolean hadProp = false;
@@ -264,9 +266,9 @@ public class ReportMethod extends MethodBase {
    *    <apply-to-principal-collection-set/>
    *  </principal-property-search>
    */
-  private void parsePrincipalPropertySearch(Element root,
-                                            int depth,
-                                            WebdavNsIntf intf) throws WebdavException {
+  private void parsePrincipalPropertySearch(final Element root,
+                                            final int depth,
+                                            final WebdavNsIntf intf) throws WebdavException {
     try {
       Element[] children = getChildrenArray(root);
 
@@ -327,9 +329,9 @@ public class ReportMethod extends MethodBase {
    * @param depth
    * @throws WebdavException
    */
-  private void processResp(HttpServletRequest req,
-                           HttpServletResponse resp,
-                           int depth) throws WebdavException {
+  private void processResp(final HttpServletRequest req,
+                           final HttpServletResponse resp,
+                           final int depth) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
     /* Build a collection of nodes for any user principals in the acl
@@ -371,16 +373,16 @@ public class ReportMethod extends MethodBase {
    * @param intf
    * @throws WebdavException
    */
-  private void processExpandProperty(HttpServletRequest req,
-                                     HttpServletResponse resp,
-                                     int depth,
-                                     WebdavNsIntf intf) throws WebdavException {
+  private void processExpandProperty(final HttpServletRequest req,
+                                     final HttpServletResponse resp,
+                                     final int depth,
+                                     final WebdavNsIntf intf) throws WebdavException {
     return;
   }
 
-  private void processAclPrincipalPropSet(HttpServletRequest req,
-                                          HttpServletResponse resp,
-                                          WebdavNsIntf intf) throws WebdavException {
+  private void processAclPrincipalPropSet(final HttpServletRequest req,
+                                          final HttpServletResponse resp,
+                                          final WebdavNsIntf intf) throws WebdavException {
     String resourceUri = getResourceUri(req);
     WebdavNsNode node = getNsIntf().getNode(resourceUri,
                                             WebdavNsIntf.existanceMust,
@@ -421,10 +423,10 @@ public class ReportMethod extends MethodBase {
    * @param intf
    * @throws WebdavException
    */
-  private void processPrincipalPropertySearch(HttpServletRequest req,
-                                              HttpServletResponse resp,
-                                              int depth,
-                                              WebdavNsIntf intf) throws WebdavException {
+  private void processPrincipalPropertySearch(final HttpServletRequest req,
+                                              final HttpServletResponse resp,
+                                              final int depth,
+                                              final WebdavNsIntf intf) throws WebdavException {
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
 
@@ -451,7 +453,7 @@ public class ReportMethod extends MethodBase {
    * @return index or <0 for unknown.
    * @throws WebdavException
    */
-  private int getReportType(Document doc) throws WebdavException {
+  private int getReportType(final Document doc) throws WebdavException {
     try {
       Element root = doc.getDocumentElement();
 
