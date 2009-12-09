@@ -62,24 +62,25 @@ import edu.rpi.sss.util.servlets.io.CharArrayWrappedResponse;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
-import java.io.InputStream;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.xml.namespace.QName;
-
-import org.apache.log4j.Logger;
 
 /** WebDAV Servlet.
  * This abstract servlet handles the request/response nonsense and calls
@@ -114,13 +115,8 @@ public abstract class WebdavServlet extends HttpServlet
 
   private static volatile HashMap<String, Waiter> waiters = new HashMap<String, Waiter>();
 
-  /** Some sort of identifying string for logging
-   *
-   * @return String id
-   */
-  public abstract String getId();
-
-  public void init(ServletConfig config) throws ServletException {
+  @Override
+  public void init(final ServletConfig config) throws ServletException {
     super.init(config);
 
     dumpContent = "true".equals(config.getInitParameter("dumpContent"));
@@ -139,7 +135,8 @@ public abstract class WebdavServlet extends HttpServlet
   public abstract WebdavNsIntf getNsIntf(HttpServletRequest req)
       throws WebdavException;
 
-  protected void service(HttpServletRequest req,
+  @Override
+  protected void service(final HttpServletRequest req,
                          HttpServletResponse resp)
       throws ServletException, IOException {
     WebdavNsIntf intf = null;
@@ -239,8 +236,8 @@ public abstract class WebdavServlet extends HttpServlet
   }
 
   /* Return true if it's a server error */
-  private boolean handleException(WebdavNsIntf intf, Throwable t,
-                                  HttpServletResponse resp,
+  private boolean handleException(final WebdavNsIntf intf, final Throwable t,
+                                  final HttpServletResponse resp,
                                   boolean serverError) {
     if (serverError) {
       return true;
@@ -268,8 +265,8 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  private void sendError(WebdavNsIntf intf, Throwable t,
-                         HttpServletResponse resp) {
+  private void sendError(final WebdavNsIntf intf, final Throwable t,
+                         final HttpServletResponse resp) {
     try {
       if (t instanceof WebdavException) {
         WebdavException wde = (WebdavException)t;
@@ -311,7 +308,7 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  private boolean emitError(WebdavNsIntf intf, QName errorTag, Writer wtr) {
+  private boolean emitError(final WebdavNsIntf intf, final QName errorTag, final Writer wtr) {
     try {
       XmlEmit xml = new XmlEmit();
       intf.addNamespace(xml);
@@ -350,7 +347,7 @@ public abstract class WebdavServlet extends HttpServlet
     //methods.put("UNLOCK", new MethodInfo(UnlockMethod.class, true));
   }
 
-  private void getResources(ServletConfig config) throws ServletException {
+  private void getResources(final ServletConfig config) throws ServletException {
     String resname = config.getInitParameter("application");
 
     if (resname != null) {
@@ -373,7 +370,7 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  private void tryWait(HttpServletRequest req, boolean in) throws Throwable {
+  private void tryWait(final HttpServletRequest req, final boolean in) throws Throwable {
     Waiter wtr = null;
     synchronized (waiters) {
       //String key = req.getRequestedSessionId();
@@ -418,13 +415,13 @@ public abstract class WebdavServlet extends HttpServlet
   /* (non-Javadoc)
    * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
    */
-  public void sessionCreated(HttpSessionEvent se) {
+  public void sessionCreated(final HttpSessionEvent se) {
   }
 
   /* (non-Javadoc)
    * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
    */
-  public void sessionDestroyed(HttpSessionEvent se) {
+  public void sessionDestroyed(final HttpSessionEvent se) {
     HttpSession session = se.getSession();
     String sessid = session.getId();
     if (sessid == null) {
@@ -440,7 +437,7 @@ public abstract class WebdavServlet extends HttpServlet
    *
    * @param req
    */
-  public void dumpRequest(HttpServletRequest req) {
+  public void dumpRequest(final HttpServletRequest req) {
     Logger log = getLogger();
 
     try {
@@ -498,7 +495,7 @@ public abstract class WebdavServlet extends HttpServlet
    *
    * @param msg
    */
-  public void debugMsg(String msg) {
+  public void debugMsg(final String msg) {
     getLogger().debug(msg);
   }
 
@@ -506,11 +503,11 @@ public abstract class WebdavServlet extends HttpServlet
    *
    * @param msg
    */
-  public void logIt(String msg) {
+  public void logIt(final String msg) {
     getLogger().info(msg);
   }
 
-  protected void error(Throwable t) {
+  protected void error(final Throwable t) {
     getLogger().error(this, t);
   }
 }
