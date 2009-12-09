@@ -26,15 +26,19 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.sss.util.xml.XmlEmit;
-import edu.rpi.sss.util.xml.XmlUtil;
-import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 import edu.rpi.cct.webdav.servlet.common.AccessUtil;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cmt.access.Acl;
+import edu.rpi.sss.util.xml.XmlEmit;
+import edu.rpi.sss.util.xml.XmlUtil;
+import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -45,17 +49,11 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-
-import org.apache.log4j.Logger;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /** This acts as an interface to the underlying namespace for which this
  * servlet is acting as a gateway. This could be a file system, a set of
@@ -87,8 +85,6 @@ public abstract class WebdavNsIntf implements Serializable {
 
   protected WebdavServlet servlet;
 
-  protected Properties props;
-
   private HttpServletRequest req;
 
   /* User associated with session */
@@ -118,22 +114,19 @@ public abstract class WebdavNsIntf implements Serializable {
    *
    * @param servlet
    * @param req
-   * @param props
    * @param debug
    * @param methods    HashMap   table of method info
    * @param dumpContent
    * @throws WebdavException
    */
-  public void init(WebdavServlet servlet,
-                   HttpServletRequest req,
-                   Properties props,
-                   boolean debug,
-                   HashMap<String, MethodInfo> methods,
-                   boolean dumpContent) throws WebdavException {
+  public void init(final WebdavServlet servlet,
+                   final HttpServletRequest req,
+                   final boolean debug,
+                   final HashMap<String, MethodInfo> methods,
+                   final boolean dumpContent) throws WebdavException {
     this.servlet = servlet;
     this.req = req;
-    this.props = props;
-    this.xml = new XmlEmit();
+    xml = new XmlEmit();
     this.debug = debug;
     this.methods = methods;
     this.dumpContent = dumpContent;
@@ -177,7 +170,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return  String
    * @throws WebdavException
    */
-  public String getDavHeader(WebdavNsNode node) throws WebdavException {
+  public String getDavHeader(final WebdavNsNode node) throws WebdavException {
     if (account == null) {
       return "1, 3";
     }
@@ -246,7 +239,7 @@ public abstract class WebdavNsIntf implements Serializable {
     */
     MethodInfo mi = methods.get(name);
 
-    if ((mi == null) || getAnonymous() && mi.getRequiresAuth()) {
+    if ((mi == null) || (getAnonymous() && mi.getRequiresAuth())) {
       return null;
     }
 
@@ -280,7 +273,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return String
    * @throws WebdavException
    */
-  public String getUri(String href) throws WebdavException {
+  public String getUri(final String href) throws WebdavException {
     try {
       if (href == null) {
         throw new WebdavBadRequest("bad URI " + href);
@@ -352,7 +345,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param xml
    * @throws WebdavException
    */
-  public void addNamespace(XmlEmit xml) throws WebdavException {
+  public void addNamespace(final XmlEmit xml) throws WebdavException {
     try {
       xml.addNs(WebdavTags.namespace);
     } catch (Throwable t) {
@@ -665,7 +658,7 @@ public abstract class WebdavNsIntf implements Serializable {
      *
      * @param uri
      */
-    public AclInfo(String uri) {
+    public AclInfo(final String uri) {
       what = uri;
     }
   }
@@ -699,7 +692,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param node
    * @throws WebdavException
    */
-  public void emitSupportedReportSet(WebdavNsNode node) throws WebdavException {
+  public void emitSupportedReportSet(final WebdavNsNode node) throws WebdavException {
     try {
       xml.openTag(WebdavTags.supportedReportSet);
 
@@ -736,7 +729,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param status
    * @throws WebdavException
    */
-  public void closePropstat(int status) throws WebdavException {
+  public void closePropstat(final int status) throws WebdavException {
     try {
       xml.closeTag(WebdavTags.prop);
 
@@ -766,7 +759,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return Collection
    * @throws WebdavException
    */
-  public Collection<WebdavProperty> parseProp(Node nd) throws WebdavException {
+  public Collection<WebdavProperty> parseProp(final Node nd) throws WebdavException {
     Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
 
     Element[] children = getChildren(nd);
@@ -795,7 +788,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return WebdavProperty
    * @throws WebdavException
    */
-  public WebdavProperty makeProp(Element propnode) throws WebdavException {
+  public WebdavProperty makeProp(final Element propnode) throws WebdavException {
     return new WebdavProperty(new QName(propnode.getNamespaceURI(),
                                         propnode.getLocalName()),
                                         null);
@@ -817,8 +810,8 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param pr
    * @return boolean
    */
-  public boolean knownProperty(WebdavNsNode node,
-                               WebdavProperty pr) {
+  public boolean knownProperty(final WebdavNsNode node,
+                               final WebdavProperty pr) {
     QName tag = pr.getTag();
 
     for (int i = 0; i < knownProperties.length; i++) {
@@ -841,9 +834,9 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return boolean false for unknown (or unset)
    * @throws WebdavException
    */
-  public boolean generatePropValue(WebdavNsNode node,
-                                   WebdavProperty pr,
-                                   boolean allProp) throws WebdavException {
+  public boolean generatePropValue(final WebdavNsNode node,
+                                   final WebdavProperty pr,
+                                   final boolean allProp) throws WebdavException {
     QName tag = pr.getTag();
     String ns = tag.getNamespaceURI();
 
@@ -918,7 +911,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return String      url
    * @throws WebdavException
    */
-  public String getLocation(WebdavNsNode node) throws WebdavException {
+  public String getLocation(final WebdavNsNode node) throws WebdavException {
     try {
       if (debug) {
         trace("Get url " + urlPrefix + node.getEncodedUri());
@@ -947,7 +940,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param status
    * @throws WebdavException
    */
-  public void addStatus(int status) throws WebdavException {
+  public void addStatus(final int status) throws WebdavException {
     try {
       xml.property(WebdavTags.status, "HTTP/1.1 " + status + " " +
                WebdavStatusCode.getMessage(status));
@@ -965,7 +958,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return String   fixed path
    * @throws WebdavException
    */
-  public static String fixPath(String path) throws WebdavException {
+  public static String fixPath(final String path) throws WebdavException {
     if (path == null) {
       return null;
     }
@@ -1047,7 +1040,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return array of Element
    * @throws WebdavException
    */
-  public Element[] getChildren(Node nd) throws WebdavException {
+  public Element[] getChildren(final Node nd) throws WebdavException {
     try {
       return XmlUtil.getElementsArray(nd);
     } catch (Throwable t) {
@@ -1065,7 +1058,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return Element
    * @throws WebdavException
    */
-  public Element getOnlyChild(Node nd) throws WebdavException {
+  public Element getOnlyChild(final Node nd) throws WebdavException {
     try {
       return XmlUtil.getOnlyElement(nd);
     } catch (Throwable t) {
@@ -1082,7 +1075,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return String
    * @throws WebdavException
    */
-  public String getElementContent(Element el) throws WebdavException {
+  public String getElementContent(final Element el) throws WebdavException {
     try {
       return XmlUtil.getElementContent(el);
     } catch (Throwable t) {
@@ -1106,23 +1099,23 @@ public abstract class WebdavNsIntf implements Serializable {
     return log;
   }
 
-  protected void trace(String msg) {
+  protected void trace(final String msg) {
     getLogger().debug("[" + sessNum + "] " + msg);
   }
 
-  protected void debugMsg(String msg) {
+  protected void debugMsg(final String msg) {
     getLogger().debug("[" + sessNum + "] " + msg);
   }
 
-  protected void warn(String msg) {
+  protected void warn(final String msg) {
     getLogger().warn("[" + sessNum + "] " + msg);
   }
 
-  protected void error(Throwable t) {
+  protected void error(final Throwable t) {
     getLogger().error(this, t);
   }
 
-  protected void logIt(String msg) {
+  protected void logIt(final String msg) {
     getLogger().info("[" + sessNum + "] " + msg);
   }
 }

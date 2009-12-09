@@ -65,12 +65,10 @@ import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -97,10 +95,6 @@ public abstract class WebdavServlet extends HttpServlet
 
   protected transient Logger log;
 
-  /** Global resources for the servlet - not to be modified.
-   */
-  protected Properties props;
-
   /** Table of methods - set at init
    */
   protected HashMap<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
@@ -120,8 +114,6 @@ public abstract class WebdavServlet extends HttpServlet
     super.init(config);
 
     dumpContent = "true".equals(config.getInitParameter("dumpContent"));
-
-    getResources(config);
 
     addMethods();
   }
@@ -345,29 +337,6 @@ public abstract class WebdavServlet extends HttpServlet
 
     //methods.put("LOCK", new MethodInfo(LockMethod.class, true));
     //methods.put("UNLOCK", new MethodInfo(UnlockMethod.class, true));
-  }
-
-  private void getResources(final ServletConfig config) throws ServletException {
-    String resname = config.getInitParameter("application");
-
-    if (resname != null) {
-      InputStream is;
-
-      ClassLoader classLoader =
-          Thread.currentThread().getContextClassLoader();
-      if (classLoader == null) {
-        classLoader = this.getClass().getClassLoader();
-      }
-      is = classLoader.getResourceAsStream(resname + ".properties");
-
-      props = new Properties();
-      try {
-        props.load(is);
-      } catch (IOException ie) {
-        log.error(ie);
-        throw new ServletException(ie);
-      }
-    }
   }
 
   private void tryWait(final HttpServletRequest req, final boolean in) throws Throwable {
