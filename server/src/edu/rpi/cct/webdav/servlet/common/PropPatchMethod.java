@@ -61,8 +61,10 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode.SetPropertyResult;
 import edu.rpi.sss.util.xml.XmlUtil;
-import edu.rpi.sss.util.xml.tagdefs.CaldavTags;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,9 +72,6 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /** Class called to handle PROPPATCH
  *
@@ -82,11 +81,13 @@ public class PropPatchMethod extends MethodBase {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
+  @Override
   public void init() {
   }
 
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                        final HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("PropPatchMethod: doMethod");
     }
@@ -130,12 +131,12 @@ public class PropPatchMethod extends MethodBase {
    *                   Protected methods
    * ==================================================================== */
 
-  protected boolean processDoc(HttpServletRequest req,
-                               HttpServletResponse resp,
-                               Document doc,
-                               WebdavNsNode node,
-                               QName expectedRoot,
-                               boolean onlySet) throws WebdavException {
+  protected boolean processDoc(final HttpServletRequest req,
+                               final HttpServletResponse resp,
+                               final Document doc,
+                               final WebdavNsNode node,
+                               final QName expectedRoot,
+                               final boolean onlySet) throws WebdavException {
     try {
       Element root = doc.getDocumentElement();
 
@@ -256,7 +257,7 @@ public class PropPatchMethod extends MethodBase {
    * @return Collection
    * @throws WebdavException
    */
-  protected Collection<? extends Collection<Element>> processUpdate(Element node) throws WebdavException {
+  protected Collection<? extends Collection<Element>> processUpdate(final Element node) throws WebdavException {
     ArrayList<Collection<Element>> res = new ArrayList<Collection<Element>>();
 
     try {
@@ -307,16 +308,14 @@ public class PropPatchMethod extends MethodBase {
   /* Process the node which should contain either empty elements for remove or
    * elements with or without values for remove==false
    */
-  private void processPlist(Collection<Element> plist, Element node,
-                            boolean remove) throws WebdavException {
+  private void processPlist(final Collection<Element> plist, final Element node,
+                            final boolean remove) throws WebdavException {
     Element[] props = getChildrenArray(node);
 
     for (int i = 0; i < props.length; i++) {
       Element prop = props[i];
 
-      if (XmlUtil.nodeMatches(prop, CaldavTags.supportedCalendarComponentSet)) {
-        // XXX Need to do something
-      } else if (remove && !isEmpty(prop)) {
+      if (remove && !isEmpty(prop)) {
         throw new WebdavBadRequest();
       }
 
