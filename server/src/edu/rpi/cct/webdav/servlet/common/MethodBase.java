@@ -64,6 +64,13 @@ import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -71,18 +78,12 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /** Base class for all webdav servlet methods.
  */
@@ -132,7 +133,7 @@ public abstract class MethodBase {
      * @param methodClass
      * @param requiresAuth
      */
-    public MethodInfo(Class methodClass, boolean requiresAuth) {
+    public MethodInfo(final Class methodClass, final boolean requiresAuth) {
       this.methodClass = methodClass;
       this.requiresAuth = requiresAuth;
     }
@@ -162,9 +163,9 @@ public abstract class MethodBase {
    * @param dumpContent
    * @throws WebdavException
    */
-  public void init(WebdavNsIntf nsIntf,
-                   boolean debug,
-                   boolean dumpContent) throws WebdavException{
+  public void init(final WebdavNsIntf nsIntf,
+                   final boolean debug,
+                   final boolean dumpContent) throws WebdavException{
     this.nsIntf = nsIntf;
     this.debug = debug;
     this.dumpContent = dumpContent;
@@ -192,7 +193,7 @@ public abstract class MethodBase {
    * @return String  fixed up uri
    * @throws WebdavException
    */
-  public String getResourceUri(HttpServletRequest req)
+  public String getResourceUri(final HttpServletRequest req)
       throws WebdavException {
     if (resourceUri != null) {
       return resourceUri;
@@ -218,7 +219,7 @@ public abstract class MethodBase {
     return resourceUri;
   }
 
-  protected int defaultDepth(int depth, int def) {
+  protected int defaultDepth(final int depth, final int def) {
     if (depth < 0) {
       return def;
     }
@@ -228,7 +229,7 @@ public abstract class MethodBase {
 
   /* depth must have given value
    */
-  protected void checkDepth(int depth, int val) throws WebdavException {
+  protected void checkDepth(final int depth, final int val) throws WebdavException {
     if (depth != val) {
       throw new WebdavBadRequest();
     }
@@ -236,13 +237,13 @@ public abstract class MethodBase {
 
   /* depth must be in min-max
    */
-  protected void checkDepth(int depth, int min, int max) throws WebdavException {
+  protected void checkDepth(final int depth, final int min, final int max) throws WebdavException {
     if ((depth < min) || (depth > max)) {
       throw new WebdavBadRequest();
     }
   }
 
-  protected void addStatus(int status, String message) throws WebdavException {
+  protected void addStatus(final int status, String message) throws WebdavException {
     try {
       if (message == null) {
         message = WebdavStatusCode.getMessage(status);
@@ -256,8 +257,8 @@ public abstract class MethodBase {
     }
   }
 
-  protected void addHeaders(HttpServletResponse resp,
-                            WebdavNsNode node) throws WebdavException {
+  protected void addHeaders(final HttpServletResponse resp,
+                            final WebdavNsNode node) throws WebdavException {
     addDavHeader(resp, node);
 
     // Lisa say's we need this
@@ -277,21 +278,22 @@ public abstract class MethodBase {
     resp.addHeader("Allow", methods.toString());
   }
 
-  protected void addDavHeader(HttpServletResponse resp,
-                              WebdavNsNode node) throws WebdavException {
+  protected void addDavHeader(final HttpServletResponse resp,
+                              final WebdavNsNode node) throws WebdavException {
     resp.addHeader("DAV", getNsIntf().getDavHeader(node));
   }
 
   private class DebugReader extends FilterReader {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     /** Constructor
      * @param rdr
      */
-    public DebugReader(Reader rdr) {
+    public DebugReader(final Reader rdr) {
       super(rdr);
     }
 
+    @Override
     public void close() throws IOException {
       if (sb != null) {
         trace(sb.toString());
@@ -300,6 +302,7 @@ public abstract class MethodBase {
       super.close();
     }
 
+    @Override
     public int read() throws IOException {
       int c = super.read();
 
@@ -315,7 +318,7 @@ public abstract class MethodBase {
         char ch = (char)c;
         if (ch == '\n') {
           trace(sb.toString());
-          sb = new StringBuffer();
+          sb = new StringBuilder();
         } else {
           sb.append(ch);
         }
@@ -324,7 +327,8 @@ public abstract class MethodBase {
       return c;
     }
 
-    public int read(char[] cbuf, int off, int len) throws IOException {
+    @Override
+    public int read(final char[] cbuf, final int off, final int len) throws IOException {
       int res = super.read(cbuf, off, len);
       if ((res > 0) && (sb != null)) {
         sb.append(cbuf, off, res);
@@ -334,7 +338,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected Reader getReader(HttpServletRequest req) throws Throwable {
+  protected Reader getReader(final HttpServletRequest req) throws Throwable {
     if (debug) {
       return new DebugReader(req.getReader());
     }
@@ -349,8 +353,8 @@ public abstract class MethodBase {
    * @return Document  Parsed body or null for no body
    * @exception WebdavException Some error occurred.
    */
-  protected Document parseContent(HttpServletRequest req,
-                                  HttpServletResponse resp)
+  protected Document parseContent(final HttpServletRequest req,
+                                  final HttpServletResponse resp)
       throws WebdavException{
     int len = req.getContentLength();
     if (len == 0) {
@@ -373,7 +377,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected String formatHTTPDate(Timestamp val) {
+  protected String formatHTTPDate(final Timestamp val) {
     if (val == null) {
       return null;
     }
@@ -389,8 +393,8 @@ public abstract class MethodBase {
    * @param props
    * @throws WebdavException
    */
-  public void doPropFind(WebdavNsNode node,
-                         Collection<WebdavProperty> props) throws WebdavException {
+  public void doPropFind(final WebdavNsNode node,
+                         final Collection<WebdavProperty> props) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
     Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
     boolean open = false;
@@ -443,7 +447,7 @@ public abstract class MethodBase {
    *                   XmlUtil wrappers
    * ==================================================================== */
 
-  protected Collection<Element> getChildren(Node nd) throws WebdavException {
+  protected Collection<Element> getChildren(final Node nd) throws WebdavException {
     try {
       return XmlUtil.getElements(nd);
     } catch (Throwable t) {
@@ -455,7 +459,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected Element[] getChildrenArray(Node nd) throws WebdavException {
+  protected Element[] getChildrenArray(final Node nd) throws WebdavException {
     try {
       return XmlUtil.getElementsArray(nd);
     } catch (Throwable t) {
@@ -467,7 +471,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected Element getOnlyChild(Node nd) throws WebdavException {
+  protected Element getOnlyChild(final Node nd) throws WebdavException {
     try {
       return XmlUtil.getOnlyElement(nd);
     } catch (Throwable t) {
@@ -479,7 +483,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected String getElementContent(Element el) throws WebdavException {
+  protected String getElementContent(final Element el) throws WebdavException {
     try {
       return XmlUtil.getElementContent(el);
     } catch (Throwable t) {
@@ -491,7 +495,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected boolean isEmpty(Element el) throws WebdavException {
+  protected boolean isEmpty(final Element el) throws WebdavException {
     try {
       return XmlUtil.isEmpty(el);
     } catch (Throwable t) {
@@ -507,7 +511,7 @@ public abstract class MethodBase {
    *                   XmlEmit wrappers
    * ==================================================================== */
 
-  protected void startEmit(HttpServletResponse resp) throws WebdavException {
+  protected void startEmit(final HttpServletResponse resp) throws WebdavException {
     try {
       xml.startEmit(resp.getWriter());
     } catch (Throwable t) {
@@ -519,7 +523,7 @@ public abstract class MethodBase {
    *
    * @param val
    */
-  public void addNs(String val) {
+  public void addNs(final String val) {
     xml.addNs(val);
   }
 
@@ -528,11 +532,11 @@ public abstract class MethodBase {
    * @param ns namespace
    * @return String abbrev
    */
-  public String getNsAbbrev(String ns) {
+  public String getNsAbbrev(final String ns) {
     return xml.getNsAbbrev(ns);
   }
 
-  protected void openTag(QName tag) throws WebdavException {
+  protected void openTag(final QName tag) throws WebdavException {
     try {
       xml.openTag(tag);
     } catch (Throwable t) {
@@ -540,7 +544,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected void openTagNoNewline(QName tag) throws WebdavException {
+  protected void openTagNoNewline(final QName tag) throws WebdavException {
     try {
       xml.openTagNoNewline(tag);
     } catch (Throwable t) {
@@ -548,7 +552,7 @@ public abstract class MethodBase {
     }
   }
 
-  protected void closeTag(QName tag) throws WebdavException {
+  protected void closeTag(final QName tag) throws WebdavException {
     try {
       xml.closeTag(tag);
     } catch (Throwable t) {
@@ -561,7 +565,7 @@ public abstract class MethodBase {
    * @param tag
    * @throws WebdavException
    */
-  public void emptyTag(QName tag) throws WebdavException {
+  public void emptyTag(final QName tag) throws WebdavException {
     try {
       xml.emptyTag(tag);
     } catch (Throwable t) {
@@ -574,7 +578,7 @@ public abstract class MethodBase {
   * @param nd
   * @throws WebdavException
   */
-  public void emptyTag(Node nd) throws WebdavException {
+  public void emptyTag(final Node nd) throws WebdavException {
     String ns = nd.getNamespaceURI();
     String ln = nd.getLocalName();
 
@@ -587,7 +591,7 @@ public abstract class MethodBase {
    * @param val
    * @throws WebdavException
    */
-  public void property(QName tag, String val) throws WebdavException {
+  public void property(final QName tag, final String val) throws WebdavException {
     try {
       xml.property(tag, val);
     } catch (Throwable t) {
@@ -601,7 +605,7 @@ public abstract class MethodBase {
    * @param val
    * @throws WebdavException
    */
-  public void cdataProperty(QName tag, String val) throws WebdavException {
+  public void cdataProperty(final QName tag, final String val) throws WebdavException {
     try {
       xml.cdataProperty(tag, val);
     } catch (Throwable t) {
@@ -615,7 +619,7 @@ public abstract class MethodBase {
    * @param val
    * @throws WebdavException
    */
-  public void property(QName tag, Reader val) throws WebdavException {
+  public void property(final QName tag, final Reader val) throws WebdavException {
     try {
       xml.property(tag, val);
     } catch (Throwable t) {
@@ -629,7 +633,7 @@ public abstract class MethodBase {
    * @param tagVal
    * @throws WebdavException
    */
-  public void propertyTagVal(QName tag, QName tagVal) throws WebdavException {
+  public void propertyTagVal(final QName tag, final QName tagVal) throws WebdavException {
     try {
       xml.propertyTagVal(tag, tagVal);
     } catch (Throwable t) {
@@ -660,27 +664,27 @@ public abstract class MethodBase {
     return log;
   }
 
-  protected void debugMsg(String msg) {
+  protected void debugMsg(final String msg) {
     getLogger().debug(msg);
   }
 
-  protected void error(Throwable t) {
+  protected void error(final Throwable t) {
     getLogger().error(this, t);
   }
 
-  protected void error(String msg) {
+  protected void error(final String msg) {
     getLogger().error(msg);
   }
 
-  protected void warn(String msg) {
+  protected void warn(final String msg) {
     getLogger().warn(msg);
   }
 
-  protected void logIt(String msg) {
+  protected void logIt(final String msg) {
     getLogger().info(msg);
   }
 
-  protected void trace(String msg) {
+  protected void trace(final String msg) {
     getLogger().debug(msg);
   }
 }
