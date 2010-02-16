@@ -59,6 +59,8 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
+import java.io.Reader;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -70,11 +72,13 @@ public class PutMethod extends MethodBase {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
+  @Override
   public void init() {
   }
 
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                        final HttpServletResponse resp) throws WebdavException {
 
     if (debug) {
       trace("PutMethod: doMethod");
@@ -115,9 +119,17 @@ public class PutMethod extends MethodBase {
                                     create,
                                     ifEtag);
       } else {
+        Reader rdr = getReader(req);
+
+        if (rdr == null) {
+          // No content?
+          resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+          return;
+        }
+
         pcr = intf.putContent(node,
                               contentTypePars,
-                              getReader(req),
+                              rdr,
                               create,
                               ifEtag);
       }

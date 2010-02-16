@@ -73,6 +73,7 @@ import org.xml.sax.SAXException;
 
 import java.io.FilterReader;
 import java.io.IOException;
+import java.io.PushbackReader;
 import java.io.Reader;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -339,11 +340,29 @@ public abstract class MethodBase {
   }
 
   protected Reader getReader(final HttpServletRequest req) throws Throwable {
+    Reader rdr;
+
     if (debug) {
-      return new DebugReader(req.getReader());
+      rdr = new DebugReader(req.getReader());
+    } else {
+      rdr = req.getReader();
     }
 
-    return req.getReader();
+    /* Wrap with a pushback reader and see if there is anything there - some
+     * people are not setting the content length to 0 when there is no body */
+
+    PushbackReader pbr = new PushbackReader(rdr);
+
+    int c = pbr.read();
+
+    if (c == -1) {
+      // No input
+      return null;
+    }
+
+    pbr.unread(c);
+
+    return pbr;
   }
 
   /** Parse the Webdav request body, and return the DOM representation.
@@ -367,7 +386,14 @@ public abstract class MethodBase {
 
       DocumentBuilder builder = factory.newDocumentBuilder();
 
-      return builder.parse(new InputSource(getReader(req)));
+      Reader rdr = getReader(req);
+
+      if (rdr == null) {
+        // No content?
+        return null;
+      }
+
+      return builder.parse(new InputSource(rdr));
     } catch (SAXException e) {
       resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       throw new WebdavException(HttpServletResponse.SC_BAD_REQUEST);
