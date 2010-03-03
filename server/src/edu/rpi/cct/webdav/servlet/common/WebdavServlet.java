@@ -270,9 +270,10 @@ public abstract class WebdavServlet extends HttpServlet
           }
           resp.setStatus(wde.getStatusCode());
           resp.setContentType("text/xml; charset=UTF-8");
-          if (!emitError(intf, errorTag, resp.getWriter())) {
+          if (!emitError(intf, errorTag, wde.getMessage(),
+                         resp.getWriter())) {
             StringWriter sw = new StringWriter();
-            emitError(intf, errorTag, sw);
+            emitError(intf, errorTag, wde.getMessage(), sw);
 
             try {
               if (debug) {
@@ -300,14 +301,19 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  private boolean emitError(final WebdavNsIntf intf, final QName errorTag, final Writer wtr) {
+  private boolean emitError(final WebdavNsIntf intf,
+                            final QName errorTag,
+                            final String extra,
+                            final Writer wtr) {
     try {
       XmlEmit xml = new XmlEmit();
       intf.addNamespace(xml);
 
       xml.startEmit(wtr);
       xml.openTag(WebdavTags.error);
-      xml.emptyTag(errorTag);
+
+      intf.emitError(errorTag, extra, xml);
+
       xml.closeTag(WebdavTags.error);
       xml.flush();
 

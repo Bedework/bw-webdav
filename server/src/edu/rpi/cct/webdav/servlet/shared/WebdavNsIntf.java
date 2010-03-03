@@ -178,6 +178,18 @@ public abstract class WebdavNsIntf implements Serializable {
     return "1, 3, access-control, extended-mkcol";
   }
 
+  /** Emit some failed precondition tag
+   *
+   * @param errorTag
+   * @param extra
+   * @param xml
+   * @throws Throwable
+   */
+  public void emitError(final QName errorTag, final String extra,
+                        final XmlEmit xml) throws Throwable {
+    xml.emptyTag(errorTag);
+  }
+
   /** Get an object suitable for use in parsing acls and generating access.
    *
    * @return AccessUtil implementation.
