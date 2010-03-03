@@ -63,23 +63,22 @@ import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
+import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.w3c.dom.Element;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
 
 /** Represents a node in the underlying namespace for which this
  * servlet is acting as a gateway. This could be a file system, a set of
@@ -145,7 +144,7 @@ public abstract class WebdavNsNode implements Serializable {
     /**
      * @param tag
      */
-    public PropertyTagEntry(QName tag) {
+    public PropertyTagEntry(final QName tag) {
       this.tag = tag;
     }
 
@@ -153,7 +152,7 @@ public abstract class WebdavNsNode implements Serializable {
      * @param tag
      * @param inPropAll
      */
-    public PropertyTagEntry(QName tag, boolean inPropAll) {
+    public PropertyTagEntry(final QName tag, final boolean inPropAll) {
       this.tag = tag;
       this.inPropAll = inPropAll;
     }
@@ -218,8 +217,8 @@ public abstract class WebdavNsNode implements Serializable {
      * @param relative
      * @throws WebdavException
      */
-    public UrlHandler(HttpServletRequest req,
-                      boolean relative) throws WebdavException {
+    public UrlHandler(final HttpServletRequest req,
+                      final boolean relative) throws WebdavException {
       this.relative = relative;
 
       try {
@@ -261,9 +260,9 @@ public abstract class WebdavNsNode implements Serializable {
      * @return String
      * @throws WebdavException
      */
-    public String prefix(String val) throws WebdavException {
+    public String prefix(final String val) throws WebdavException {
       try {
-        if (val.startsWith("mailto:")) {
+        if (val.toLowerCase().startsWith("mailto:")) {
           return val;
         }
 
@@ -310,7 +309,7 @@ public abstract class WebdavNsNode implements Serializable {
       return urlPrefix;
     }
 
-    private boolean endsWithSlash(StringBuilder sb) {
+    private boolean endsWithSlash(final StringBuilder sb) {
       if (sb.length() == 0) {
         return false;
       }
@@ -318,7 +317,7 @@ public abstract class WebdavNsNode implements Serializable {
       return sb.charAt(sb.length() - 1) == '/';
     }
 
-    private void append(StringBuilder sb, String val) {
+    private void append(final StringBuilder sb, final String val) {
       if (val.startsWith("/")) {
         if (!endsWithSlash(sb)) {
           sb.append(val);
@@ -343,9 +342,9 @@ public abstract class WebdavNsNode implements Serializable {
    * @param uri - the uri (XXX is that the same as the path?)
    * @param debug
    */
-  public WebdavNsNode(UrlHandler urlHandler, String path,
-                      boolean collection, String uri,
-                      boolean debug) {
+  public WebdavNsNode(final UrlHandler urlHandler, final String path,
+                      final boolean collection, final String uri,
+                      final boolean debug) {
     this.urlHandler = urlHandler;
     this.path = path;
     this.collection = collection;
@@ -388,8 +387,8 @@ public abstract class WebdavNsNode implements Serializable {
      * @param prop
      * @param rootElement allow nodes to determine what is tryingto set things
      */
-    public SetPropertyResult(Element prop,
-                             QName rootElement) {
+    public SetPropertyResult(final Element prop,
+                             final QName rootElement) {
       this.prop = prop;
       this.rootElement = rootElement;
     }
@@ -427,7 +426,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param xml
    * @throws WebdavException
    */
-  public void generateHref(XmlEmit xml) throws WebdavException {
+  public void generateHref(final XmlEmit xml) throws WebdavException {
     try {
       generateUrl(xml, WebdavTags.href, uri);
 //      String url = getUrlPrefix() + new URI(getEncodedUri()).toASCIIString();
@@ -444,7 +443,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param uri
    * @throws WebdavException
    */
-  public void generateHref(XmlEmit xml, String uri) throws WebdavException {
+  public void generateHref(final XmlEmit xml, final String uri) throws WebdavException {
     generateUrl(xml, WebdavTags.href, uri);
   }
 
@@ -454,7 +453,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param uri
    * @throws WebdavException
    */
-  public void generateUrl(XmlEmit xml, QName tag, String uri) throws WebdavException {
+  public void generateUrl(final XmlEmit xml, final QName tag, final String uri) throws WebdavException {
     try {
       /*
       String enc = new URI(null, null, uri, null).toString();
@@ -529,8 +528,8 @@ public abstract class WebdavNsNode implements Serializable {
    * @return boolean  true if property recognized.
    * @throws WebdavException
    */
-  public boolean removeProperty(Element val,
-                                SetPropertyResult spr) throws WebdavException {
+  public boolean removeProperty(final Element val,
+                                final SetPropertyResult spr) throws WebdavException {
     try {
       if (XmlUtil.nodeMatches(val, WebdavTags.getetag)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
@@ -555,8 +554,8 @@ public abstract class WebdavNsNode implements Serializable {
    * @return boolean  true if property recognized and processed.
    * @throws WebdavException
    */
-  public boolean setProperty(Element val,
-                             SetPropertyResult spr) throws WebdavException {
+  public boolean setProperty(final Element val,
+                             final SetPropertyResult spr) throws WebdavException {
     try {
       if (XmlUtil.nodeMatches(val, WebdavTags.getetag)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
@@ -579,7 +578,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param tag
    * @return boolean
    */
-  public boolean knownProperty(QName tag) {
+  public boolean knownProperty(final QName tag) {
     return propertyNames.get(tag) != null;
   }
 
@@ -591,9 +590,9 @@ public abstract class WebdavNsNode implements Serializable {
    * @return boolean   true if emitted
    * @throws WebdavException
    */
-  public boolean generatePropertyValue(QName tag,
-                                       WebdavNsIntf intf,
-                                       boolean allProp) throws WebdavException {
+  public boolean generatePropertyValue(final QName tag,
+                                       final WebdavNsIntf intf,
+                                       final boolean allProp) throws WebdavException {
     String ns = tag.getNamespaceURI();
     XmlEmit xml = intf.getXmlEmit();
 
@@ -780,7 +779,7 @@ public abstract class WebdavNsNode implements Serializable {
    *                    and/or rendering the content
    * @throws WebdavException
    */
-  public void init(boolean content) throws WebdavException {
+  public void init(final boolean content) throws WebdavException {
   }
 
   /** Return true if this represents a principal
@@ -825,7 +824,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param val  boolean true if node exists
    * @throws WebdavException
    */
-  public void setExists(boolean val) throws WebdavException {
+  public void setExists(final boolean val) throws WebdavException {
     exists = val;
   }
 
@@ -842,7 +841,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param val
    * @throws WebdavException
    */
-  public void setUri(String val) throws WebdavException {
+  public void setUri(final String val) throws WebdavException {
     init(false);
     uri = val;
   }
@@ -884,7 +883,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param val boolean true if node allows get
    * @throws WebdavException
    */
-  public void setAllowsGet(boolean val) throws WebdavException {
+  public void setAllowsGet(final boolean val) throws WebdavException {
     allowsGet = val;
   }
 
@@ -899,7 +898,7 @@ public abstract class WebdavNsNode implements Serializable {
   /**
    * @param val in status
    */
-  public void setStatus(int val) {
+  public void setStatus(final int val) {
     status = val;
   }
 
@@ -914,7 +913,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param val
    * @throws WebdavException
    */
-  public void setAlias(boolean val) throws WebdavException {
+  public void setAlias(final boolean val) throws WebdavException {
     init(false);
     alias = val;
   }
@@ -932,7 +931,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param val
    * @throws WebdavException
    */
-  public void setTargetUri(String val) throws WebdavException {
+  public void setTargetUri(final String val) throws WebdavException {
     init(false);
     targetUri = val;
   }
@@ -954,7 +953,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @return Collection (possibly empty) of WebdavProperty objects
    * @throws WebdavException
    */
-  public Collection<WebdavProperty> getProperties(String ns) throws WebdavException {
+  public Collection<WebdavProperty> getProperties(final String ns) throws WebdavException {
     return new ArrayList<WebdavProperty>();
   }
 
@@ -1010,7 +1009,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @param methodTag - acts as a flag for the method type
    * @throws WebdavException
    */
-  public void setDefaults(QName methodTag) throws WebdavException {
+  public void setDefaults(final QName methodTag) throws WebdavException {
   }
 
   /* ====================================================================
@@ -1105,29 +1104,29 @@ public abstract class WebdavNsNode implements Serializable {
     return log;
   }
 
-  protected void error(Throwable t) {
+  protected void error(final Throwable t) {
     getLogger().error(this, t);
   }
 
-  protected void warn(String msg) {
+  protected void warn(final String msg) {
     getLogger().warn(msg);
   }
 
-  protected void debugMsg(String msg) {
+  protected void debugMsg(final String msg) {
     getLogger().debug(msg);
   }
 
-  protected void logIt(String msg) {
+  protected void logIt(final String msg) {
     getLogger().info(msg);
   }
 
-  protected static void addPropEntry(HashMap<QName, PropertyTagEntry> propertyNames,
-                                     QName tag) {
+  protected static void addPropEntry(final HashMap<QName, PropertyTagEntry> propertyNames,
+                                     final QName tag) {
     propertyNames.put(tag, new PropertyTagEntry(tag));
   }
 
-  protected static void addPropEntry(HashMap<QName, PropertyTagEntry> propertyNames,
-                                     QName tag, boolean inAllProp) {
+  protected static void addPropEntry(final HashMap<QName, PropertyTagEntry> propertyNames,
+                                     final QName tag, final boolean inAllProp) {
     propertyNames.put(tag, new PropertyTagEntry(tag, inAllProp));
   }
 
@@ -1135,11 +1134,13 @@ public abstract class WebdavNsNode implements Serializable {
    *                        Object methods
    * ******************************************************************** */
 
+  @Override
   public int hashCode() {
     return uri.hashCode();
   }
 
-  public boolean equals(Object o) {
+  @Override
+  public boolean equals(final Object o) {
     if (o == this) {
       return true;
     }
