@@ -54,8 +54,6 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cmt.access.AccessPrincipal;
 import edu.rpi.cmt.access.WhoDefs;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
@@ -94,10 +92,10 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    * @param debug
    * @throws WebdavException
    */
-  public WebdavPrincipalNode(UrlHandler urlHandler, String path,
-                             AccessPrincipal account,
-                             boolean collection,
-                             String uri, boolean debug) throws WebdavException {
+  public WebdavPrincipalNode(final UrlHandler urlHandler, final String path,
+                             final AccessPrincipal account,
+                             final boolean collection,
+                             final String uri, final boolean debug) throws WebdavException {
     super(urlHandler, path, collection, uri, debug);
     this.account = account;
     userPrincipal = account.getKind() == WhoDefs.whoTypeUser;
@@ -110,6 +108,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getOwner()
    */
+  @Override
   public AccessPrincipal getOwner() throws WebdavException {
     return account;
   }
@@ -117,6 +116,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#update()
    */
+  @Override
   public void update() throws WebdavException {
   }
 
@@ -124,11 +124,13 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    *                   Abstract methods
    * ==================================================================== */
 
+  @Override
   public CurrentAccess getCurrentAccess() throws WebdavException {
     return null;
   }
 
-  public String getEtagValue(boolean strong) throws WebdavException {
+  @Override
+  public String getEtagValue(final boolean strong) throws WebdavException {
     String val = "1234567890";
 
     if (strong) {
@@ -141,6 +143,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#trailSlash()
    */
+  @Override
   public boolean trailSlash() {
     return true;
   }
@@ -148,11 +151,13 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getChildren()
    */
+  @Override
   public Collection getChildren() throws WebdavException {
     return null;
   }
 
-  public WdCollection getCollection(boolean deref) throws WebdavException {
+  @Override
+  public WdCollection getCollection(final boolean deref) throws WebdavException {
     return null;
   }
 
@@ -163,6 +168,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getContentBinary()
    */
+  @Override
   public boolean getContentBinary() throws WebdavException {
     return false;
   }
@@ -170,6 +176,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getContentLang()
    */
+  @Override
   public String getContentLang() throws WebdavException {
     return null;
   }
@@ -177,13 +184,15 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getContentLen()
    */
-  public int getContentLen() throws WebdavException {
+  @Override
+  public long getContentLen() throws WebdavException {
     return 0;
   }
 
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getContentType()
    */
+  @Override
   public String getContentType() throws WebdavException {
     return null;
   }
@@ -191,6 +200,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getCreDate()
    */
+  @Override
   public String getCreDate() throws WebdavException {
     return null;
   }
@@ -198,6 +208,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getDisplayname()
    */
+  @Override
   public String getDisplayname() throws WebdavException {
     return account.getAccount();
   }
@@ -205,6 +216,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getLastmodDate()
    */
+  @Override
   public String getLastmodDate() throws WebdavException {
     return null;
   }
@@ -216,8 +228,9 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#removeProperty(org.w3c.dom.Element)
    */
-  public boolean removeProperty(Element val,
-                                SetPropertyResult spr) throws WebdavException {
+  @Override
+  public boolean removeProperty(final Element val,
+                                final SetPropertyResult spr) throws WebdavException {
     warn("Unimplemented - removeProperty");
 
     return false;
@@ -226,8 +239,9 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#setProperty(org.w3c.dom.Element)
    */
-  public boolean setProperty(Element val,
-                             SetPropertyResult spr) throws WebdavException {
+  @Override
+  public boolean setProperty(final Element val,
+                             final SetPropertyResult spr) throws WebdavException {
     if (super.setProperty(val, spr)) {
       return true;
     }
@@ -238,7 +252,8 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#knownProperty(edu.rpi.sss.util.xml.QName)
    */
-  public boolean knownProperty(QName tag) {
+  @Override
+  public boolean knownProperty(final QName tag) {
     if (propertyNames.get(tag) != null) {
       return true;
     }
@@ -250,9 +265,10 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#generatePropertyValue(edu.rpi.sss.util.xml.QName, edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf, boolean)
    */
-  public boolean generatePropertyValue(QName tag,
-                                       WebdavNsIntf intf,
-                                       boolean allProp) throws WebdavException {
+  @Override
+  public boolean generatePropertyValue(final QName tag,
+                                       final WebdavNsIntf intf,
+                                       final boolean allProp) throws WebdavException {
     String ns = tag.getNamespaceURI();
     XmlEmit xml = intf.getXmlEmit();
 

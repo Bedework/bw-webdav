@@ -63,6 +63,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -83,12 +84,14 @@ public class GetMethod extends MethodBase {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
+  @Override
   public void init() {
     doContent = true;
   }
 
-  public void doMethod(HttpServletRequest req,
-                       HttpServletResponse resp) throws WebdavException {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("GetMethod: doMethod");
     }
@@ -126,7 +129,7 @@ public class GetMethod extends MethodBase {
       /** Get the content now to set up length, type etc.
        */
       String contentType;
-      int contentLength;
+      long contentLength;
 
       if (node.getContentBinary()) {
         streamIn = getNsIntf().getBinaryContent(node);
@@ -154,7 +157,12 @@ public class GetMethod extends MethodBase {
       }
 
       resp.setContentType(contentType);
-      resp.setContentLength(contentLength);
+
+      if (contentLength > Integer.MAX_VALUE) {
+        resp.setContentLength(-1);
+      } else {
+        resp.setContentLength((int)contentLength);
+      }
 
       if (doContent) {
         if ((in == null) && (streamIn == null)) {
@@ -185,7 +193,7 @@ public class GetMethod extends MethodBase {
     }
   }
 
-  private void writeContent(Reader in, Writer out)
+  private void writeContent(final Reader in, final Writer out)
       throws WebdavException {
     try {
       char[] buff = new char[bufferSize];
@@ -212,7 +220,7 @@ public class GetMethod extends MethodBase {
     }
   }
 
-  private void streamContent(InputStream in, OutputStream out)
+  private void streamContent(final InputStream in, final OutputStream out)
       throws WebdavException {
     try {
       byte[] buff = new byte[bufferSize];
@@ -252,8 +260,8 @@ public class GetMethod extends MethodBase {
    * @return Reader
    * @throws WebdavException
    */
-  protected String generateHtml(HttpServletRequest req,
-                                WebdavNsNode node) throws WebdavException {
+  protected String generateHtml(final HttpServletRequest req,
+                                final WebdavNsNode node) throws WebdavException {
     try {
       Sbuff sb = new Sbuff();
 
@@ -330,7 +338,7 @@ public class GetMethod extends MethodBase {
     /**
      * @param ss
      */
-    public void lines(String[] ss) {
+    public void lines(final String[] ss) {
       for (int i = 0; i < ss.length; i++) {
         line(ss[i]);
       }
@@ -339,7 +347,7 @@ public class GetMethod extends MethodBase {
     /**
      * @param s
      */
-    public void line(String s) {
+    public void line(final String s) {
       sb.append(s);
       sb.append("\r\n");
     }
@@ -347,10 +355,11 @@ public class GetMethod extends MethodBase {
     /**
      * @param s
      */
-    public void append(String s) {
+    public void append(final String s) {
       sb.append(s);
     }
 
+    @Override
     public String toString() {
       return sb.toString();
     }

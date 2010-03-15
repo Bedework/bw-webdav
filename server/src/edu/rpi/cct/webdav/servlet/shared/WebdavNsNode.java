@@ -66,7 +66,6 @@ import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
@@ -978,13 +977,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public InputStream getContentStream() throws WebdavException {
-    byte[] cont = getBinaryContent();
-
-    if (cont == null) {
-      return null;
-    }
-
-    return new ByteArrayInputStream(cont);
+    return null;
   }
 
   /** Return string content
@@ -993,15 +986,6 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public String getContentString() throws WebdavException {
-    return null;
-  }
-
-  /** Return binary content
-   *
-   * @return byte[]       content.
-   * @throws WebdavException
-   */
-  public byte[] getBinaryContent() throws WebdavException {
     return null;
   }
 
@@ -1029,10 +1013,10 @@ public abstract class WebdavNsNode implements Serializable {
   public abstract String getContentLang() throws WebdavException;
 
   /**
-   * @return int content length
+   * @return long content length
    * @throws WebdavException
    */
-  public abstract int getContentLen() throws WebdavException;
+  public abstract long getContentLen() throws WebdavException;
 
   /** A content type of null implies no content (or we don't know)
    *
