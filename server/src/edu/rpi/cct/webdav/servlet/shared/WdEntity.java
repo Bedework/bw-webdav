@@ -109,7 +109,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    String name
    * @throws WebdavException
    */
-  public void setName(String val) throws WebdavException {
+  public void setName(final String val) throws WebdavException {
     name = val;
   }
 
@@ -127,7 +127,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    String display name
    * @throws WebdavException
    */
-  public void setDisplayName(String val) throws WebdavException {
+  public void setDisplayName(final String val) throws WebdavException {
     displayName = val;
   }
 
@@ -145,7 +145,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    String path
    * @throws WebdavException
    */
-  public void setPath(String val) throws WebdavException {
+  public void setPath(final String val) throws WebdavException {
     path = val;
   }
 
@@ -163,7 +163,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    String path
    * @throws WebdavException
    */
-  public void setParentPath(String val) throws WebdavException {
+  public void setParentPath(final String val) throws WebdavException {
     parentPath = val;
   }
 
@@ -180,7 +180,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val
    * @throws WebdavException
    */
-  public void setOwner(AccessPrincipal val) throws WebdavException {
+  public void setOwner(final AccessPrincipal val) throws WebdavException {
     owner = val;
   }
 
@@ -196,7 +196,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val
    * @throws WebdavException
    */
-  public void setCreated(String val) throws WebdavException {
+  public void setCreated(final String val) throws WebdavException {
     created = val;
   }
 
@@ -212,7 +212,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val
    * @throws WebdavException
    */
-  public void setLastmod(String val) throws WebdavException {
+  public void setLastmod(final String val) throws WebdavException {
     lastmod = val;
   }
 
@@ -229,7 +229,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    sequence number
    * @throws WebdavException
    */
-  public void setSequence(int val) throws WebdavException {
+  public void setSequence(final int val) throws WebdavException {
     sequence = val;
   }
 
@@ -247,7 +247,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val
    * @throws WebdavException
    */
-  public void setPrevLastmod(String val) throws WebdavException {
+  public void setPrevLastmod(final String val) throws WebdavException {
     prevLastmod = val;
   }
 
@@ -264,7 +264,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    sequence number
    * @throws WebdavException
    */
-  public void setPrevSequence(int val) throws WebdavException {
+  public void setPrevSequence(final int val) throws WebdavException {
     prevSequence = val;
   }
 
@@ -282,7 +282,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @param val    String description
    * @throws WebdavException
    */
-  public void setDescription(String val) throws WebdavException {
+  public void setDescription(final String val) throws WebdavException {
     description = val;
   }
 
@@ -314,36 +314,58 @@ public abstract class WdEntity implements Comparable<WdEntity> {
   /**
    * @param sb
    */
-  public void toStringSegment(StringBuilder sb) {
+  public void toStringSegment(final StringBuilder sb) {
     try {
-      sb.append("name=");
-      sb.append(getName());
+      addStringSegmentNoComma(sb, "name", getName());
 
-      sb.append(", displayName");
-      sb.append(getDisplayName());
+      addStringSegment(sb, "displayName", getDisplayName());
 
-      sb.append(", path");
-      sb.append(getPath());
+      addStringSegment(sb, "path", getPath());
 
-      sb.append(", parentPath");
-      sb.append(getParentPath());
+      addStringSegment(sb, "parentPath", getParentPath());
 
-      sb.append(", owner");
-      sb.append(getOwner());
+      addStringSegment(sb, "owner", getOwner());
 
-      sb.append(", created");
-      sb.append(getCreated());
+      addStringSegment(sb, "created", getCreated());
 
-      sb.append(", lastmod");
-      sb.append(getLastmod());
+      addStringSegment(sb, "lastmod", getLastmod());
 
-      sb.append(", sequence");
-      sb.append(getSequence());
+      addStringSegment(sb, "sequence", getSequence());
 
-      sb.append(", description");
-      sb.append(getDescription());
+      addStringSegment(sb, "description", getDescription());
     } catch (Throwable t) {
       sb.append(t);
+    }
+  }
+
+  /**
+   * @param sb
+   * @param name
+   * @param val
+   * @throws Throwable
+   */
+  public void addStringSegment(final StringBuilder sb,
+                               final String name,
+                               final Object val) throws Throwable {
+    sb.append(", ");
+    addStringSegmentNoComma(sb, name, val);
+  }
+
+  /**
+   * @param sb
+   * @param name
+   * @param val
+   * @throws Throwable
+   */
+  public void addStringSegmentNoComma(final StringBuilder sb,
+                                      final String name,
+                                      final Object val) throws Throwable {
+    sb.append(name);
+    sb.append("=");
+    if (val == null) {
+      sb.append("<<null>>");
+    } else {
+      sb.append(String.valueOf(val));
     }
   }
 
@@ -351,6 +373,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    *                      Object methods
    * ==================================================================== */
 
+  @Override
   public int hashCode() {
     try {
       return getPath().hashCode() * getName().hashCode();
@@ -359,7 +382,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
     }
   }
 
-  public int compareTo(WdEntity that)  {
+  public int compareTo(final WdEntity that)  {
     try {
       if (this == that) {
         return 0;
@@ -371,6 +394,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
     }
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("WdEntity{");
 
