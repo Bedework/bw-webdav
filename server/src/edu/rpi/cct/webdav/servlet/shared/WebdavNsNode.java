@@ -461,7 +461,11 @@ public abstract class WebdavNsNode implements Serializable {
         if (intf.getAccount() == null) {
           xml.emptyTag(WebdavTags.unauthenticated);
         } else {
-          xml.property(WebdavTags.href, intf.makeUserHref(intf.getAccount()));
+          String href = intf.makeUserHref(intf.getAccount());
+          if (!href.endsWith("/")) {
+            href += "/";
+          }
+          xml.property(WebdavTags.href, href);
         }
         xml.closeTag(tag);
 
@@ -547,7 +551,11 @@ public abstract class WebdavNsNode implements Serializable {
       if (tag.equals(WebdavTags.owner)) {
         // access 5.1
         xml.openTag(tag);
-        xml.property(WebdavTags.href, intf.makeUserHref(getOwner().getAccount()));
+        String href = getOwner().getPrincipalRef();
+        if (!href.endsWith("/")) {
+          href += "/";
+        }
+        xml.property(WebdavTags.href, href);
         xml.closeTag(tag);
 
         return true;
