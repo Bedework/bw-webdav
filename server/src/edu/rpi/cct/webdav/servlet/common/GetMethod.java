@@ -1,33 +1,5 @@
-/*
- Copyright (c) 2000-2005 University of Washington.  All rights reserved.
-
- Redistribution and use of this distribution in source and binary forms,
- with or without modification, are permitted provided that:
-
-   The above copyright notice and this permission notice appear in
-   all copies and supporting documentation;
-
-   The name, identifiers, and trademarks of the University of Washington
-   are not used in advertising or publicity without the express prior
-   written permission of the University of Washington;
-
-   Recipients acknowledge that this distribution is made available as a
-   research courtesy, "as is", potentially with defects, without
-   any obligation on the part of the University of Washington to
-   provide support, services, or repair;
-
-   THE UNIVERSITY OF WASHINGTON DISCLAIMS ALL WARRANTIES, EXPRESS OR
-   IMPLIED, WITH REGARD TO THIS SOFTWARE, INCLUDING WITHOUT LIMITATION
-   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-   PARTICULAR PURPOSE, AND IN NO EVENT SHALL THE UNIVERSITY OF
-   WASHINGTON BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL
-   DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-   PROFITS, WHETHER IN AN ACTION OF CONTRACT, TORT (INCLUDING
-   NEGLIGENCE) OR STRICT LIABILITY, ARISING OUT OF OR IN CONNECTION WITH
-   THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
 /* **********************************************************************
-    Copyright 2005 Rensselaer Polytechnic Institute. All worldwide rights reserved.
+    Copyright 2010 Rensselaer Polytechnic Institute. All worldwide rights reserved.
 
     Redistribution and use of this distribution in source and binary forms,
     with or without modification, are permitted provided that:
@@ -97,27 +69,25 @@ public class GetMethod extends MethodBase {
     }
 
     try {
-      if (getNsIntf().specialUri(req, resp, getResourceUri(req))) {
+      WebdavNsIntf intf = getNsIntf();
+
+      if (intf.specialUri(req, resp, getResourceUri(req))) {
         return;
       }
 
       //String reqContentType = req.getContentType();
       //boolean reqHtml = "text/html".equals(reqContentType);
 
-      WebdavNsNode node = getNsIntf().getNode(getResourceUri(req),
-                                              WebdavNsIntf.existanceMust,
-                                              WebdavNsIntf.nodeTypeUnknown);
+      WebdavNsNode node = intf.getNode(getResourceUri(req),
+                                       WebdavNsIntf.existanceMust,
+                                       WebdavNsIntf.nodeTypeUnknown);
 
       if ((node == null) || !node.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
 
-      String etag = Headers.ifNoneMatch(req);
-
-      if ((etag != null) && (!node.isCollection()) &&
-          (etag.equals(node.getEtagValue(true)))) {
-        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      if (!intf.prefetch(req, resp, node)) {
         return;
       }
 
@@ -132,11 +102,11 @@ public class GetMethod extends MethodBase {
       long contentLength;
 
       if (node.getContentBinary()) {
-        streamIn = getNsIntf().getBinaryContent(node);
+        streamIn = intf.getBinaryContent(node);
         contentType = node.getContentType();
         contentLength = node.getContentLen();
       } else if (node.isCollection()) {
-        if (getNsIntf().getDirectoryBrowsingDisallowed()) {
+        if (intf.getDirectoryBrowsingDisallowed()) {
           throw new WebdavException(HttpServletResponse.SC_FORBIDDEN);
         }
 
@@ -145,7 +115,7 @@ public class GetMethod extends MethodBase {
         contentType = "text/html";
         contentLength = content.getBytes().length;
       } else {
-        in = getNsIntf().getContent(node);
+        in = intf.getContent(req, resp, node);
         contentType = node.getContentType();
         contentLength = node.getContentLen();
       }

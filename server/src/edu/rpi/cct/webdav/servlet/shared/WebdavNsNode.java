@@ -786,17 +786,18 @@ public abstract class WebdavNsNode implements Serializable {
     return targetUri;
   }
 
-  /** Return a collection of property objects
+  /* UNUSED* Return a collection of property objects
    *
    * <p>Default is to return an empty Collection
    *
    * @param ns      String interface namespace.
    * @return Collection (possibly empty) of WebdavProperty objects
    * @throws WebdavException
-   */
+   * /
   public Collection<WebdavProperty> getProperties(final String ns) throws WebdavException {
     return new ArrayList<WebdavProperty>();
   }
+  */
 
   /** Returns a Reader for the content.
    *

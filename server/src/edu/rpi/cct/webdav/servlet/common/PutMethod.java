@@ -78,7 +78,7 @@ public class PutMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                        final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) throws WebdavException {
 
     if (debug) {
       trace("PutMethod: doMethod");
@@ -113,7 +113,7 @@ public class PutMethod extends MethodBase {
       }
 
       if (node.getContentBinary()) {
-        pcr = intf.putBinaryContent(node,
+        pcr = intf.putBinaryContent(req, node,
                                     contentTypePars,
                                     req.getInputStream(),
                                     create,
@@ -127,7 +127,7 @@ public class PutMethod extends MethodBase {
           return;
         }
 
-        pcr = intf.putContent(node,
+        pcr = intf.putContent(req, node,
                               contentTypePars,
                               rdr,
                               create,

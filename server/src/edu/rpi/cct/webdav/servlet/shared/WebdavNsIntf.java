@@ -27,6 +27,7 @@
 package edu.rpi.cct.webdav.servlet.shared;
 
 import edu.rpi.cct.webdav.servlet.common.AccessUtil;
+import edu.rpi.cct.webdav.servlet.common.Headers;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
@@ -479,13 +480,42 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract WebdavNsNode getParent(WebdavNsNode node)
       throws WebdavException;
 
+  /** Called before fetching in GET processing. ALlows implementations to add
+   * some pre-processing, for instance the schedule-tag processing in CalDAV.
+   *
+   * <p>This method handles etag processing.
+   *
+   * @param req
+   * @param resp
+   * @param node - the node
+   * @return true - just proceed otherwise status is set
+   * @throws WebdavException
+   */
+  public boolean prefetch(final HttpServletRequest req,
+                          final HttpServletResponse resp,
+                          final WebdavNsNode node) throws WebdavException {
+    String etag = Headers.ifNoneMatch(req);
+
+    if ((etag != null) && (!node.isCollection()) &&
+        (etag.equals(node.getEtagValue(true)))) {
+      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      return false;
+    }
+
+    return true;
+  }
+
   /** Returns a Reader for the content.
    *
+   * @param req
+   * @param resp
    * @param node             node in question
    * @return Reader          A reader for the content.
    * @throws WebdavException
    */
-  public abstract Reader getContent(WebdavNsNode node)
+  public abstract Reader getContent(HttpServletRequest req,
+                                    HttpServletResponse resp,
+                                    WebdavNsNode node)
       throws WebdavException;
 
   /** Returns an InputStream for the binary content.
@@ -509,6 +539,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Set the content from a Reader
    *
+   * @param req
    * @param node              node in question.
    * @param contentTypePars   null or values from content-type header
    * @param contentRdr        Reader for content
@@ -517,7 +548,8 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
-  public abstract PutContentResult putContent(WebdavNsNode node,
+  public abstract PutContentResult putContent(HttpServletRequest req,
+                                              WebdavNsNode node,
                                               String[] contentTypePars,
                                               Reader contentRdr,
                                               boolean create,
@@ -526,6 +558,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Set the content from a Stream
    *
+   * @param req
    * @param node              node in question.
    * @param contentTypePars   null or values from content-type header
    * @param contentStream     Stream for content
@@ -534,11 +567,12 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
-  public abstract PutContentResult putBinaryContent(WebdavNsNode node,
+  public abstract PutContentResult putBinaryContent(HttpServletRequest req,
+                                                    WebdavNsNode node,
                                                     String[] contentTypePars,
-                                              InputStream contentStream,
-                                              boolean create,
-                                              String ifEtag)
+                                                    InputStream contentStream,
+                                                    boolean create,
+                                                    String ifEtag)
       throws WebdavException;
 
   /** Create a new node.
