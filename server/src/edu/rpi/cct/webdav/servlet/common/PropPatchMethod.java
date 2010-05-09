@@ -80,10 +80,8 @@ public class PropPatchMethod extends MethodBase {
     }
 
     if (doc != null) {
-      if (processDoc(req, resp, doc, node, WebdavTags.propertyUpdate, false)) {
-        node.update();
-      }
-
+      processDoc(req, resp, doc, node, WebdavTags.propertyUpdate, false);
+      node.update();
     }
   }
 
@@ -103,12 +101,12 @@ public class PropPatchMethod extends MethodBase {
    *                   Protected methods
    * ==================================================================== */
 
-  protected boolean processDoc(final HttpServletRequest req,
-                               final HttpServletResponse resp,
-                               final Document doc,
-                               final WebdavNsNode node,
-                               final QName expectedRoot,
-                               final boolean onlySet) throws WebdavException {
+  protected void processDoc(final HttpServletRequest req,
+                            final HttpServletResponse resp,
+                            final Document doc,
+                            final WebdavNsNode node,
+                            final QName expectedRoot,
+                            final boolean onlySet) throws WebdavException {
     try {
       Element root = doc.getDocumentElement();
 
@@ -169,24 +167,23 @@ public class PropPatchMethod extends MethodBase {
       int status = 0;
       String msg = null;
 
-      openTag(WebdavTags.propstat);
-      for (SetPropertyResult spr: failures) {
-        openTag(WebdavTags.prop);
-        emptyTag(spr.prop);
-        closeTag(WebdavTags.prop);
-        status = spr.status;
-        msg = spr.message;
-      }
-      addStatus(status, msg);
-      closeTag(WebdavTags.propstat);
-
       if (failures.isEmpty()) {
         status = HttpServletResponse.SC_OK;
-        msg = null;
       } else {
         // The successes are failed because of the failures
         status = WebdavStatusCode.SC_FAILED_DEPENDENCY;
         msg = "Failed Dependency";
+
+        openTag(WebdavTags.propstat);
+        for (SetPropertyResult spr: failures) {
+          openTag(WebdavTags.prop);
+          emptyTag(spr.prop);
+          closeTag(WebdavTags.prop);
+          status = spr.status;
+          msg = spr.message;
+        }
+        addStatus(status, msg);
+        closeTag(WebdavTags.propstat);
       }
 
       if (!successes.isEmpty()) {
@@ -204,8 +201,6 @@ public class PropPatchMethod extends MethodBase {
       closeTag(WebdavTags.multistatus);
 
       flush();
-
-      return false;
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {

@@ -30,10 +30,10 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
+import org.w3c.dom.Document;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.w3c.dom.Document;
 
 /** Class called to handle MKCOL
  *
@@ -43,14 +43,16 @@ public class MkcolMethod extends PropPatchMethod {
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
    */
+  @Override
   public void init() {
   }
 
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
    */
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                        final HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("MkcolMethod: doMethod");
     }
@@ -67,10 +69,11 @@ public class MkcolMethod extends PropPatchMethod {
 
     node.setDefaults(WebdavTags.mkcol);
 
-    if ((doc == null) ||
-        processDoc(req, resp, doc, node, WebdavTags.mkcol, true)) {
-      // Make collection using properties sent in request
-      getNsIntf().makeCollection(req, resp, node);
+    if (doc != null) {
+      processDoc(req, resp, doc, node, WebdavTags.mkcol, true);
     }
+
+    // Make collection using properties sent in request
+    getNsIntf().makeCollection(req, resp, node);
   }
 }
