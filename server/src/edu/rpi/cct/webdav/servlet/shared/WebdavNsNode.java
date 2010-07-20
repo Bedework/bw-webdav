@@ -261,7 +261,7 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public void generateHref(final XmlEmit xml) throws WebdavException {
     try {
-      generateUrl(xml, WebdavTags.href, uri);
+      generateUrl(xml, WebdavTags.href, uri, getExists());
 //      String url = getUrlPrefix() + new URI(getEncodedUri()).toASCIIString();
 //      xml.property(WebdavTags.href, url);
     } catch (WebdavException wde) {
@@ -277,16 +277,20 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public void generateHref(final XmlEmit xml, final String uri) throws WebdavException {
-    generateUrl(xml, WebdavTags.href, uri);
+    generateUrl(xml, WebdavTags.href, uri, false);
   }
 
   /**
    * @param xml
    * @param tag
    * @param uri
+   * @param exists - true if we KNOW it exists
    * @throws WebdavException
    */
-  public void generateUrl(final XmlEmit xml, final QName tag, final String uri) throws WebdavException {
+  public void generateUrl(final XmlEmit xml,
+                          final QName tag,
+                          final String uri,
+                          final boolean exists) throws WebdavException {
     try {
       /*
       String enc = new URI(null, null, uri, null).toString();
@@ -324,7 +328,7 @@ public abstract class WebdavNsNode implements Serializable {
       */
       String prefixed = urlHandler.prefix(uri);
 
-      if (getExists()) {
+      if (exists) {
         if (prefixed.endsWith("/")) {
           if (!trailSlash()) {
             prefixed = prefixed.substring(0, prefixed.length() - 1);
@@ -563,7 +567,7 @@ public abstract class WebdavNsNode implements Serializable {
 
       if (tag.equals(WebdavTags.principalURL)) {
         xml.openTag(tag);
-        generateUrl(xml, WebdavTags.href, getEncodedUri());
+        generateUrl(xml, WebdavTags.href, getEncodedUri(), getExists());
         xml.closeTag(tag);
 
         return true;
