@@ -61,11 +61,11 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavServerError;
 import edu.rpi.cmt.access.AccessException;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /** Class to handle WebDav ACLs
  *
@@ -74,11 +74,13 @@ import org.w3c.dom.Element;
 public class AclMethod extends MethodBase {
   /** Called at each request
    */
+  @Override
   public void init() {
   }
 
-  public void doMethod(HttpServletRequest req,
-                       HttpServletResponse resp) throws WebdavException {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("AclMethod: doMethod");
     }
@@ -101,7 +103,7 @@ public class AclMethod extends MethodBase {
   /* We process the parsed document and produce a Collection of request
    * objects to process.
    */
-  private WebdavNsIntf.AclInfo processDoc(Document doc, String uri) throws WebdavException {
+  private WebdavNsIntf.AclInfo processDoc(final Document doc, final String uri) throws WebdavException {
     try {
       WebdavNsIntf intf = getNsIntf();
 
@@ -111,7 +113,7 @@ public class AclMethod extends MethodBase {
 
       AccessUtil autil = intf.getAccessUtil();
 
-      ainfo.acl = autil.getAcl(root);
+      ainfo.acl = autil.getAcl(root, true);
 
       if (autil.getErrorTag() != null) {
         ainfo.errorTag = autil.getErrorTag();
@@ -132,9 +134,9 @@ public class AclMethod extends MethodBase {
     }
   }
 
-  private void processResp(HttpServletRequest req,
-                          HttpServletResponse resp,
-                          WebdavNsIntf.AclInfo ainfo) throws WebdavException {
+  private void processResp(final HttpServletRequest req,
+                          final HttpServletResponse resp,
+                          final WebdavNsIntf.AclInfo ainfo) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
     if (ainfo.errorTag == null) {
