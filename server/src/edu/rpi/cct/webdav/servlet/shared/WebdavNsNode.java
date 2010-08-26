@@ -555,7 +555,7 @@ public abstract class WebdavNsNode implements Serializable {
       if (tag.equals(WebdavTags.owner)) {
         // access 5.1
         xml.openTag(tag);
-        String href = getOwner().getPrincipalRef();
+        String href = intf.makeUserHref(getOwner().getPrincipalRef());
         if (!href.endsWith("/")) {
           href += "/";
         }
