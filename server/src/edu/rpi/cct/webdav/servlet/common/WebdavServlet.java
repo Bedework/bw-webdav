@@ -260,6 +260,8 @@ public abstract class WebdavServlet extends HttpServlet
   private void sendError(final WebdavNsIntf intf, final Throwable t,
                          final HttpServletResponse resp) {
     try {
+      intf.rollback();
+
       if (t instanceof WebdavException) {
         WebdavException wde = (WebdavException)t;
         QName errorTag = wde.getErrorTag();

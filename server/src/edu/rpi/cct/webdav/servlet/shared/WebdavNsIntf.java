@@ -373,6 +373,11 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public abstract boolean getDirectoryBrowsingDisallowed() throws WebdavException;
 
+  /** Called on the way out before close if there was an error.
+   *
+   */
+  public abstract void rollback();
+
   /** Called on the way out to allow resources to be freed.
    *
    * @throws WebdavException
