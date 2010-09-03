@@ -29,8 +29,8 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf.Content;
 
-import java.io.CharArrayReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -91,33 +91,30 @@ public class GetMethod extends MethodBase {
         return;
       }
 
-      Reader in = null;
-
-      /* For binary */
-      InputStream streamIn = null;
+      Content c = null;
 
       /** Get the content now to set up length, type etc.
        */
-      String contentType;
-      long contentLength;
 
       if (node.getContentBinary()) {
-        streamIn = intf.getBinaryContent(node);
-        contentType = node.getContentType();
-        contentLength = node.getContentLen();
-      } else if (node.isCollection()) {
-        if (intf.getDirectoryBrowsingDisallowed()) {
-          throw new WebdavException(HttpServletResponse.SC_FORBIDDEN);
+        c = intf.getBinaryContent(node);
+        // XXX check accept header
+      } else {
+        c = intf.getContent(req, resp, node);
+      }
+
+      if (c.written) {
+        resp.setStatus(HttpServletResponse.SC_OK);
+        return;
+      }
+
+      if (c == null) {
+        if (debug) {
+          debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
         }
 
-        String content = generateHtml(req, node);
-        in = new CharArrayReader(content.toCharArray());
-        contentType = "text/html";
-        contentLength = content.getBytes().length;
-      } else {
-        in = intf.getContent(req, resp, node);
-        contentType = node.getContentType();
-        contentLength = node.getContentLen();
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        return;
       }
 
       resp.setHeader("ETag", node.getEtagValue(true));
@@ -126,16 +123,16 @@ public class GetMethod extends MethodBase {
         resp.addHeader("Last-Modified", node.getLastmodDate().toString());
       }
 
-      resp.setContentType(contentType);
+      resp.setContentType(c.contentType);
 
-      if (contentLength > Integer.MAX_VALUE) {
+      if (c.contentLength > Integer.MAX_VALUE) {
         resp.setContentLength(-1);
       } else {
-        resp.setContentLength((int)contentLength);
+        resp.setContentLength((int)c.contentLength);
       }
 
       if (doContent) {
-        if ((in == null) && (streamIn == null)) {
+        if ((c.stream == null) && (c.rdr == null)) {
           if (debug) {
             debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
           }
@@ -143,16 +140,13 @@ public class GetMethod extends MethodBase {
           resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } else {
           if (debug) {
-            debugMsg("send content - length=" + node.getContentLen());
-          }
-          if (node.getContentBinary()) {
-          } else {
+            debugMsg("send content - length=" + c.contentLength);
           }
 
-          if (node.getContentBinary()) {
-            streamContent(streamIn, resp.getOutputStream());
+          if (c.stream != null) {
+            streamContent(c.stream, resp.getOutputStream());
           } else {
-            writeContent(in, resp.getWriter());
+            writeContent(c.rdr, resp.getWriter());
           }
         }
       }
@@ -216,124 +210,5 @@ public class GetMethod extends MethodBase {
       } catch (Throwable t) {}
     }
   }
-
-  /** Return a String giving an HTML representation of the directory.
-   *
-   * TODO
-   *
-   * <p>Use some form of template to generate an internationalized form of the
-   * listing. We don't need a great deal to start with. It will also allow us to
-   * provide stylesheets, images etc. Probably place it in the resources directory.
-   *
-   * @param req
-   * @param node  WebdavNsNode
-   * @return Reader
-   * @throws WebdavException
-   */
-  protected String generateHtml(final HttpServletRequest req,
-                                final WebdavNsNode node) throws WebdavException {
-    try {
-      Sbuff sb = new Sbuff();
-
-      sb.lines(new String[] {"<html>",
-                             "  <head>"});
-      /* Need some styles I guess */
-      sb.append("    <title>");
-      sb.append(node.getDisplayname());
-      sb.line("</title>");
-
-      sb.lines(new String[] {"</head>",
-                             "<body>"});
-
-      sb.append("    <h1>");
-      sb.append(node.getDisplayname());
-      sb.line("</h1>");
-
-      sb.line("  <hr>");
-
-      sb.line("  <table width=\"100%\" " +
-              "cellspacing=\"0\"" +
-              " cellpadding=\"4\">");
-
-      for (WebdavNsNode child: getNsIntf().getChildren(node)) {
-        /* icon would be nice */
-
-        sb.line("<tr>");
-
-        if (node.isCollection()) {
-          /* folder */
-        } else {
-          /* calendar? */
-        }
-
-        sb.line("  <td align=\"left\">");
-        sb.append("<a href=\"");
-        sb.append(req.getContextPath());
-        sb.append(child.getUri());
-        sb.append("\">");
-        sb.append(child.getDisplayname());
-        sb.line("</a>");
-        sb.line("</td>");
-
-        sb.line("  <td align=\"left\">");
-
-        String lastMod = child.getLastmodDate();
-
-        if (lastMod != null) {
-          sb.line(lastMod);
-        } else {
-          sb.line("&nbsp;");
-        }
-        sb.line("</td>");
-        sb.append("</tr>\r\n");
-      }
-
-      sb.line("</table>");
-
-      /* Could use a footer */
-      sb.line("</body>");
-      sb.line("</html>");
-
-      return sb.toString();
-    } catch (WebdavException we) {
-      throw we;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
-  }
-
-  private static class Sbuff {
-    StringBuilder sb = new StringBuilder();
-
-    /**
-     * @param ss
-     */
-    public void lines(final String[] ss) {
-      for (int i = 0; i < ss.length; i++) {
-        line(ss[i]);
-      }
-    }
-
-    /**
-     * @param s
-     */
-    public void line(final String s) {
-      sb.append(s);
-      sb.append("\r\n");
-    }
-
-    /**
-     * @param s
-     */
-    public void append(final String s) {
-      sb.append(s);
-    }
-
-    @Override
-    public String toString() {
-      return sb.toString();
-    }
-  }
-
 }
 

@@ -35,12 +35,14 @@ import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cmt.access.Acl;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
+import edu.rpi.sss.util.xml.XmlEmit.NameSpace;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
@@ -360,7 +362,7 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public void addNamespace(final XmlEmit xml) throws WebdavException {
     try {
-      xml.addNs(WebdavTags.namespace);
+      xml.addNs(new NameSpace(WebdavTags.namespace, "DAV"), true);
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
@@ -510,26 +512,44 @@ public abstract class WebdavNsIntf implements Serializable {
     return true;
   }
 
-  /** Returns a Reader for the content.
+  /** */
+  public static class Content {
+    /** Content was written directly */
+    public boolean written;
+
+    /** A reader for the content */
+    public Reader rdr;
+
+    /** For binary */
+    public InputStream stream = null;
+
+    /** */
+    public String contentType;
+
+    /** */
+    public long contentLength;
+  }
+
+  /** Returns a Content object for the content.
    *
    * @param req
    * @param resp
    * @param node             node in question
-   * @return Reader          A reader for the content.
+   * @return content.
    * @throws WebdavException
    */
-  public abstract Reader getContent(HttpServletRequest req,
-                                    HttpServletResponse resp,
-                                    WebdavNsNode node)
+  public abstract Content getContent(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     WebdavNsNode node)
       throws WebdavException;
 
-  /** Returns an InputStream for the binary content.
+  /** Returns a Content object for the binary content.
    *
    * @param node             node in question
-   * @return inputStream     A stream for the content.
+   * @return content.
    * @throws WebdavException
    */
-  public abstract InputStream getBinaryContent(WebdavNsNode node)
+  public abstract Content getBinaryContent(WebdavNsNode node)
       throws WebdavException;
 
   /** Result for putContent
@@ -819,7 +839,13 @@ public abstract class WebdavNsIntf implements Serializable {
       Element propnode = children[i];
       String ns = propnode.getNamespaceURI();
 
-      xml.addNs(ns);
+      if (xml.getNameSpace(ns) == null) {
+        try {
+          xml.addNs(new NameSpace(ns, null), false);
+        } catch (IOException e) {
+          throw new WebdavException(e);
+        }
+      }
 
       WebdavProperty prop = makeProp(propnode);
 
@@ -1141,6 +1167,124 @@ public abstract class WebdavNsIntf implements Serializable {
   /* ====================================================================
    *                        Protected methods
    * ==================================================================== */
+
+  /** Return a String giving an HTML representation of the directory.
+   *
+   * TODO
+   *
+   * <p>Use some form of template to generate an internationalized form of the
+   * listing. We don't need a great deal to start with. It will also allow us to
+   * provide stylesheets, images etc. Probably place it in the resources directory.
+   *
+   * @param req
+   * @param node  WebdavNsNode
+   * @return Reader
+   * @throws WebdavException
+   */
+  protected String generateHtml(final HttpServletRequest req,
+                                final WebdavNsNode node) throws WebdavException {
+    try {
+      Sbuff sb = new Sbuff();
+
+      sb.lines(new String[] {"<html>",
+                             "  <head>"});
+      /* Need some styles I guess */
+      sb.append("    <title>");
+      sb.append(node.getDisplayname());
+      sb.line("</title>");
+
+      sb.lines(new String[] {"</head>",
+                             "<body>"});
+
+      sb.append("    <h1>");
+      sb.append(node.getDisplayname());
+      sb.line("</h1>");
+
+      sb.line("  <hr>");
+
+      sb.line("  <table width=\"100%\" " +
+              "cellspacing=\"0\"" +
+              " cellpadding=\"4\">");
+
+      for (WebdavNsNode child: getChildren(node)) {
+        /* icon would be nice */
+
+        sb.line("<tr>");
+
+        if (node.isCollection()) {
+          /* folder */
+        } else {
+          /* calendar? */
+        }
+
+        sb.line("  <td align=\"left\">");
+        sb.append("<a href=\"");
+        sb.append(req.getContextPath());
+        sb.append(child.getUri());
+        sb.append("\">");
+        sb.append(child.getDisplayname());
+        sb.line("</a>");
+        sb.line("</td>");
+
+        sb.line("  <td align=\"left\">");
+
+        String lastMod = child.getLastmodDate();
+
+        if (lastMod != null) {
+          sb.line(lastMod);
+        } else {
+          sb.line("&nbsp;");
+        }
+        sb.line("</td>");
+        sb.append("</tr>\r\n");
+      }
+
+      sb.line("</table>");
+
+      /* Could use a footer */
+      sb.line("</body>");
+      sb.line("</html>");
+
+      return sb.toString();
+    } catch (WebdavException we) {
+      throw we;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  private static class Sbuff {
+    StringBuilder sb = new StringBuilder();
+
+    /**
+     * @param ss
+     */
+    public void lines(final String[] ss) {
+      for (int i = 0; i < ss.length; i++) {
+        line(ss[i]);
+      }
+    }
+
+    /**
+     * @param s
+     */
+    public void line(final String s) {
+      sb.append(s);
+      sb.append("\r\n");
+    }
+
+    /**
+     * @param s
+     */
+    public void append(final String s) {
+      sb.append(s);
+    }
+
+    @Override
+    public String toString() {
+      return sb.toString();
+    }
+  }
 
   protected Logger getLogger() {
     if (log == null) {

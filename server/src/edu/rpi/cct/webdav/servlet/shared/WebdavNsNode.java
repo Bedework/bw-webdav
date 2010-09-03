@@ -104,7 +104,7 @@ public abstract class WebdavNsNode implements Serializable {
   private final static Collection<QName> supportedReports = new ArrayList<QName>();
 
   /** */
-  public static final class PropertyTagEntry {
+  public static class PropertyTagEntry {
     /** */
     public QName tag;
     /** */
