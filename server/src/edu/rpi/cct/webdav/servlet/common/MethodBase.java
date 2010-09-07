@@ -173,18 +173,7 @@ public abstract class MethodBase {
       return resourceUri;
     }
 
-    String uri = req.getServletPath();
-
-    if ((uri == null) || (uri.length() == 0)) {
-      /* No path specified - set it to root. */
-      uri = "/";
-    }
-
-    if (debug) {
-      trace("uri: " + uri);
-    }
-
-    resourceUri = WebdavNsIntf.fixPath(uri);
+    resourceUri = WebdavNsIntf.getResourceUri(req);
 
     if (debug) {
       trace("resourceUri: " + resourceUri);

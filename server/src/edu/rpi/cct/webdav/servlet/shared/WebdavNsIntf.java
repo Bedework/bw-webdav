@@ -1026,6 +1026,24 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
+  /** Get the decoded and fixed resource URI
+   *
+   * @param req      Servlet request object
+   * @return String  fixed up uri
+   * @throws WebdavException
+   */
+  public static String getResourceUri(final HttpServletRequest req)
+      throws WebdavException {
+    String uri = req.getServletPath();
+
+    if ((uri == null) || (uri.length() == 0)) {
+      /* No path specified - set it to root. */
+      uri = "/";
+    }
+
+    return fixPath(uri);
+  }
+
   /** Return a path, beginning with a "/", after "." and ".." are removed.
    * If the parameter path attempts to go above the root we return null.
    *
