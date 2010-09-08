@@ -42,8 +42,10 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.io.FilterReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URI;
@@ -560,6 +562,109 @@ public abstract class WebdavNsIntf implements Serializable {
 
     /** True if created */
     public boolean created;
+  }
+
+  /** Put content for the PUT or POST methods
+   *
+   * @param req
+   * @param resp
+   * @param fromPost          POST style - create
+   * @param create            true if this is a probably creation
+   * @param ifEtag            if non-null etag must match
+   * @return PutContentResult result of creating
+   * @throws WebdavException
+   */
+  public PutContentResult putContent(final HttpServletRequest req,
+                                     final HttpServletResponse resp,
+                                     final boolean fromPost,
+                                     final boolean create,
+                                     final String ifEtag) throws WebdavException {
+    try {
+      /* We get a node to represent the entity we are creating or updating. */
+      int existance;
+
+      if (create) {
+        existance = existanceNot;
+      } if (!fromPost) {
+        existance = existanceMay;
+      } else {
+        existance = existanceMust;
+      }
+
+      WebdavNsNode node = getNode(getResourceUri(req),
+                                  existance,
+                                  nodeTypeEntity);
+
+      if (node == null) {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return null;
+      }
+
+      if (!node.getAllowsGet() || !canPut(node)) {
+        // If we can't GET - we can't PUT
+        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return null;
+      }
+
+      PutContentResult pcr;
+
+      String[] contentTypePars = null;
+      String contentType = req.getContentType();
+
+      if (contentType != null) {
+        contentTypePars = contentType.split(";");
+      }
+
+      if (node.getContentBinary()) {
+        pcr = putBinaryContent(req, node,
+                               contentTypePars,
+                               req.getInputStream(),
+                               create,
+                               ifEtag);
+      } else {
+        Reader rdr = getReader(req);
+
+        if (rdr == null) {
+          // No content?
+          resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+          return null;
+        }
+
+        pcr = putContent(req, node,
+                         contentTypePars,
+                         rdr,
+                         create,
+                         ifEtag);
+      }
+
+      if (pcr.created) {
+        resp.setStatus(HttpServletResponse.SC_CREATED);
+      } else {
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+      }
+      resp.setContentLength(0);
+
+      resp.setHeader("ETag", node.getEtagValue(true));
+
+      if (fromPost && pcr.created) {
+        resp.setHeader("Location", getLocation(pcr.node));
+      }
+
+      return pcr;
+    } catch (WebdavForbidden wdf) {
+      resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      throw wdf;
+    } catch (WebdavException we) {
+      if (debug) {
+        error(we);
+      }
+      throw we;
+    } catch (Throwable t) {
+      if (debug) {
+        error(t);
+      }
+      throw new WebdavException(t);
+    }
   }
 
   /** Set the content from a Reader
@@ -1123,6 +1228,92 @@ public abstract class WebdavNsIntf implements Serializable {
     }
 
     return sb.toString();
+  }
+
+  private class DebugReader extends FilterReader {
+    StringBuilder sb = new StringBuilder();
+
+    /** Constructor
+     * @param rdr
+     */
+    public DebugReader(final Reader rdr) {
+      super(rdr);
+    }
+
+    @Override
+    public void close() throws IOException {
+      if (sb != null) {
+        trace(sb.toString());
+      }
+
+      super.close();
+    }
+
+    @Override
+    public int read() throws IOException {
+      int c = super.read();
+
+      if (c == -1) {
+        if (sb != null) {
+          trace(sb.toString());
+          sb = null;
+        }
+        return c;
+      }
+
+      if (sb != null) {
+        char ch = (char)c;
+        if (ch == '\n') {
+          trace(sb.toString());
+          sb = new StringBuilder();
+        } else {
+          sb.append(ch);
+        }
+      }
+
+      return c;
+    }
+
+    @Override
+    public int read(final char[] cbuf, final int off, final int len) throws IOException {
+      int res = super.read(cbuf, off, len);
+      if ((res > 0) && (sb != null)) {
+        sb.append(cbuf, off, res);
+      }
+
+      return res;
+    }
+  }
+
+  /**
+   * @param req
+   * @return possibly wrapped reader
+   * @throws Throwable
+   */
+  public Reader getReader(final HttpServletRequest req) throws Throwable {
+    Reader rdr;
+
+    if (debug) {
+      rdr = new DebugReader(req.getReader());
+    } else {
+      rdr = req.getReader();
+    }
+
+    /* Wrap with a pushback reader and see if there is anything there - some
+     * people are not setting the content length to 0 when there is no body */
+
+    PushbackReader pbr = new PushbackReader(rdr);
+
+    int c = pbr.read();
+
+    if (c == -1) {
+      // No input
+      return null;
+    }
+
+    pbr.unread(c);
+
+    return pbr;
   }
 
   /* ====================================================================

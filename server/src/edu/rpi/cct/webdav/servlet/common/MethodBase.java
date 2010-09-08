@@ -44,9 +44,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.FilterReader;
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.io.Reader;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -246,87 +244,6 @@ public abstract class MethodBase {
     resp.addHeader("DAV", getNsIntf().getDavHeader(node));
   }
 
-  private class DebugReader extends FilterReader {
-    StringBuilder sb = new StringBuilder();
-
-    /** Constructor
-     * @param rdr
-     */
-    public DebugReader(final Reader rdr) {
-      super(rdr);
-    }
-
-    @Override
-    public void close() throws IOException {
-      if (sb != null) {
-        trace(sb.toString());
-      }
-
-      super.close();
-    }
-
-    @Override
-    public int read() throws IOException {
-      int c = super.read();
-
-      if (c == -1) {
-        if (sb != null) {
-          trace(sb.toString());
-          sb = null;
-        }
-        return c;
-      }
-
-      if (sb != null) {
-        char ch = (char)c;
-        if (ch == '\n') {
-          trace(sb.toString());
-          sb = new StringBuilder();
-        } else {
-          sb.append(ch);
-        }
-      }
-
-      return c;
-    }
-
-    @Override
-    public int read(final char[] cbuf, final int off, final int len) throws IOException {
-      int res = super.read(cbuf, off, len);
-      if ((res > 0) && (sb != null)) {
-        sb.append(cbuf, off, res);
-      }
-
-      return res;
-    }
-  }
-
-  protected Reader getReader(final HttpServletRequest req) throws Throwable {
-    Reader rdr;
-
-    if (debug) {
-      rdr = new DebugReader(req.getReader());
-    } else {
-      rdr = req.getReader();
-    }
-
-    /* Wrap with a pushback reader and see if there is anything there - some
-     * people are not setting the content length to 0 when there is no body */
-
-    PushbackReader pbr = new PushbackReader(rdr);
-
-    int c = pbr.read();
-
-    if (c == -1) {
-      // No input
-      return null;
-    }
-
-    pbr.unread(c);
-
-    return pbr;
-  }
-
   /** Parse the Webdav request body, and return the DOM representation.
    *
    * @param req        Servlet request object
@@ -348,7 +265,7 @@ public abstract class MethodBase {
 
       DocumentBuilder builder = factory.newDocumentBuilder();
 
-      Reader rdr = getReader(req);
+      Reader rdr = getNsIntf().getReader(req);
 
       if (rdr == null) {
         // No content?
