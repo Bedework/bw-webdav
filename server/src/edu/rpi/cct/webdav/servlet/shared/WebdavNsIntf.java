@@ -585,7 +585,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (create) {
         existance = existanceNot;
-      } if (!fromPost) {
+      } else if (!fromPost) {
         existance = existanceMay;
       } else {
         existance = existanceMust;
