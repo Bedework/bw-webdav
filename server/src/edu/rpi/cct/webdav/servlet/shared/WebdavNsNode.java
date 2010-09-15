@@ -26,6 +26,7 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf.Content;
 import edu.rpi.cmt.access.AccessPrincipal;
 import edu.rpi.cmt.access.AccessXmlUtil;
 import edu.rpi.cmt.access.PrivilegeSet;
@@ -38,9 +39,9 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -803,19 +804,26 @@ public abstract class WebdavNsNode implements Serializable {
   }
   */
 
-  /** Returns a Reader for the content.
+  /** Returns the content.
    *
-   * @return Reader       A reader for the content.
+   * @param contentType
+   * @return Content object
    * @throws WebdavException
    */
-  public Reader getContent() throws WebdavException {
+  public Content getContent(final String contentType) throws WebdavException {
     String cont = getContentString();
 
     if (cont == null) {
       return null;
     }
 
-    return new StringReader(cont);
+    Content c = new Content();
+
+    c.rdr = new StringReader(cont);
+    c.contentType = getContentType();
+    c.contentLength = getContentLen();
+
+    return c;
   }
 
   /** Returns an InputStream for the content.
@@ -846,6 +854,18 @@ public abstract class WebdavNsNode implements Serializable {
   /* ====================================================================
    *                   Required webdav properties
    * ==================================================================== */
+
+  /** Called during xml emission to write the content for the node.
+   *
+   * @param xml - if this is embedded in an xml stream
+   * @param wtr - if standalone output or no xml stream initialized.
+   * @return boolean true if content written OK
+   * @param contentType desired content type or null for default.
+   * @throws WebdavException
+   */
+  public abstract boolean writeContent(XmlEmit xml,
+                                       Writer wtr,
+                                       String contentType) throws WebdavException;
 
   /**
    * @return boolean true if this is binary content
