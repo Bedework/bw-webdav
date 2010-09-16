@@ -84,11 +84,15 @@ public class ReportMethod extends MethodBase {
     /* Get hold of the PROPFIND method instance - we need it to process
        possible prop requests.
      */
+    /*
     pm = (PropFindMethod)getNsIntf().getMethod("PROPFIND");
 
     if (pm == null) {
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+    */
+    pm = new PropFindMethod();
+    pm.init(getNsIntf(), debug, true);
 
     Document doc = parseContent(req, resp);
 
