@@ -15,7 +15,7 @@
   <property file="${project.home}/build.properties" />
 
   <property name="project.name" value="${edu.rpi.cmt.package.name}"/>
-  <property name="project.version" value="${edu.rpi.cmt.version}"/>
+  <property name="project.version" value="${org.bedework.webdav.version}"/>
 
   <property name="dist.home" location="${project.home}/dist"/>
   <property name="lib.dir" location="${project.home}/lib"/>

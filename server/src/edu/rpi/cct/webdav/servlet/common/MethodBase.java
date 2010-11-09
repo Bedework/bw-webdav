@@ -254,8 +254,30 @@ public abstract class MethodBase {
   protected Document parseContent(final HttpServletRequest req,
                                   final HttpServletResponse resp)
       throws WebdavException{
-    int len = req.getContentLength();
+    try {
+      return parseContent(req.getContentLength(), getNsIntf().getReader(req));
+    } catch (WebdavException we) {
+      throw we;
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    }
+  }
+
+  /** Parse a reader and return the DOM representation.
+   *
+   * @param len        Content length
+   * @param rdr        Reader
+   * @return Document  Parsed body or null for no body
+   * @exception WebdavException Some error occurred.
+   */
+  protected Document parseContent(final int len,
+                                  final Reader rdr) throws WebdavException{
     if (len == 0) {
+      return null;
+    }
+
+    if (rdr == null) {
+      // No content?
       return null;
     }
 
@@ -265,19 +287,10 @@ public abstract class MethodBase {
 
       DocumentBuilder builder = factory.newDocumentBuilder();
 
-      Reader rdr = getNsIntf().getReader(req);
-
-      if (rdr == null) {
-        // No content?
-        return null;
-      }
-
       return builder.parse(new InputSource(rdr));
     } catch (SAXException e) {
-      resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      throw new WebdavException(HttpServletResponse.SC_BAD_REQUEST);
+      throw new WebdavBadRequest();
     } catch (Throwable t) {
-      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       throw new WebdavException(t);
     }
   }
