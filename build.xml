@@ -40,9 +40,14 @@
     <getJar name="log4j" version="1.2.8" />
     <getJar name="servletapi" version="2.4" />
 
-    <getJar name="bw-davio" version="3.6" project="davutil" />
-    <getJar name="rpiaccess" version="3.6" project="access" />
-    <getJar name="rpiutil" version="3.6" project="rpiutil" />
+    <getJar name="bw-davio" version="${org.bedework.davutil.version}" 
+            project="davutil" />
+
+    <getJar name="rpiaccess" version="${org.bedework.access.version}" 
+            project="access" />
+    
+    <getJar name="rpiutil" version="${org.bedework.rpiutil.version}" 
+            project="rpiutil" />
 
     <property name="org.bedework.webdavserver.base" location="${project.home}/server" />
 
