@@ -192,7 +192,11 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public void emitError(final QName errorTag, final String extra,
                         final XmlEmit xml) throws Throwable {
-    xml.emptyTag(errorTag);
+    if (extra == null) {
+      xml.emptyTag(errorTag);
+    } else {
+      xml.property(errorTag, extra);
+    }
   }
 
   /** Get an object suitable for use in parsing acls and generating access.

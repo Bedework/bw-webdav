@@ -244,7 +244,8 @@ public abstract class WebdavServlet extends HttpServlet
 
         if (errorTag != null) {
           if (debug) {
-            debugMsg("setStatus(" + wde.getStatusCode() + ")");
+            debugMsg("setStatus(" + wde.getStatusCode() + ")" +
+                     " message=" + wde.getMessage());
           }
           resp.setStatus(wde.getStatusCode());
           resp.setContentType("text/xml; charset=UTF-8");
@@ -255,7 +256,8 @@ public abstract class WebdavServlet extends HttpServlet
 
             try {
               if (debug) {
-                debugMsg("setStatus(" + wde.getStatusCode() + ")");
+                debugMsg("setStatus(" + wde.getStatusCode() + ")" +
+                         " message=" + wde.getMessage());
               }
               resp.sendError(wde.getStatusCode(), sw.toString());
             } catch (Throwable t1) {
@@ -263,13 +265,15 @@ public abstract class WebdavServlet extends HttpServlet
           }
         } else {
           if (debug) {
-            debugMsg("setStatus(" + wde.getStatusCode() + ")");
+            debugMsg("setStatus(" + wde.getStatusCode() + ")" +
+                     " message=" + wde.getMessage());
           }
           resp.sendError(wde.getStatusCode(), wde.getMessage());
         }
       } else {
         if (debug) {
-          debugMsg("setStatus(" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + ")");
+          debugMsg("setStatus(" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + ")" +
+                   " message=" + t.getMessage());
         }
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                        t.getMessage());
