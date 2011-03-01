@@ -153,7 +153,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    * @see edu.rpi.cct.webdav.servlet.shared.WebdavNsNode#getChildren()
    */
   @Override
-  public Collection getChildren() throws WebdavException {
+  public Collection<? extends WdEntity> getChildren() throws WebdavException {
     return null;
   }
 
