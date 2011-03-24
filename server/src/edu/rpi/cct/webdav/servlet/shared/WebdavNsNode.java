@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -274,6 +274,23 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   /**
+   * @return this nodes fully prefixed uri
+   * @throws WebdavException
+   */
+  public String getPrefixedUri() throws WebdavException {
+    return urlHandler.prefix(uri);
+  }
+
+  /**
+   * @param uri
+   * @return fully prefixed uri
+   * @throws WebdavException
+   */
+  public String getPrefixedUri(final String uri) throws WebdavException {
+    return urlHandler.prefix(uri);
+  }
+
+  /**
    * @param xml
    * @param tag
    * @param uri
@@ -319,7 +336,7 @@ public abstract class WebdavNsNode implements Serializable {
       sb.append(enc);
       xml.property(tag, sb.toString());
       */
-      String prefixed = urlHandler.prefix(uri);
+      String prefixed = getPrefixedUri(uri);
 
       if (exists) {
         if (prefixed.endsWith("/")) {
