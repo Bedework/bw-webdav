@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -95,11 +95,6 @@ public class GetMethod extends MethodBase {
         c = intf.getContent(req, resp, node);
       }
 
-      if (c.written) {
-        resp.setStatus(HttpServletResponse.SC_OK);
-        return;
-      }
-
       if (c == null) {
         if (debug) {
           debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
@@ -109,13 +104,19 @@ public class GetMethod extends MethodBase {
         return;
       }
 
+      if (c.written) {
+        resp.setStatus(HttpServletResponse.SC_OK);
+      }
+
       resp.setHeader("ETag", node.getEtagValue(true));
 
       if (node.getLastmodDate() != null) {
         resp.addHeader("Last-Modified", node.getLastmodDate().toString());
       }
 
-      resp.setContentType(c.contentType);
+      if (c.contentType != null) {
+        resp.setContentType(c.contentType);
+      }
 
       if (c.contentLength > Integer.MAX_VALUE) {
         resp.setContentLength(-1);
@@ -123,23 +124,25 @@ public class GetMethod extends MethodBase {
         resp.setContentLength((int)c.contentLength);
       }
 
-      if (doContent) {
-        if ((c.stream == null) && (c.rdr == null)) {
-          if (debug) {
-            debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
-          }
+      if (c.written || !doContent) {
+        return;
+      }
 
-          resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+      if ((c.stream == null) && (c.rdr == null)) {
+        if (debug) {
+          debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
+        }
+
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+      } else {
+        if (debug) {
+          debugMsg("send content - length=" + c.contentLength);
+        }
+
+        if (c.stream != null) {
+          streamContent(c.stream, resp.getOutputStream());
         } else {
-          if (debug) {
-            debugMsg("send content - length=" + c.contentLength);
-          }
-
-          if (c.stream != null) {
-            streamContent(c.stream, resp.getOutputStream());
-          } else {
-            writeContent(c.rdr, resp.getWriter());
-          }
+          writeContent(c.rdr, resp.getWriter());
         }
       }
     } catch (WebdavException we) {

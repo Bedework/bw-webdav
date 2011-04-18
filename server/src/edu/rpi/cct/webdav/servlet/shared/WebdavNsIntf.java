@@ -529,7 +529,7 @@ public abstract class WebdavNsIntf implements Serializable {
     public String contentType;
 
     /** */
-    public long contentLength;
+    public long contentLength = -1;
   }
 
   /** Returns a Content object for the content.
