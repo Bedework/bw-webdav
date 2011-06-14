@@ -630,7 +630,7 @@ public abstract class WebdavNsIntf implements Serializable {
           return null;
         }
 
-        pcr = putContent(req, node,
+        pcr = putContent(req, resp, node,
                          contentTypePars,
                          rdr,
                          create,
@@ -670,6 +670,7 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Set the content from a Reader
    *
    * @param req
+   * @param resp              For any additional headers
    * @param node              node in question.
    * @param contentTypePars   null or values from content-type header
    * @param contentRdr        Reader for content
@@ -679,6 +680,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract PutContentResult putContent(HttpServletRequest req,
+                                              HttpServletResponse resp,
                                               WebdavNsNode node,
                                               String[] contentTypePars,
                                               Reader contentRdr,
