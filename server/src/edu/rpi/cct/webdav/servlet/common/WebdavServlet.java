@@ -141,6 +141,7 @@ public abstract class WebdavServlet extends HttpServlet
         // ================================================================
         //     Set the correct response
         // ================================================================
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
       } else {
         method.doMethod(req, resp);
       }
