@@ -50,17 +50,6 @@ public abstract class WdEntity implements Comparable<WdEntity> {
   /** UTC datetime */
   private String lastmod;
 
-  /** Ensure uniqueness - lastmod only down to second.
-   */
-  private int sequence;
-
-  /** UTC datetime */
-  private String prevLastmod;
-
-  /** Ensure uniqueness - lastmod only down to second.
-   */
-  private int prevSequence;
-
   private String description;
 
   /** Constructor
@@ -215,15 +204,6 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    */
   public String getLastmod() throws WebdavException {
     return lastmod;
-  }
-
-  /** Set the sequence
-   *
-   * @param val    sequence number
-   * @throws WebdavException
-   */
-  public void setSequence(final int val) throws WebdavException {
-    sequence = val;
   }
 
   /** Get the current etag value
