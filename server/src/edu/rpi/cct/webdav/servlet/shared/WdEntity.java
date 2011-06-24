@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -226,49 +226,19 @@ public abstract class WdEntity implements Comparable<WdEntity> {
     sequence = val;
   }
 
-  /** Get the sequence
+  /** Get the current etag value
    *
-   * @return int    the sequence
+   * @return String    the etag
    * @throws WebdavException
    */
-  public int getSequence() throws WebdavException {
-    return sequence;
-  }
+  public abstract String getEtag() throws WebdavException;
 
-  /** Prev lastmod is the saved lastmod before any changes.
+  /** Get the etag value before any changes were applied
    *
-   * @param val
+   * @return String    the etag
    * @throws WebdavException
    */
-  public void setPrevLastmod(final String val) throws WebdavException {
-    prevLastmod = val;
-  }
-
-  /**
-   * @return String lastmod
-   * @throws WebdavException
-   */
-  public String getPrevLastmod() throws WebdavException {
-    return prevLastmod;
-  }
-
-  /** Set the sequence
-   *
-   * @param val    sequence number
-   * @throws WebdavException
-   */
-  public void setPrevSequence(final int val) throws WebdavException {
-    prevSequence = val;
-  }
-
-  /** Get the sequence
-   *
-   * @return int    the sequence
-   * @throws WebdavException
-   */
-  public int getPrevSequence() throws WebdavException {
-    return prevSequence;
-  }
+  public abstract String getPreviousEtag() throws WebdavException;
 
   /** Set the description
    *
@@ -286,22 +256,6 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    */
   public String getDescription() throws WebdavException {
     return description;
-  }
-
-  /**
-   * @return a value to be used for etags or ctags
-   * @throws WebdavException
-   */
-  public String getTagValue() throws WebdavException {
-    return getLastmod() + "-" + getSequence();
-  }
-
-  /**
-   * @return a value to be used for etags or ctags
-   * @throws WebdavException
-   */
-  public String getPrevTagValue() throws WebdavException {
-    return getPrevLastmod() + "-" + getPrevSequence();
   }
 
   /**
@@ -323,7 +277,9 @@ public abstract class WdEntity implements Comparable<WdEntity> {
 
       addStringSegment(sb, "lastmod", getLastmod());
 
-      addStringSegment(sb, "sequence", getSequence());
+      addStringSegment(sb, "etag", getEtag());
+
+      addStringSegment(sb, "previousEtag", getPreviousEtag());
 
       addStringSegment(sb, "description", getDescription());
     } catch (Throwable t) {
