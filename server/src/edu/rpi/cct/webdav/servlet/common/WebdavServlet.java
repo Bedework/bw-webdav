@@ -57,6 +57,11 @@ public abstract class WebdavServlet extends HttpServlet
 
   protected boolean dumpContent;
 
+  /* If true we don't invalidate the session - this might allow the application
+   * to be used as the server for CAS authenticated widgets etc.
+   */
+  protected boolean webVersion;
+
   protected transient Logger log;
 
   /** Table of methods - set at init
@@ -78,6 +83,7 @@ public abstract class WebdavServlet extends HttpServlet
     super.init(config);
 
     dumpContent = "true".equals(config.getInitParameter("dumpContent"));
+    webVersion = "true".equals(config.getInitParameter("web-version"));
 
     addMethods();
   }
@@ -186,13 +192,15 @@ public abstract class WebdavServlet extends HttpServlet
         }
       }
 
-      /* WebDAV is stateless - toss away the session */
-      try {
-        HttpSession sess = req.getSession(false);
-        if (sess != null) {
-          sess.invalidate();
-        }
-      } catch (Throwable t) {}
+      if (!webVersion) {
+        /* WebDAV is stateless - toss away the session */
+        try {
+          HttpSession sess = req.getSession(false);
+          if (sess != null) {
+            sess.invalidate();
+          }
+        } catch (Throwable t) {}
+      }
     }
   }
 
