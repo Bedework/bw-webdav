@@ -21,13 +21,13 @@ package edu.rpi.cct.webdav.servlet.shared;
 import edu.rpi.cct.webdav.servlet.common.AccessUtil;
 import edu.rpi.cct.webdav.servlet.common.Headers;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
+import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
-import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cmt.access.Acl;
 import edu.rpi.sss.util.xml.XmlEmit;
-import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.XmlEmit.NameSpace;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.apache.log4j.Logger;
@@ -1133,7 +1133,14 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
-  /** Get the decoded and fixed resource URI
+  /** Get the decoded and fixed resource URI. This calls getServletPath() to
+   * obtain the path information. The description of that method is a little
+   * obscure in it's meaning. In a request of this form:<br/><br/>
+   * "GET /ucaldav/user/douglm/calendar/1302064354993-g.ics HTTP/1.1[\r][\n]"<br/><br/>
+   * getServletPath() will return <br/><br/>
+   * /user/douglm/calendar/1302064354993-g.ics<br/><br/>
+   * that is the context has been removed. In addition this method will URL
+   * decode the path. getRequestUrl() does neither.
    *
    * @param req      Servlet request object
    * @return String  fixed up uri
@@ -1148,6 +1155,7 @@ public abstract class WebdavNsIntf implements Serializable {
       uri = "/";
     }
 
+    // This may not be needed.
     return fixPath(uri);
   }
 
