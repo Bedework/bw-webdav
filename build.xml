@@ -31,29 +31,34 @@
   <target name="init" >
     <projectInit/>
 
-    <getJar name="log4j" version="1.2.8" />
-    <getJar name="servletapi" version="2.4" />
-
-    <getJar name="bw-davio" version="${org.bedework.davutil.version}" 
-            project="davutil" />
-
-    <getJar name="rpiaccess" version="${org.bedework.access.version}" 
-            project="access" />
-    
-    <getJar name="rpiutil" version="${org.bedework.rpiutil.version}" 
-            project="rpiutil" />
-
     <property name="org.bedework.webdavserver.base" location="${project.home}/server" />
 
     <property name="webdavserver.jar"
               location="${dist.home}/${org.bedework.webdavserver.jar}-${project.version}.jar" />
+  </target>
+  
+  <target name="build-init" depends="init,build.rpiutil,build.access">
+    <getJar name="log4j" version="1.2.8" />
+    <getJar name="servletapi" version="2.4" />
+
+    <getJar name="bw-davio" version="${org.bedework.davutil.version}" 
+            project="davutil" 
+            projecthome="${bedework.home}/../davutil" />
+
+    <getJar name="rpiaccess" version="${org.bedework.access.version}" 
+            project="access"
+            projecthome="${bedework.home}/../access" />
+    
+    <getJar name="rpiutil" version="${org.bedework.rpiutil.version}" 
+            project="rpiutil"
+            projecthome="${bedework.home}/../rpiutil" />
   </target>
 
   <!-- ===================== build-source Target ===============================
      This target builds jar files ready for the deploy target.
      =================================================================== -->
 
-  <target name="build-source" depends="init" >
+  <target name="build-source" depends="build-init">
     <build-jar module-base="${org.bedework.webdavserver.base}" 
                jar-file="${webdavserver.jar}" />
   </target>
