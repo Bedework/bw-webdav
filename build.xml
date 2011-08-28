@@ -6,13 +6,15 @@
 -->
 
 <project name="bedework.webdav" default="build">
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
   <property environment="env"/>
   <dirname property="project.home" file="${ant.file}"/>
 
   <property file="${project.home}/build.properties" />
 
   <property name="bedework.home"
-            location="${project.home}/../.." />
+            location="${project.home}/../bedework" />
 
   <property name="build.dir" location="${bedework.home}/build"/>
 
@@ -43,15 +45,15 @@
 
     <getJar name="bw-davio" version="${org.bedework.davutil.version}" 
             project="davutil" 
-            projecthome="${bedework.home}/../davutil" />
+            projecthome="${project.home}/../davutil" />
 
     <getJar name="rpiaccess" version="${org.bedework.access.version}" 
             project="access"
-            projecthome="${bedework.home}/../access" />
+            projecthome="${project.home}/../access" />
     
     <getJar name="rpiutil" version="${org.bedework.rpiutil.version}" 
             project="rpiutil"
-            projecthome="${bedework.home}/../rpiutil" />
+            projecthome="${project.home}/../rpiutil" />
   </target>
 
   <!-- ===================== build-source Target ===============================
@@ -61,36 +63,5 @@
   <target name="build-source" depends="build-init">
     <build-jar module-base="${org.bedework.webdavserver.base}" 
                jar-file="${webdavserver.jar}" />
-  </target>
-
-<!-- ==================== Javadoc Target ===============================
-     The "javadoc" target creates Javadoc API documentation for the Java
-     classes included in your application.  Normally, this is only required
-     when preparing a distribution release, but is available as a separate
-     target in case the developer wants to create Javadocs independently.
-     =================================================================== -->
-
-  <target name="javadoc" depends="init"
-          description="Create Javadoc API documentation">
-    <property name="destdir" location="${dist.home}/docs/api"/>
-    <mkdir dir="${destdir}"/>
-
-    <javadoc sourcepath="${org.bedework.webdavserver.base}/src:"
-           classpathref="compile.classpath"
-                destdir="${destdir}"
-           packagenames="org.bedework.*,
-                         edu.rpi.*"
-                 access="public"
-                 author="true"
-                version="true"
-          breakiterator="yes"
-            windowtitle="${project.name} ${project.version} API Documentation">
-      <doctitle><![CDATA[${project.name} ${project.version}<br/>API Documentation]]></doctitle>
-      <header><![CDATA[${project.name} ${project.version}<br/>API Documentation]]></header>
-      <link href="../../access/api" />
-      <link href="../../davutil/api" />
-      <link href="../../rpiutil/api" />
-      <link href="${env.JAVA_HOME}/docs/api" />
-    </javadoc>
   </target>
 </project>
