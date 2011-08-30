@@ -105,10 +105,7 @@ public abstract class WebdavServlet extends HttpServlet
     boolean serverError = false;
 
     try {
-      String debugStr = getInitParameter("debug");
-      if (debugStr != null) {
-        debug = !"0".equals(debugStr);
-      }
+      debug = getLogger().isDebugEnabled();
 
       if (debug) {
         debugMsg("entry: " + req.getMethod());
@@ -128,7 +125,7 @@ public abstract class WebdavServlet extends HttpServlet
 
       if (debug && dumpContent) {
         resp = new CharArrayWrappedResponse(resp,
-                                            getLogger(), debug);
+                                            getLogger());
       }
 
       String methodName = req.getHeader("X-HTTP-Method-Override");
@@ -373,12 +370,14 @@ public abstract class WebdavServlet extends HttpServlet
   /* (non-Javadoc)
    * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
    */
+  @Override
   public void sessionCreated(final HttpSessionEvent se) {
   }
 
   /* (non-Javadoc)
    * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
    */
+  @Override
   public void sessionDestroyed(final HttpSessionEvent se) {
     HttpSession session = se.getSession();
     String sessid = session.getId();

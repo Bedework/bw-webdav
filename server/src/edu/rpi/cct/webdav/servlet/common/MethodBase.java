@@ -123,15 +123,13 @@ public abstract class MethodBase {
   /** Called at each request
    *
    * @param nsIntf
-   * @param debug
    * @param dumpContent
    * @throws WebdavException
    */
   public void init(final WebdavNsIntf nsIntf,
-                   final boolean debug,
                    final boolean dumpContent) throws WebdavException{
     this.nsIntf = nsIntf;
-    this.debug = debug;
+    debug = getLogger().isDebugEnabled();
     this.dumpContent = dumpContent;
 
 //    config = servlet.getServletConfig();

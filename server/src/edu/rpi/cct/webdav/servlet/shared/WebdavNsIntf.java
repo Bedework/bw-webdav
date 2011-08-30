@@ -111,22 +111,21 @@ public abstract class WebdavNsIntf implements Serializable {
    *
    * @param servlet
    * @param req
-   * @param debug
    * @param methods    HashMap   table of method info
    * @param dumpContent
    * @throws WebdavException
    */
   public void init(final WebdavServlet servlet,
                    final HttpServletRequest req,
-                   final boolean debug,
                    final HashMap<String, MethodInfo> methods,
                    final boolean dumpContent) throws WebdavException {
     this.servlet = servlet;
     this.req = req;
     xml = new XmlEmit();
-    this.debug = debug;
     this.methods = methods;
     this.dumpContent = dumpContent;
+
+    debug = getLogger().isDebugEnabled();
 
     synchronized (session) {
       session.sessNum++;
@@ -259,7 +258,7 @@ public abstract class WebdavNsIntf implements Serializable {
     try {
       MethodBase mb = (MethodBase)mi.getMethodClass().newInstance();
 
-      mb.init(this, debug, dumpContent);
+      mb.init(this, dumpContent);
 
       return mb;
     } catch (Throwable t) {

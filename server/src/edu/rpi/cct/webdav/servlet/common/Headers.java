@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,8 +20,6 @@ package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-
-import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -80,13 +78,9 @@ public class Headers {
    *
    * @param resp
    * @param url
-   * @param debug
    */
   public static void makeLocation(final HttpServletResponse resp,
-                                  final String url, final boolean debug) {
-    if (debug) {
-      Logger.getLogger(Headers.class).debug("Location:" + url);
-    }
+                                  final String url) {
     resp.setHeader("Location", url);
   }
 

@@ -39,7 +39,7 @@
               location="${dist.home}/${org.bedework.webdavserver.jar}-${project.version}.jar" />
   </target>
   
-  <target name="build-init" depends="init,build.rpiutil,build.access">
+  <target name="build-init" depends="init">
     <getJar name="log4j" version="1.2.8" />
     <getJar name="servletapi" version="2.4" />
 

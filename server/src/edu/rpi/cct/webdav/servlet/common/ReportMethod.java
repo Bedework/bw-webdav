@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,12 +20,12 @@ package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.common.PropFindMethod.PropRequest;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch;
+import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
-import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
@@ -85,7 +85,7 @@ public class ReportMethod extends MethodBase {
     }
     */
     pm = new PropFindMethod();
-    pm.init(getNsIntf(), debug, true);
+    pm.init(getNsIntf(), true);
 
     Document doc = parseContent(req, resp);
 
@@ -177,7 +177,7 @@ public class ReportMethod extends MethodBase {
       if (reportType == reportTypePrincipalMatch) {
         depth = defaultDepth(depth, 0);
         checkDepth(depth, 0);
-        pmatch = new PrincipalMatchReport(this, intf, debug);
+        pmatch = new PrincipalMatchReport(this, intf);
 
         pmatch.parse(root, depth);
         return;

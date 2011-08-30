@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -37,13 +37,11 @@ public class AccessUtil extends AccessXmlUtil {
    * @param namespacePrefix String prefix
    * @param xml   XmlEmit
    * @param cb
-   * @param debug
    * @throws WebdavException
    */
-  public AccessUtil(String namespacePrefix, XmlEmit xml,
-                    AccessXmlCb cb,
-                    boolean debug) throws WebdavException {
-    super(caldavPrivTags, xml, cb, debug);
+  public AccessUtil(final String namespacePrefix, final XmlEmit xml,
+                    final AccessXmlCb cb) throws WebdavException {
+    super(caldavPrivTags, xml, cb);
 
     this.namespacePrefix = namespacePrefix;
   }
@@ -53,7 +51,7 @@ public class AccessUtil extends AccessXmlUtil {
    * @param who String
    * @return String href
    */
-  public String makeUserHref(String who) {
+  public String makeUserHref(final String who) {
     return namespacePrefix + "/principals/users/" + who;
   }
 
@@ -62,7 +60,7 @@ public class AccessUtil extends AccessXmlUtil {
    * @param who String
    * @return String href
    */
-  public String makeGroupHref(String who) {
+  public String makeGroupHref(final String who) {
     return namespacePrefix + "/principals/groups/" + who;
   }
 

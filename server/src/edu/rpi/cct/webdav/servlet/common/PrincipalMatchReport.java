@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,14 +28,14 @@ import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
+import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Element;
 
 /**
  * @author Mike Douglass
@@ -72,12 +72,11 @@ public class PrincipalMatchReport {
    *
    * @param mb
    * @param intf
-   * @param debug
    */
-  public PrincipalMatchReport(MethodBase mb, WebdavNsIntf intf, boolean debug) {
+  public PrincipalMatchReport(final MethodBase mb, final WebdavNsIntf intf) {
     this.mb = mb;
     this.intf = intf;
-    this.debug = debug;
+    debug = getLogger().isDebugEnabled();
   }
 
   /** Parse the principal match request.
@@ -95,8 +94,8 @@ public class PrincipalMatchReport {
    * @param depth
    * @throws WebdavException
    */
-  public void parse(Element root,
-                    int depth) throws WebdavException {
+  public void parse(final Element root,
+                    final int depth) throws WebdavException {
     try {
       if (debug) {
         trace("ReportMethod: parsePrincipalMatch");
@@ -172,9 +171,9 @@ public class PrincipalMatchReport {
    * @param depth
    * @throws WebdavException
    */
-  public void process(HttpServletRequest req,
-                      HttpServletResponse resp,
-                      int depth) throws WebdavException {
+  public void process(final HttpServletRequest req,
+                      final HttpServletResponse resp,
+                      final int depth) throws WebdavException {
     try {
       resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
       resp.setContentType("text/xml; charset=UTF-8");
@@ -225,7 +224,7 @@ public class PrincipalMatchReport {
     }
   }
 
-  private Collection<WebdavNsNode> doNodeAndChildren(WebdavNsNode node)
+  private Collection<WebdavNsNode> doNodeAndChildren(final WebdavNsNode node)
           throws WebdavException {
     Collection<WebdavNsNode> nodes = new ArrayList<WebdavNsNode>();
 
@@ -246,7 +245,7 @@ public class PrincipalMatchReport {
     return nodes;
   }
 
-  private boolean nodeMatches(WebdavNsNode node) throws WebdavException {
+  private boolean nodeMatches(final WebdavNsNode node) throws WebdavException {
     if (owner) {
       String account = intf.getAccount();
 
@@ -267,11 +266,11 @@ public class PrincipalMatchReport {
     return log;
   }
 
-  protected void trace(String msg) {
+  protected void trace(final String msg) {
     getLogger().debug(msg);
   }
 
-  protected void warn(String msg) {
+  protected void warn(final String msg) {
     getLogger().warn(msg);
   }
 }
