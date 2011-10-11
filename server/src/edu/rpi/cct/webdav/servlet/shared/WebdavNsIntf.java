@@ -561,6 +561,13 @@ public abstract class WebdavNsIntf implements Serializable {
 
     /** True if created */
     public boolean created;
+
+    /** True if wecan emit Etag. This implies a subsequent GET will return
+     * an EXACT byte-for-byte representation of the entity we just PUT.
+     *
+     * <p>If that is not the case this MUST be left FALSE
+     */
+    public boolean emitEtag;
   }
 
   /** Put content for the PUT or POST methods
@@ -643,7 +650,9 @@ public abstract class WebdavNsIntf implements Serializable {
       }
       resp.setContentLength(0);
 
-      resp.setHeader("ETag", node.getEtagValue(true));
+      if (pcr.emitEtag) {
+        resp.setHeader("ETag", node.getEtagValue(true));
+      }
 
       if (fromPost && pcr.created) {
         resp.setHeader("Location", getLocation(pcr.node));
