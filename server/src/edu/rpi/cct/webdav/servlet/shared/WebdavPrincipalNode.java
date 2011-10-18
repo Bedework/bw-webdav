@@ -20,8 +20,8 @@
 package edu.rpi.cct.webdav.servlet.shared;
 
 import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.cmt.access.WhoDefs;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
+import edu.rpi.cmt.access.WhoDefs;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
@@ -124,6 +124,11 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   @Override
   public WdCollection getCollection(final boolean deref) throws WebdavException {
     return null;
+  }
+
+  @Override
+  public boolean getDeleted() throws WebdavException {
+    return false;
   }
 
   /* ====================================================================

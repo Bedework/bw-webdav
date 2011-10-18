@@ -21,11 +21,14 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.common.PropFindMethod.PropRequest;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
+import edu.rpi.cct.webdav.servlet.shared.WdSynchReport;
+import edu.rpi.cct.webdav.servlet.shared.WdSynchReport.WdSynchReportItem;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
+import edu.rpi.sss.util.Util;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
@@ -47,6 +50,7 @@ public class ReportMethod extends MethodBase {
   private final static int reportTypePrincipalMatch = 2;
   private final static int reportTypeAclPrincipalPropSet = 3;
   private final static int reportTypePrincipalSearchPropertySet = 4;
+  private final static int reportTypeSync = 5;
 
   private int reportType;
 
@@ -58,7 +62,13 @@ public class ReportMethod extends MethodBase {
 
   protected PropFindMethod pm;
 
-  private PropRequest aclPrincipalProps;
+  private PropRequest propReq;
+
+  private String syncToken;
+
+  private int syncLimit; // -1 for no limit
+
+  private boolean syncRecurse;
 
   /* (non-Javadoc)
    * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
@@ -159,6 +169,16 @@ public class ReportMethod extends MethodBase {
 
       Element root = doc.getDocumentElement();
 
+      if (reportType == reportTypeSync) {
+        if ((depth != Headers.depthInfinity) && (depth != 1)) {
+          throw new WebdavBadRequest("Bad depth");
+        }
+
+        parseSyncReport(root, depth == Headers.depthInfinity, intf);
+
+        return;
+      }
+
       if (reportType == reportTypeAclPrincipalPropSet) {
         depth = defaultDepth(depth, 0);
         checkDepth(depth, 0);
@@ -223,11 +243,63 @@ public class ReportMethod extends MethodBase {
           if (hadProp) {
             throw new WebdavBadRequest("More than one DAV:prop element");
           }
-          aclPrincipalProps = pm.parseProps(curnode);
+          propReq = pm.parseProps(curnode);
 
           hadProp = true;
         }
       }
+    } catch (WebdavException wde) {
+      throw wde;
+    } catch (Throwable t) {
+      System.err.println(t.getMessage());
+      if (debug) {
+        t.printStackTrace();
+      }
+
+      throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private void parseSyncReport(final Element root,
+                               final boolean recurse,
+                               final WebdavNsIntf intf) throws WebdavException {
+    try {
+      Element[] children = getChildrenArray(root);
+
+      if ((children.length < 2) || (children.length > 3)) {
+        throw new WebdavBadRequest("Expect 2 or 3 child elements");
+      }
+
+      if (!XmlUtil.nodeMatches(children[0], WebdavTags.syncToken)) {
+        throw new WebdavBadRequest("Expect " + WebdavTags.syncToken);
+      }
+
+      syncRecurse = recurse;
+
+      syncToken = XmlUtil.getOneNodeVal(children[0]);
+
+      if (!syncToken.startsWith("data:")) {
+        throw new WebdavBadRequest("Invalid sync-token");
+      }
+
+      syncToken = syncToken.substring(5);
+
+      int childI = 1;
+      syncLimit = -1;
+
+      if (XmlUtil.nodeMatches(children[1], WebdavTags.limit)) {
+        childI++;
+        syncLimit = Integer.valueOf(XmlUtil.getElementContent(children[1]));
+      }
+
+      if (!XmlUtil.nodeMatches(children[childI], WebdavTags.prop)) {
+        throw new WebdavBadRequest("Expect " + WebdavTags.prop);
+      }
+
+      propReq = pm.parseProps(children[childI]);
+
+    } catch (NumberFormatException nfe) {
+      throw new WebdavBadRequest("Invalid value");
     } catch (WebdavException wde) {
       throw wde;
     } catch (Throwable t) {
@@ -331,6 +403,11 @@ public class ReportMethod extends MethodBase {
                            final int depth) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
 
+    if (reportType == reportTypeSync) {
+      processSyncReport(req, resp, intf);
+      return;
+    }
+
     /* Build a collection of nodes for any user principals in the acl
      * associated with the resource.
      */
@@ -377,13 +454,52 @@ public class ReportMethod extends MethodBase {
     return;
   }
 
+  private void processSyncReport(final HttpServletRequest req,
+                                 final HttpServletResponse resp,
+                                 final WebdavNsIntf intf) throws WebdavException {
+    WdSynchReport wsr = intf.getSynchReport(getResourceUri(req),
+                                            syncToken,
+                                            syncLimit,
+                                            syncRecurse);
+    resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+    resp.setContentType("text/xml; charset=UTF-8");
+
+    startEmit(resp);
+
+    openTag(WebdavTags.multistatus);
+
+    if (wsr != null) {
+      if (!Util.isEmpty(wsr.items)) {
+        for (WdSynchReportItem wsri: wsr.items) {
+          openTag(WebdavTags.response);
+
+          pm.doNodeProperties(wsri.node, propReq);
+
+          /* No status for changed element - 404 for deleted */
+
+          if (wsri.node.getDeleted()) {
+            addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+          }
+
+          closeTag(WebdavTags.response);
+        }
+      }
+
+      property(WebdavTags.syncToken, "data:" + wsr.token);
+    }
+
+    closeTag(WebdavTags.multistatus);
+
+    flush();
+  }
+
   private void processAclPrincipalPropSet(final HttpServletRequest req,
                                           final HttpServletResponse resp,
                                           final WebdavNsIntf intf) throws WebdavException {
     String resourceUri = getResourceUri(req);
-    WebdavNsNode node = getNsIntf().getNode(resourceUri,
-                                            WebdavNsIntf.existanceMust,
-                                            WebdavNsIntf.nodeTypeUnknown);
+    WebdavNsNode node = intf.getNode(resourceUri,
+                                     WebdavNsIntf.existanceMust,
+                                     WebdavNsIntf.nodeTypeUnknown);
 
     Collection<String> hrefs = intf.getAclPrincipalInfo(node);
 
@@ -401,7 +517,7 @@ public class ReportMethod extends MethodBase {
                                                  WebdavNsIntf.existanceMay,
                                                  WebdavNsIntf.nodeTypePrincipal);
         if (pnode != null) {
-          pm.doNodeProperties(pnode, aclPrincipalProps);
+          pm.doNodeProperties(pnode, propReq);
         }
       }
 
@@ -456,6 +572,10 @@ public class ReportMethod extends MethodBase {
 
       if (XmlUtil.nodeMatches(root, WebdavTags.expandProperty)) {
         return reportTypeExpandProperty;
+      }
+
+      if (XmlUtil.nodeMatches(root, WebdavTags.syncCollection)) {
+        return reportTypeSync;
       }
 
       if (XmlUtil.nodeMatches(root, WebdavTags.principalPropertySearch)) {

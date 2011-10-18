@@ -21,8 +21,8 @@ package edu.rpi.cct.webdav.servlet.shared;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf.Content;
 import edu.rpi.cmt.access.AccessPrincipal;
 import edu.rpi.cmt.access.AccessXmlUtil;
-import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.cmt.access.Acl.CurrentAccess;
+import edu.rpi.cmt.access.PrivilegeSet;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
@@ -949,6 +949,12 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public abstract WdCollection getCollection(boolean deref) throws WebdavException;
+
+  /**
+   * @return true if this represents a deleted resource.
+   * @throws WebdavException
+   */
+  public abstract boolean getDeleted() throws WebdavException;
 
   /* ********************************************************************
    *                        Protected methods

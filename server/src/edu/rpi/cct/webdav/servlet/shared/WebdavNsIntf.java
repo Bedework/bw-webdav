@@ -785,6 +785,19 @@ public abstract class WebdavNsIntf implements Serializable {
                                      HttpServletResponse resp,
                                      String resourceUri) throws WebdavException;
 
+  /**
+   * @param path
+   * @param token
+   * @param limit - negative for no limit on result set size
+   * @param recurse
+   * @return report
+   * @throws WebdavException
+   */
+  public abstract WdSynchReport getSynchReport(String path,
+                                               String token,
+                                               int limit,
+                                               boolean recurse) throws WebdavException;
+
   /* ====================================================================
    *                  Access methods
    * ==================================================================== */

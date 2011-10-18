@@ -25,8 +25,8 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavProperty;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.XmlEmit;
-import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.XmlEmit.NameSpace;
+import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.apache.log4j.Logger;
@@ -182,14 +182,6 @@ public abstract class MethodBase {
    */
   protected void checkDepth(final int depth, final int val) throws WebdavException {
     if (depth != val) {
-      throw new WebdavBadRequest();
-    }
-  }
-
-  /* depth must be in min-max
-   */
-  protected void checkDepth(final int depth, final int min, final int max) throws WebdavException {
-    if ((depth < min) || (depth > max)) {
       throw new WebdavBadRequest();
     }
   }
