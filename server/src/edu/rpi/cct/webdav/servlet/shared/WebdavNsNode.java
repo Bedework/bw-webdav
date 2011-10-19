@@ -138,7 +138,9 @@ public abstract class WebdavNsNode implements Serializable {
     //addPropEntry(propertyNames, WebdavTags.principalCollectionSet, false);
     addPropEntry(propertyNames, WebdavTags.principalURL);
     addPropEntry(propertyNames, WebdavTags.resourcetype, true);
+    addPropEntry(propertyNames, WebdavTags.supportedReportSet);
     addPropEntry(propertyNames, WebdavTags.supportedPrivilegeSet);
+    addPropEntry(propertyNames, WebdavTags.syncToken);
 
     /* Supported reports */
 
@@ -614,6 +616,14 @@ public abstract class WebdavNsNode implements Serializable {
         return true;
       }
 
+      if (tag.equals(WebdavTags.syncToken)) {
+        if (!allowsSyncReport()) {
+          return false;
+        }
+        xml.property(tag, getSyncToken());
+        return true;
+      }
+
       // Not known
       return false;
     } catch (WebdavException wde) {
@@ -669,6 +679,10 @@ public abstract class WebdavNsNode implements Serializable {
   public Collection<QName> getSupportedReports() throws WebdavException {
     Collection<QName> res = new ArrayList<QName>();
     res.addAll(supportedReports);
+
+    if (allowsSyncReport()) {
+      res.add(WebdavTags.syncCollection);
+    }
 
     return res;
   }
@@ -951,10 +965,22 @@ public abstract class WebdavNsNode implements Serializable {
   public abstract WdCollection getCollection(boolean deref) throws WebdavException;
 
   /**
+   * @return true if this node allows a sync-report.
+   * @throws WebdavException
+   */
+  public abstract boolean allowsSyncReport() throws WebdavException;
+
+  /**
    * @return true if this represents a deleted resource.
    * @throws WebdavException
    */
   public abstract boolean getDeleted() throws WebdavException;
+
+  /**
+   * @return String sync-token, a URI
+   * @throws WebdavException
+   */
+  public abstract String getSyncToken() throws WebdavException;
 
   /* ********************************************************************
    *                        Protected methods

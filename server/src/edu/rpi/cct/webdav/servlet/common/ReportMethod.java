@@ -278,12 +278,6 @@ public class ReportMethod extends MethodBase {
 
       syncToken = XmlUtil.getOneNodeVal(children[0]);
 
-      if (!syncToken.startsWith("data:")) {
-        throw new WebdavBadRequest("Invalid sync-token");
-      }
-
-      syncToken = syncToken.substring(5);
-
       int childI = 1;
       syncLimit = -1;
 

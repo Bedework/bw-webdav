@@ -127,8 +127,18 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   }
 
   @Override
+  public boolean allowsSyncReport() throws WebdavException {
+    return false;
+  }
+
+  @Override
   public boolean getDeleted() throws WebdavException {
     return false;
+  }
+
+  @Override
+  public String getSyncToken() throws WebdavException {
+    return null;
   }
 
   /* ====================================================================
