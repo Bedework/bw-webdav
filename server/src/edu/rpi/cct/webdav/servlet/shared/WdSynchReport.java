@@ -18,7 +18,7 @@
 */
 package edu.rpi.cct.webdav.servlet.shared;
 
-import java.util.Set;
+import java.util.List;
 
 /** Data for Synch Report
  *
@@ -69,7 +69,7 @@ public class WdSynchReport {
 
   /**
    */
-  public Set<WdSynchReportItem> items;
+  public List<WdSynchReportItem> items;
 
   /** True if the report was truncated
    */

@@ -479,7 +479,7 @@ public class ReportMethod extends MethodBase {
         }
       }
 
-      property(WebdavTags.syncToken, "data:" + wsr.token);
+      property(WebdavTags.syncToken, wsr.token);
     }
 
     closeTag(WebdavTags.multistatus);
