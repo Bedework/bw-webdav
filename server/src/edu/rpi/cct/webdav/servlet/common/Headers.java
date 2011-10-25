@@ -21,8 +21,12 @@ package edu.rpi.cct.webdav.servlet.common;
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.Holder;
 
 /** Retrieve and process Webdav header values
  *
@@ -84,6 +88,171 @@ public class Headers {
     resp.setHeader("Location", url);
   }
 
+  /**
+   */
+  public static class IfHeader {
+    /** Null if no resource tag */
+    public String resourceTag;
+
+    /** An entity tag is surrounded by "[" and "]", whereas a token is
+     * surrounded by "<" and ">"
+     */
+    public static class TagOrToken {
+      /** True if value is an entity tag */
+      public boolean entityTag;
+      /** The tag or token value */
+      public String value;
+
+      /** Constructor
+       * @param entityTag
+       * @param value
+       */
+      public TagOrToken(final boolean entityTag,
+                        final String value) {
+        this.entityTag = entityTag;
+        this.value = value;
+      }
+    }
+
+    /** The list - never null */
+    public List<TagOrToken> tagsAndTokens = new ArrayList<TagOrToken>();
+
+    /**
+     * @param tagOrToken
+     * @throws WebdavException
+     */
+    public void addTagOrToken(final String tagOrToken) throws WebdavException {
+      boolean entityTag;
+
+      if (tagOrToken.length() < 3) {
+        throw new WebdavException("Invalid tag or token for If header: " +
+            tagOrToken);
+      }
+
+      if (tagOrToken.startsWith("[")) {
+        entityTag = true;
+      } else if (tagOrToken.startsWith("<")) {
+        entityTag = false;
+      } else {
+        throw new WebdavException("Invalid tag or token for If header: " +
+                                  tagOrToken);
+      }
+
+      tagsAndTokens.add(new TagOrToken(entityTag,
+                                       tagOrToken.substring(1,
+                                                            tagOrToken.length() - 1)));
+    }
+  }
+
+  /** From Webdav RFC4918 Section 10.4
+   * <pre>
+   *  If = "If" ":" ( 1*No-tag-list | 1*Tagged-list )
+   *
+   *  No-tag-list = List
+   *  Tagged-list = Resource-Tag 1*List
+   *
+   *  List = "(" 1*Condition ")"
+   *  Condition = ["Not"] (State-token | "[" entity-tag "]")
+   *  ; entity-tag: see Section 3.11 of [RFC2616]
+   *  ; No LWS allowed between "[", entity-tag and "]"
+   *
+   *  State-token = Coded-URL
+   *
+   *  Resource-Tag = "<" Simple-ref ">"
+   *  ; Simple-ref: see Section 8.3
+   *  ; No LWS allowed in Resource-Tag
+   * </pre>
+   *
+   * @param req
+   * @return populated IfHeader or null
+   * @throws WebdavException
+   */
+  public static IfHeader testIfHeader(final HttpServletRequest req)
+          throws WebdavException {
+    final String hdrStr = req.getHeader("If");
+
+    if (hdrStr == null) {
+      return null;
+    }
+
+    String h = hdrStr.trim();
+
+    IfHeader ih = new IfHeader();
+
+    if (h.startsWith("<")) {
+      int pos = h.indexOf(">");
+
+      if (pos < 0) {
+        throw new WebdavException("Invalid If header: " + hdrStr);
+      }
+
+      ih.resourceTag = h.substring(1, pos);
+      h = h.substring(pos + 1).trim();
+    }
+
+    if (!h.startsWith("(") || !h.endsWith(")")) {
+      throw new WebdavException("Invalid If header: " + hdrStr);
+    }
+
+    h = h.substring(1, h.length() - 1);
+
+    Holder<Integer> hpos = new Holder<Integer>();
+
+    hpos.value = new Integer(0);
+
+    for (;;) {
+      String ntt = nextTagOrToken(hdrStr, h, hpos);
+
+      if (ntt == null) {
+        break;
+      }
+
+      ih.addTagOrToken(ntt);
+    }
+
+    return ih;
+  }
+
+  private static String nextTagOrToken(final String hdrStr, // Original header
+                                       final String h,      // What we're parsing
+                                       final Holder<Integer> hpos) throws WebdavException {
+    int pos = hpos.value;
+
+    if (pos >= h.length()) {
+      return null; // done
+    }
+
+    String res = null;
+    String endDelim;
+
+    char delim = h.charAt(pos);
+
+    if (delim == '<') {
+      endDelim = ">";
+    } else if (delim == '[') {
+      endDelim = "]";
+    } else {
+      throw new WebdavException("Invalid If header: " + hdrStr);
+    }
+
+    pos = h.indexOf(endDelim, pos);
+
+    if (pos < 0) {
+      throw new WebdavException("Invalid If header: " + hdrStr);
+    }
+
+    res = h.substring(0, pos + 1);
+    pos++;
+
+    while ((pos < h.length()) && Character.isSpaceChar(h.charAt(pos))) {
+      pos++;
+    }
+
+    hpos.value = new Integer(pos);
+
+    return res;
+  }
+
   /** Look for the If-None-Match * header
    *
    * @param req    HttpServletRequest
@@ -133,9 +302,32 @@ public class Headers {
   /** The following is instantiated for If headers
    */
   public static class IfHeaders {
-    /* Only If-Match or If-None-Match are allowed not both
-     */
+    /** True if we had ifNoneMatchAny */
+    public boolean create;
 
+    /** Non null if we got if-match
+     */
+    public String ifEtag;
+
+    /** Non null if we got an if header
+     */
+    public Headers.IfHeader ifHeader;
+  }
+
+  /**
+   * @param req
+   * @return populated Ifheaders object
+   * @throws WebdavException
+   */
+  public static IfHeaders processIfHeaders(final HttpServletRequest req)
+      throws WebdavException {
+    IfHeaders ih = new IfHeaders();
+
+    ih.create = ifNoneMatchAny(req);
+    ih.ifEtag = ifMatch(req);
+    ih.ifHeader = testIfHeader(req);
+
+    return ih;
   }
 }
 

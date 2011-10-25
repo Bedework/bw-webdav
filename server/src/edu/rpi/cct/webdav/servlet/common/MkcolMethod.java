@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,6 +18,7 @@
 */
 package edu.rpi.cct.webdav.servlet.common;
 
+import edu.rpi.cct.webdav.servlet.common.Headers.IfHeaders;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
@@ -50,15 +51,24 @@ public class MkcolMethod extends PropPatchMethod {
       trace("MkcolMethod: doMethod");
     }
 
+    WebdavNsIntf intf = getNsIntf();
+
+    IfHeaders ifHeaders = Headers.processIfHeaders(req);
+    if ((ifHeaders.ifHeader != null) &&
+        !intf.syncTokenMatch(ifHeaders.ifHeader)) {
+      intf.rollback();
+      throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED);
+    }
+
     /* Parse any content */
     Document doc = parseContent(req, resp);
 
     /* Create the node */
     String resourceUri = getResourceUri(req);
 
-    WebdavNsNode node = getNsIntf().getNode(resourceUri,
-                                            WebdavNsIntf.existanceNot,
-                                            WebdavNsIntf.nodeTypeCollection);
+    WebdavNsNode node = intf.getNode(resourceUri,
+                                     WebdavNsIntf.existanceNot,
+                                     WebdavNsIntf.nodeTypeCollection);
 
     node.setDefaults(WebdavTags.mkcol);
 
@@ -67,6 +77,6 @@ public class MkcolMethod extends PropPatchMethod {
     }
 
     // Make collection using properties sent in request
-    getNsIntf().makeCollection(req, resp, node);
+    intf.makeCollection(req, resp, node);
   }
 }

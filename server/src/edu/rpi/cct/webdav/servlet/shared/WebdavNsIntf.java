@@ -20,6 +20,9 @@ package edu.rpi.cct.webdav.servlet.shared;
 
 import edu.rpi.cct.webdav.servlet.common.AccessUtil;
 import edu.rpi.cct.webdav.servlet.common.Headers;
+import edu.rpi.cct.webdav.servlet.common.Headers.IfHeader;
+import edu.rpi.cct.webdav.servlet.common.Headers.IfHeader.TagOrToken;
+import edu.rpi.cct.webdav.servlet.common.Headers.IfHeaders;
 import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
@@ -172,6 +175,47 @@ public abstract class WebdavNsIntf implements Serializable {
     }
 
     return "1, 3, access-control, extended-mkcol";
+  }
+
+  /**
+   * @param ih
+   * @return false for a mismatch
+   * @throws WebdavException for invalid if header
+   */
+  public boolean syncTokenMatch(final IfHeader ih) throws WebdavException {
+    if (ih.resourceTag == null) {
+      throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
+                                "Bad If header - no resource tag");
+    }
+
+    if (ih.tagsAndTokens.size() != 1) {
+      throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
+          "Bad If header - only 1 state-token allowed");
+    }
+
+    TagOrToken tt = ih.tagsAndTokens.get(0);
+
+    if (tt.entityTag) {
+      throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
+          "Bad If header - entity-tag not allowed");
+    }
+
+    String token = getSyncToken(ih.resourceTag);
+
+    if (token == null) {
+      throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
+                                "Bad If header - no token for resource");
+    }
+
+    if (!token.equals(tt.value)) {
+      if (debug) {
+        debugMsg("putContent: sync-token mismatch ifheader=" + tt.value +
+                 "col-token=" + token);
+      }
+      return false;
+    }
+
+    return true;
   }
 
   /** Emit some failed precondition tag
@@ -575,21 +619,19 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param req
    * @param resp
    * @param fromPost          POST style - create
-   * @param create            true if this is a probably creation
-   * @param ifEtag            if non-null etag must match
+   * @param ifHeaders         info from headers
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
   public PutContentResult putContent(final HttpServletRequest req,
                                      final HttpServletResponse resp,
                                      final boolean fromPost,
-                                     final boolean create,
-                                     final String ifEtag) throws WebdavException {
+                                     final IfHeaders ifHeaders) throws WebdavException {
     try {
       /* We get a node to represent the entity we are creating or updating. */
       int existance;
 
-      if (create) {
+      if (ifHeaders.create) {
         existance = existanceNot;
       } else if (!fromPost) {
         existance = existanceMay;
@@ -625,8 +667,7 @@ public abstract class WebdavNsIntf implements Serializable {
         pcr = putBinaryContent(req, node,
                                contentTypePars,
                                req.getInputStream(),
-                               create,
-                               ifEtag);
+                               ifHeaders);
       } else {
         Reader rdr = getReader(req);
 
@@ -639,8 +680,7 @@ public abstract class WebdavNsIntf implements Serializable {
         pcr = putContent(req, resp, node,
                          contentTypePars,
                          rdr,
-                         create,
-                         ifEtag);
+                         ifHeaders);
       }
 
       if (pcr.created) {
@@ -682,8 +722,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param node              node in question.
    * @param contentTypePars   null or values from content-type header
    * @param contentRdr        Reader for content
-   * @param create            true if this is a probably creation
-   * @param ifEtag            if non-null etag must match
+   * @param ifHeaders         info from headers
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
@@ -692,8 +731,7 @@ public abstract class WebdavNsIntf implements Serializable {
                                               WebdavNsNode node,
                                               String[] contentTypePars,
                                               Reader contentRdr,
-                                              boolean create,
-                                              String ifEtag)
+                                              IfHeaders ifHeaders)
       throws WebdavException;
 
   /** Set the content from a Stream
@@ -702,8 +740,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @param node              node in question.
    * @param contentTypePars   null or values from content-type header
    * @param contentStream     Stream for content
-   * @param create            true if this is a probably creation
-   * @param ifEtag            if non-null etag must match
+   * @param ifHeaders         info from headers
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
@@ -711,8 +748,7 @@ public abstract class WebdavNsIntf implements Serializable {
                                                     WebdavNsNode node,
                                                     String[] contentTypePars,
                                                     InputStream contentStream,
-                                                    boolean create,
-                                                    String ifEtag)
+                                                    IfHeaders ifHeaders)
       throws WebdavException;
 
   /** Create a new node.
@@ -797,6 +833,13 @@ public abstract class WebdavNsIntf implements Serializable {
                                                String token,
                                                int limit,
                                                boolean recurse) throws WebdavException;
+
+  /** Used to match tokens in If header
+   * @param path
+   * @return sync token or null
+   * @throws WebdavException
+   */
+  public abstract String getSyncToken(String path) throws WebdavException;
 
   /* ====================================================================
    *                  Access methods
