@@ -880,13 +880,13 @@ public abstract class WebdavNsNode implements Serializable {
    *
    * @param xml - if this is embedded in an xml stream
    * @param wtr - if standalone output or no xml stream initialized.
-   * @return boolean true if content written OK
    * @param contentType desired content type or null for default.
+   * @return actual contentType
    * @throws WebdavException
    */
-  public abstract boolean writeContent(XmlEmit xml,
-                                       Writer wtr,
-                                       String contentType) throws WebdavException;
+  public abstract String writeContent(XmlEmit xml,
+                                      Writer wtr,
+                                      String contentType) throws WebdavException;
 
   /**
    * @return boolean true if this is binary content
