@@ -11,8 +11,6 @@
   <property environment="env"/>
   <dirname property="project.home" file="${ant.file}"/>
 
-  <property file="${project.home}/build.properties" />
-
   <property name="bedework.home"
             location="${project.home}/../bedework" />
 
@@ -22,7 +20,7 @@
 
   <deftasks/>
 
-  <projectDefs name="${org.bedework.package.name}"
+  <projectDefs name="Webdav abstract server classes"
                version="${org.bedework.webdav.version}" 
                subproject="true" />
 
@@ -36,12 +34,12 @@
     <property name="org.bedework.webdavserver.base" location="${project.home}/server" />
 
     <property name="webdavserver.jar"
-              location="${dist.home}/${org.bedework.webdavserver.jar}-${project.version}.jar" />
+              location="${dist.home}/bw-webdavserver-${project.version}.jar" />
   </target>
   
   <target name="build-init" depends="init">
     <getJar name="log4j" version="1.2.8" />
-    <getJar name="servletapi" version="2.4" />
+    <getJar name="servlet-api" version="2.4" />
 
     <getJar name="bw-davio" version="${org.bedework.davutil.version}" 
             project="davutil" 
