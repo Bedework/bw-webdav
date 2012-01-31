@@ -66,6 +66,8 @@ public class ReportMethod extends MethodBase {
 
   private String syncToken;
 
+  private int syncLevel;
+
   private int syncLimit; // -1 for no limit
 
   private boolean syncRecurse;
@@ -170,11 +172,7 @@ public class ReportMethod extends MethodBase {
       Element root = doc.getDocumentElement();
 
       if (reportType == reportTypeSync) {
-        if ((depth != Headers.depthInfinity) && (depth != 1)) {
-          throw new WebdavBadRequest("Bad depth");
-        }
-
-        parseSyncReport(root, depth == Headers.depthInfinity, intf);
+        parseSyncReport(root, depth, intf);
 
         return;
       }
@@ -261,29 +259,50 @@ public class ReportMethod extends MethodBase {
   }
 
   private void parseSyncReport(final Element root,
-                               final boolean recurse,
+                               final int depth,
                                final WebdavNsIntf intf) throws WebdavException {
     try {
       Element[] children = getChildrenArray(root);
 
-      if ((children.length < 2) || (children.length > 3)) {
-        throw new WebdavBadRequest("Expect 2 or 3 child elements");
+      if ((children.length < 2) || (children.length > 4)) {
+        throw new WebdavBadRequest("Expect 2 - 4 child elements");
       }
 
       if (!XmlUtil.nodeMatches(children[0], WebdavTags.syncToken)) {
         throw new WebdavBadRequest("Expect " + WebdavTags.syncToken);
       }
 
-      syncRecurse = recurse;
-
       syncToken = XmlUtil.getOneNodeVal(children[0]);
 
       int childI = 1;
       syncLimit = -1;
 
-      if (XmlUtil.nodeMatches(children[1], WebdavTags.limit)) {
+      if (XmlUtil.nodeMatches(children[1], WebdavTags.synclevel)) {
+        String lvl = XmlUtil.getElementContent(children[1]);
+
+        if (lvl != "1") {
+          syncLevel = 1;
+        } else if (lvl.equals("infinity")) {
+          syncLevel = Headers.depthInfinity;
+        } else {
+          throw new WebdavBadRequest("Bad sync-level " + lvl);
+        }
+
         childI++;
-        syncLimit = Integer.valueOf(XmlUtil.getElementContent(children[1]));
+      } else {
+        // Cope with back-level clients
+        if ((depth != Headers.depthInfinity) && (depth != 1)) {
+          throw new WebdavBadRequest("Bad depth");
+        }
+
+        syncLevel = depth;
+      }
+
+      syncRecurse = syncLevel == Headers.depthInfinity;
+
+      if (XmlUtil.nodeMatches(children[childI], WebdavTags.limit)) {
+        syncLimit = Integer.valueOf(XmlUtil.getElementContent(children[childI]));
+        childI++;
       }
 
       if (!XmlUtil.nodeMatches(children[childI], WebdavTags.prop)) {
