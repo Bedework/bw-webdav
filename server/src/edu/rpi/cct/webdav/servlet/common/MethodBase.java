@@ -58,6 +58,8 @@ public abstract class MethodBase {
 
   protected transient Logger log;
 
+  protected boolean hasBriefHeader;
+
 //  private ServletConfig config;
 
   /** namespace interface for this request
@@ -245,6 +247,8 @@ public abstract class MethodBase {
                                   final HttpServletResponse resp)
       throws WebdavException{
     try {
+      hasBriefHeader = Headers.brief(req);
+
       return parseContent(req.getContentLength(), getNsIntf().getReader(req));
     } catch (WebdavException we) {
       throw we;
@@ -332,7 +336,7 @@ public abstract class MethodBase {
     }
 
 
-    if (!unknowns.isEmpty()) {
+    if (!hasBriefHeader && !unknowns.isEmpty()) {
       openTag(WebdavTags.propstat);
       openTag(WebdavTags.prop);
 

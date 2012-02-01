@@ -78,6 +78,16 @@ public class Headers {
     throw new WebdavBadRequest();
   }
 
+  /**
+   * @param req
+   * @return true if we have a (MS) "brief" header
+   */
+  public static boolean brief(final HttpServletRequest req) {
+    String b = req.getHeader("Depth");
+
+    return (b != null) && b.equalsIgnoreCase("T");
+  }
+
   /** Create a location header
    *
    * @param resp
