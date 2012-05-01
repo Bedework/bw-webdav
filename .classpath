@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="server/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/access"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/davutil"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/rpiutil"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="bin/eclipse-build"/>
 </classpath>

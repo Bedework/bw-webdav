@@ -38,6 +38,7 @@
   </target>
   
   <target name="build-init" depends="init">
+    <!--
     <getJar name="log4j" version="1.2.8" />
     <getJar name="servlet-api" version="2.4" />
 
@@ -52,6 +53,8 @@
     <getJar name="rpiutil" version="${org.bedework.rpiutil.version}" 
             project="rpiutil"
             projecthome="${project.home}/../rpiutil" />
+    -->
+    <resolveDependencies pomFile="pom.xml" />
   </target>
 
   <!-- ===================== build-source Target ===============================
@@ -61,5 +64,7 @@
   <target name="build-source" depends="build-init">
     <build-jar module-base="${org.bedework.webdavserver.base}" 
                jar-file="${webdavserver.jar}" />
+    
+    <installJar dir="${project.home}" name="${webdavserver.jar}"/>
   </target>
 </project>
