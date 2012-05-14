@@ -74,13 +74,14 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    */
   public abstract boolean isAlias() throws WebdavException;
 
-  /** If isAlias() and this is null system may have to resolve the alias in some
-   * way.
+  /** If isAlias() resolves the alias. Otherwise just returns the parameter.
    *
    * @return WdEntity or null.
+   * @param resolveSubAlias - if true and the alias points to an alias, resolve
+   *                  down to a non-alias.
    * @throws WebdavException
    */
-  public abstract WdEntity getAliasTarget() throws WebdavException;
+  public abstract WdEntity resolveAlias(final boolean resolveSubAlias) throws WebdavException;
 
   /* ====================================================================
    *                      Bean methods
@@ -311,6 +312,7 @@ public abstract class WdEntity implements Comparable<WdEntity> {
     }
   }
 
+  @Override
   public int compareTo(final WdEntity that)  {
     try {
       if (this == that) {
