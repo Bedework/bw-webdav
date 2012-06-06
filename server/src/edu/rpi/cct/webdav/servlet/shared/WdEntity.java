@@ -24,6 +24,8 @@ import edu.rpi.sss.util.Util;
 
 import java.util.Date;
 
+import javax.xml.namespace.QName;
+
 /** Class to represent an entity in WebDAV
  *
  * @author douglm
@@ -82,6 +84,21 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * @throws WebdavException
    */
   public abstract WdEntity resolveAlias(final boolean resolveSubAlias) throws WebdavException;
+
+  /** set/replace properties with the given name and value
+   *
+   * @param name
+   * @param val
+   * @throws WebdavException
+   */
+  public abstract void setProperty(QName name, String val) throws WebdavException;
+
+  /**
+   * @param name
+   * @return null if not set otherwise value of first property found with name
+   * @throws WebdavException
+   */
+  public abstract String getProperty(QName name) throws WebdavException;
 
   /* ====================================================================
    *                      Bean methods
