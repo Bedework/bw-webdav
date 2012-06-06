@@ -26,6 +26,7 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavProperty;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
 import edu.rpi.sss.util.xml.XmlEmit;
 import edu.rpi.sss.util.xml.XmlEmit.NameSpace;
+import edu.rpi.sss.util.xml.XmlEmit.Notifier;
 import edu.rpi.sss.util.xml.XmlUtil;
 import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.ws.Holder;
 
 /** Base class for all webdav servlet methods.
  */
@@ -299,6 +301,33 @@ public abstract class MethodBase {
     }
   }
 
+  private class XmlNotifier extends Notifier {
+    private boolean enabled;
+
+    private Holder<Boolean> openFlag;
+
+    XmlNotifier(final Holder<Boolean> openFlag) {
+      this.openFlag = openFlag;
+      enabled = true;
+    }
+
+    @Override
+    public void doNotification() throws Throwable {
+      enabled = false;
+
+      if (!openFlag.value) {
+        openFlag.value = true;
+        openTag(WebdavTags.propstat);
+        openTag(WebdavTags.prop);
+      }
+    }
+
+    @Override
+    public boolean isEnabled() {
+      return enabled;
+    }
+  }
+
   /** Build the response for a single node for a propfind request
    *
    * @param node
@@ -309,49 +338,58 @@ public abstract class MethodBase {
                          final Collection<WebdavProperty> props) throws WebdavException {
     WebdavNsIntf intf = getNsIntf();
     Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
-    boolean open = false;
 
-    for (WebdavProperty pr: props) {
-      if (!intf.knownProperty(node, pr)) {
-        unknowns.add(pr);
-      } else  {
-        if (!open) {
-          openTag(WebdavTags.propstat);
-          openTag(WebdavTags.prop);
-          open = true;
-        }
+    Holder<Boolean> openFlag = new Holder<Boolean>(Boolean.FALSE);
+    XmlNotifier notifier = new XmlNotifier(openFlag);
+    try {
+      xml.setNotifier(notifier);
 
-        addNs(pr.getTag().getNamespaceURI());
-        if (!intf.generatePropValue(node, pr, false)) {
+      for (WebdavProperty pr: props) {
+        if (!intf.knownProperty(node, pr)) {
           unknowns.add(pr);
-        }
-      }
-    }
+        } else  {
+          /*
+          if (!open) {
+            openTag(WebdavTags.propstat);
+            openTag(WebdavTags.prop);
+            open = true;
+          }*/
 
-    if (open) {
-      closeTag(WebdavTags.prop);
-      addStatus(node.getStatus(), null);
-
-      closeTag(WebdavTags.propstat);
-    }
-
-
-    if (!hasBriefHeader && !unknowns.isEmpty()) {
-      openTag(WebdavTags.propstat);
-      openTag(WebdavTags.prop);
-
-      for (WebdavProperty prop: unknowns) {
-        try {
-          xml.emptyTag(prop.getTag());
-        } catch (Throwable t) {
-          throw new WebdavException(t);
+          addNs(pr.getTag().getNamespaceURI());
+          if (!intf.generatePropValue(node, pr, false)) {
+            unknowns.add(pr);
+          }
         }
       }
 
-      closeTag(WebdavTags.prop);
-      addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+      if (openFlag.value) {
+        closeTag(WebdavTags.prop);
+        addStatus(node.getStatus(), null);
 
-      closeTag(WebdavTags.propstat);
+        closeTag(WebdavTags.propstat);
+      }
+
+      xml.setNotifier(null);
+
+      if (!hasBriefHeader && !unknowns.isEmpty()) {
+        openTag(WebdavTags.propstat);
+        openTag(WebdavTags.prop);
+
+        for (WebdavProperty prop: unknowns) {
+          try {
+            xml.emptyTag(prop.getTag());
+          } catch (Throwable t) {
+            throw new WebdavException(t);
+          }
+        }
+
+        closeTag(WebdavTags.prop);
+        addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+
+        closeTag(WebdavTags.propstat);
+      }
+    } finally {
+      xml.setNotifier(null);
     }
   }
 
