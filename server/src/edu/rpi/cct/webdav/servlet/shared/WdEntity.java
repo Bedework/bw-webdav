@@ -71,6 +71,18 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    * ==================================================================== */
 
   /**
+   * @return true if this can be shared.
+   * @throws WebdavException
+   */
+  public abstract boolean getCanShare() throws WebdavException;
+
+  /**
+   * @return true if this can be published.
+   * @throws WebdavException
+   */
+  public abstract boolean getCanPublish() throws WebdavException;
+
+  /**
    * @return true if this is an alias for another entity.
    * @throws WebdavException
    */
