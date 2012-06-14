@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,8 +22,9 @@ package edu.rpi.cct.webdav.servlet.shared;
  *
  * @author douglm
  *
+ * @param <T>
  */
-public abstract class WdCollection extends WdEntity {
+public abstract class WdCollection <T> extends WdEntity<T> {
   /** Constructor
    *
    * @throws WebdavException
@@ -32,6 +33,7 @@ public abstract class WdCollection extends WdEntity {
     super();
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("WdCollection{");
 

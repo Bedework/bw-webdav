@@ -30,8 +30,9 @@ import javax.xml.namespace.QName;
  *
  * @author douglm
  *
+ * @param <T>
  */
-public abstract class WdEntity implements Comparable<WdEntity> {
+public abstract class WdEntity <T> implements Comparable<WdEntity> {
   /** The internal name of the entity
    */
   private String name;
@@ -88,14 +89,20 @@ public abstract class WdEntity implements Comparable<WdEntity> {
    */
   public abstract boolean isAlias() throws WebdavException;
 
-  /** If isAlias() resolves the alias. Otherwise just returns the parameter.
+  /**
+   * @return null if this is not an alias otherwise the uri of the target
+   * @throws WebdavException
+   */
+  public abstract String getAliasUri() throws WebdavException;
+
+  /** If isAlias() then resolves the alias. Otherwise just returns the parameter.
    *
    * @return WdEntity or null.
    * @param resolveSubAlias - if true and the alias points to an alias, resolve
    *                  down to a non-alias.
    * @throws WebdavException
    */
-  public abstract WdEntity resolveAlias(final boolean resolveSubAlias) throws WebdavException;
+  public abstract T resolveAlias(final boolean resolveSubAlias) throws WebdavException;
 
   /** set/replace properties with the given name and value
    *
