@@ -404,12 +404,15 @@ public abstract class WebdavNsNode implements Serializable {
   public boolean setProperty(final Element val,
                              final SetPropertyResult spr) throws WebdavException {
     try {
-      if (XmlUtil.nodeMatches(val, WebdavTags.getetag)) {
+      QName tag = new QName(val.getNamespaceURI(),
+                            val.getLocalName());
+
+      if (tag.equals(WebdavTags.getetag)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
         return true;
       }
 
-      if (XmlUtil.nodeMatches(val, WebdavTags.getlastmodified)) {
+      if (tag.equals(WebdavTags.getlastmodified)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
         return true;
       }
