@@ -80,12 +80,31 @@ public class Headers {
 
   /**
    * @param req
-   * @return true if we have a (MS) "brief" header
+   * @return true if we have a (MS) "brief" header or the Prefer header
+   *              with "return-minimal"
    */
   public static boolean brief(final HttpServletRequest req) {
-    String b = req.getHeader("Depth");
+    String b = req.getHeader("Brief");
 
-    return (b != null) && b.equalsIgnoreCase("T");
+    if (b != null) {
+      return b.equalsIgnoreCase("T");
+    }
+
+    b = req.getHeader("Prefer");
+
+    if (b == null) {
+      return false;
+    }
+
+    String[] bels = b.split(",");
+
+    for (String bel: bels) {
+      if ("return-minimal".equalsIgnoreCase(bel.trim())) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /** Create a location header
