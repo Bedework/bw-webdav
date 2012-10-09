@@ -486,12 +486,18 @@ public class ReportMethod extends MethodBase {
         for (WdSynchReportItem wsri: wsr.items) {
           openTag(WebdavTags.response);
 
-          pm.doNodeProperties(wsri.node, propReq);
+          if (wsri.getCanSync()) {
+            pm.doNodeProperties(wsri.getNode(), propReq);
 
-          /* No status for changed element - 404 for deleted */
+            /* No status for changed element - 404 for deleted */
 
-          if (wsri.node.getDeleted()) {
-            addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+            if (wsri.getNode().getDeleted()) {
+              addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+            }
+          } else {
+            wsri.getNode().generateHref(xml);
+            addStatus(HttpServletResponse.SC_FORBIDDEN, null);
+            propertyTagVal(WebdavTags.error, WebdavTags.syncTraversalSupported);
           }
 
           closeTag(WebdavTags.response);

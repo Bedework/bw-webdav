@@ -33,19 +33,43 @@ public class WdSynchReport {
   public static class WdSynchReportItem implements Comparable<WdSynchReportItem> {
     /**
      */
-    public String lastmod;
+    private String token;
 
     /** The changed node
      */
-    public WebdavNsNode node;
+    private WebdavNsNode node;
+
+    /** true if we can provide sync info for this - usually false for aliases */
+    private boolean canSync;
 
     /**
      * @param node
+     * @param token
+     * @param canSync
      * @throws WebdavException
      */
-    public WdSynchReportItem(final WebdavNsNode node) throws WebdavException {
+    public WdSynchReportItem(final WebdavNsNode node,
+                             final String token,
+                             final boolean canSync) throws WebdavException {
       this.node = node;
-      lastmod = node.getLastmodDate();
+      this.token = token;
+      this.canSync = canSync;
+    }
+
+    /** The node
+     *
+     * @return node
+     */
+    public WebdavNsNode getNode() {
+      return node;
+    }
+
+    /** False if we can't do a direct sync report.
+     *
+     * @return boolean
+     */
+    public boolean getCanSync() {
+      return canSync;
     }
 
     /* (non-Javadoc)
@@ -53,12 +77,12 @@ public class WdSynchReport {
      */
     @Override
     public int compareTo(final WdSynchReportItem that) {
-      return lastmod.compareTo(that.lastmod);
+      return token.compareTo(that.token);
     }
 
     @Override
     public int hashCode() {
-      return lastmod.hashCode();
+      return token.hashCode();
     }
 
     @Override
