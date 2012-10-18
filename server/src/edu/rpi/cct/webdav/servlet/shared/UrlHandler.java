@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 *
 * @author douglm
 */
-public class UrlHandler {
+public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
   private String urlPrefix;
 
   private boolean relative;
@@ -76,17 +76,7 @@ public class UrlHandler {
     }
   }
 
-  /** Return an appropriately prefixed url. The parameter url will be
-   * absolute or relative. If relative it may be prefixed with the context
-   * path which we need to remove.
-   *
-   * <p>We're doing this because some clients don't handle absolute urls
-   * (a violation of the spec)
-   *
-   * @param val
-   * @return String
-   * @throws WebdavException
-   */
+  @Override
   public String prefix(final String val) throws WebdavException {
     try {
       if (val.toLowerCase().startsWith("mailto:")) {
@@ -113,12 +103,7 @@ public class UrlHandler {
     }
   }
 
-  /** Remove any vestige of the host, port or context
-   *
-   * @param val
-   * @return String
-   * @throws WebdavException
-   */
+  @Override
   public String unprefix(String val) throws WebdavException {
     if (val.startsWith(getUrlPrefix())) {
       val = val.substring(getUrlPrefix().length());
