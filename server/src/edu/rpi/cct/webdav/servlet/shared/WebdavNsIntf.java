@@ -650,7 +650,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (!node.getAllowsGet() || !canPut(node)) {
         // If we can't GET - we can't PUT
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         return null;
       }
 
