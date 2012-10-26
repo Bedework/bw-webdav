@@ -19,10 +19,7 @@
 package edu.rpi.cct.webdav.servlet.shared;
 
 import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.sss.util.DateTimeUtil;
 import edu.rpi.sss.util.Util;
-
-import java.util.Date;
 
 import javax.xml.namespace.QName;
 
@@ -62,9 +59,9 @@ public abstract class WdEntity <T> implements Comparable<WdEntity> {
   public WdEntity() throws WebdavException {
     super();
 
-    Date dt = new Date();
-    setLastmod(DateTimeUtil.isoDateTimeUTC(dt));
-    setCreated(DateTimeUtil.isoDateTimeUTC(dt));
+//    Date dt = new Date();
+//    setLastmod(DateTimeUtil.isoDateTimeUTC(dt));
+//    setCreated(DateTimeUtil.isoDateTimeUTC(dt));
   }
 
   /* ====================================================================
