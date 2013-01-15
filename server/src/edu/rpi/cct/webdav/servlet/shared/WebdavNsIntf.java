@@ -380,6 +380,45 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
+  /** Turn val into something which can be used as a name for an entity. This
+   * involves removing path delimiters such as "/".
+   *
+   * @param val
+   * @return modified name
+   */
+  public String makeName(final String val) {
+    if ((val == null) || (val.length() == 0)) {
+      return "";
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < val.length(); i++) {
+      char ch = val.charAt(i);
+
+      switch (ch) {
+      case '"':
+      case '/':
+      case '\\':
+        sb.append('-');
+        break;
+
+      case ' ':
+        sb.append("-");
+        break;
+
+      default:
+        if (Character.isISOControl(ch)) {
+          sb.append("-");
+        } else {
+          sb.append(ch);
+        }
+      }
+    }
+
+    return sb.toString();
+  }
+
   /**
    * @return WebdavServlet
    */
