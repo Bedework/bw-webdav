@@ -406,14 +406,19 @@ public abstract class WebdavServlet extends HttpServlet
 
       while (names.hasMoreElements()) {
         String key = (String)names.nextElement();
-        String val = req.getHeader(key);
-        if (key.toLowerCase().equals("authorization") &&
-            (val != null) &&
-            (val.toLowerCase().startsWith("basic"))) {
-          val = "Basic **********";
-        }
+        Enumeration vals = req.getHeaders(key);
 
-        log.debug("  " + key + " = \"" + val + "\"");
+        while (vals.hasMoreElements()) {
+          String val = (String)vals.nextElement();
+
+          if (key.toLowerCase().equals("authorization") &&
+              (val != null) &&
+              (val.toLowerCase().startsWith("basic"))) {
+            val = "Basic **********";
+          }
+
+          log.debug("  " + key + " = \"" + val + "\"");
+        }
       }
 
       names = req.getParameterNames();
