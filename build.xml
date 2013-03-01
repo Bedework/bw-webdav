@@ -36,26 +36,6 @@
     <property name="webdavserver.jar"
               location="${dist.home}/bw-webdavserver-${project.version}.jar" />
   </target>
-  
-  <target name="build-init" depends="init">
-    <!--
-    <getJar name="log4j" version="1.2.8" />
-    <getJar name="servlet-api" version="2.4" />
-
-    <getJar name="bw-davio" version="${org.bedework.davutil.version}" 
-            project="davutil" 
-            projecthome="${project.home}/../davutil" />
-
-    <getJar name="rpiaccess" version="${org.bedework.access.version}" 
-            project="access"
-            projecthome="${project.home}/../access" />
-    
-    <getJar name="rpiutil" version="${org.bedework.rpiutil.version}" 
-            project="rpiutil"
-            projecthome="${project.home}/../rpiutil" />
-    -->
-    <resolveDependencies pomFile="pom.xml" />
-  </target>
 
   <!-- ===================== build-source Target ===============================
      This target builds jar files ready for the deploy target.
