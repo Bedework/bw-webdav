@@ -1,56 +1,104 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.bedework</groupId>
+	<artifactId>bw-webdav</artifactId>
+	<version>4.0.0-SNAPSHOT</version>
+	<name>bw-webdav</name>
 
-<!--
-    Licensed to Jasig under one or more contributor license
-    agreements. See the NOTICE file distributed with this work
-    for additional information regarding copyright ownership.
-    Jasig licenses this file to you under the Apache License,
-    Version 2.0 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a
-    copy of the License at:
-        
-    http://www.apache.org/licenses/LICENSE-2.0
-        
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on
-    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied. See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Maven Plugin Versions -->
+		<maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
+		<maven.source.plugin.version>2.1.2</maven.source.plugin.version>
+		<!-- Bedework Versions -->
+		<bw-util.version>4.0.0-SNAPSHOT</bw-util.version>
+		<bw-access.version>4.0.0-SNAPSHOT</bw-access.version>
+		<!-- Third Party Library Versions -->
+		<commons-codec.version>1.5</commons-codec.version>
+		<apache-http.version>4.2.2</apache-http.version>
+		<hibernate.version>3.6.9.Final</hibernate.version>
+		<derby.version>10.8.2.2</derby.version>
+		<h2.version>1.2.130</h2.version>
+		<servlet-api.version>2.5</servlet-api.version>
+		<jtidy.version>4aug2000r7-dev</jtidy.version>
+		<struts.version>1.3.10</struts.version>
+		<lucene.version>2.0.0</lucene.version>
+		<junit.version>4.8.2</junit.version>
+		<ical4j.version>head-20100601</ical4j.version>
+		<log4j.version>1.2.15</log4j.version>
+	</properties>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<dependencies>
+		<!-- Bedework Dependencies -->
+		<dependency>
+			<groupId>org.bedework</groupId>
+			<artifactId>bw-util</artifactId>
+			<version>${bw-util.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bedework</groupId>
+			<artifactId>bw-access</artifactId>
+			<version>${bw-access.version}</version>
+		</dependency>
+		<!-- Third Party Dependencies -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jmxtools</artifactId>
+					<groupId>com.sun.jdmk</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jmxri</artifactId>
+					<groupId>com.sun.jmx</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jms</artifactId>
+					<groupId>javax.jms</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
-  <parent>
-    <groupId>org.bedework</groupId>
-    <artifactId>bedework</artifactId>
-    <version>3.9</version>
-    <relativePath>../bedework</relativePath>
-  </parent>
-
-  <groupId>org.bedework</groupId>
-  <artifactId>bw-webdavserver</artifactId>
-  <version>${bedeworkWebdavVersion}</version>
-
-  <name>Webdav abstract server classes</name>
-  <description>Webdav abstract server classes</description>
-  <url>http://bedework.org/</url>
-
-    <dependencies>
-      <dependency>
-        <groupId>org.bedework</groupId>
-        <artifactId>rpiaccess</artifactId>
-        <version>${bedeworkAccessVersion}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.bedework</groupId>
-        <artifactId>rpiutil</artifactId>
-        <version>${bedeworkRpiutilVersion}</version>
-      </dependency>
-    </dependencies>
+	<build>
+		<plugins>
+			<!-- Specify the compiler options and settings -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<showDeprecation>false</showDeprecation>
+					<showWarnings>false</showWarnings>
+				</configuration>
+			</plugin>
+			<!-- Produce source jars during the 'verify' phase -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven.source.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
