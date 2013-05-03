@@ -618,12 +618,14 @@ public abstract class WebdavNsIntf implements Serializable {
    *
    * @param req
    * @param resp
+   * @param contentType      if non-null specifies the content we want
    * @param node             node in question
    * @return content.
    * @throws WebdavException
    */
   public abstract Content getContent(HttpServletRequest req,
                                      HttpServletResponse resp,
+                                     String contentType,
                                      WebdavNsNode node)
       throws WebdavException;
 
@@ -697,6 +699,8 @@ public abstract class WebdavNsIntf implements Serializable {
 
       String[] contentTypePars = null;
       String contentType = req.getContentType();
+      boolean returnRep = Headers.returnRepresentation(req);
+      Content c = null;
 
       if (contentType != null) {
         contentTypePars = contentType.split(";");
@@ -727,6 +731,7 @@ public abstract class WebdavNsIntf implements Serializable {
       } else {
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
       }
+
       resp.setContentLength(0);
 
       if (pcr.emitEtag) {

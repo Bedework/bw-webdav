@@ -20,8 +20,8 @@ package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
-import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf.Content;
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -92,7 +92,7 @@ public class GetMethod extends MethodBase {
         c = intf.getBinaryContent(node);
         // XXX check accept header
       } else {
-        c = intf.getContent(req, resp, node);
+        c = intf.getContent(req, resp, null, node);
       }
 
       if (c == null) {

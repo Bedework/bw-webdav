@@ -81,7 +81,7 @@ public class Headers {
   /**
    * @param req
    * @return true if we have a (MS) "brief" header or the Prefer header
-   *              with "return-minimal"
+   *              with "return-minimal" or "return=minimal"
    */
   public static boolean brief(final HttpServletRequest req) {
     String b = req.getHeader("Brief");
@@ -99,12 +99,72 @@ public class Headers {
     String[] bels = b.split(",");
 
     for (String bel: bels) {
-      if ("return-minimal".equalsIgnoreCase(bel.trim())) {
+      String tr = bel.trim();
+
+      // Previous form in draft
+      if ("return-minimal".equalsIgnoreCase(tr)) {
+        return true;
+      }
+
+      if (preferKeyEquals(tr, "return", "minimal")) {
         return true;
       }
     }
 
     return false;
+  }
+
+  /**
+   * @param req
+   * @return true if we have a Prefer header
+   *              with "return-representation" or "return=representation"
+   */
+  public static boolean returnRepresentation(final HttpServletRequest req) {
+    String b = req.getHeader("Prefer");
+
+    if (b == null) {
+      return false;
+    }
+
+    String[] bels = b.split(",");
+
+    for (String bel: bels) {
+      String tr = bel.trim();
+
+      // Previous form in draft
+      if ("return-representation".equalsIgnoreCase(tr)) {
+        return true;
+      }
+
+      if (preferKeyEquals(tr, "return", "representation")) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private static boolean preferKeyEquals(final String unparsed,
+                                         final String key,
+                                         final String val) {
+    if (unparsed.indexOf("=") < 0) {
+      return false;
+    }
+
+    String[] sp = unparsed.split("=");
+    if ((sp.length != 2) || (sp[0] == null) || (sp[1] == null)) {
+      return false;
+    }
+
+    if (!key.equalsIgnoreCase(sp[0].trim())) {
+      return false;
+    }
+
+    if (!val.equals(sp[1].trim())) {
+      return false;
+    }
+
+    return true;
   }
 
   /** Create a location header
