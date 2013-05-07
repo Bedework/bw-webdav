@@ -40,9 +40,11 @@ import org.w3c.dom.Node;
 import java.io.FilterReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -647,7 +649,7 @@ public abstract class WebdavNsIntf implements Serializable {
     /** True if created */
     public boolean created;
 
-    /** True if wecan emit Etag. This implies a subsequent GET will return
+    /** True if we can emit Etag. This implies a subsequent GET will return
      * an EXACT byte-for-byte representation of the entity we just PUT.
      *
      * <p>If that is not the case this MUST be left FALSE
@@ -726,13 +728,7 @@ public abstract class WebdavNsIntf implements Serializable {
                          ifHeaders);
       }
 
-      if (pcr.created) {
-        resp.setStatus(HttpServletResponse.SC_CREATED);
-      } else {
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-      }
-
-      resp.setContentLength(0);
+      /* Headers have to go out before content */
 
       if (pcr.emitEtag) {
         resp.setHeader("ETag", node.getEtagValue(true));
@@ -740,6 +736,69 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (fromPost && pcr.created) {
         resp.setHeader("Location", getLocation(pcr.node));
+      }
+
+      if (!node.getContentBinary() &&
+          returnRep) {
+        // Try to get the content
+        resp.setContentType(req.getContentType());
+
+        if (!pcr.emitEtag) {
+          /* Do it now */
+          resp.setHeader("ETag", node.getEtagValue(true));
+        }
+
+        String ctype = null;
+        if ((contentTypePars != null) && (contentTypePars.length > 0)) {
+          ctype = contentTypePars[0];
+        }
+
+        c = getContent(req, resp, ctype, node);
+      }
+
+      if (c == null) {
+        if (pcr.created) {
+          resp.setStatus(HttpServletResponse.SC_CREATED);
+        } else {
+          resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        }
+
+        resp.setContentLength(0);
+      } else {
+        if (pcr.created) {
+          resp.setStatus(HttpServletResponse.SC_CREATED);
+        } else {
+          resp.setStatus(HttpServletResponse.SC_OK);
+        }
+
+        if (c.contentType != null) {
+          resp.setContentType(c.contentType);
+        }
+
+        if (node.getLastmodDate() != null) {
+          resp.addHeader("Last-Modified", node.getLastmodDate().toString());
+        }
+
+
+        if (!c.written) {
+          if ((c.stream == null) && (c.rdr == null)) {
+            if (debug) {
+              debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
+            }
+
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+          } else {
+            if (debug) {
+              debugMsg("send content - length=" + c.contentLength);
+            }
+
+            if (c.stream != null) {
+              streamContent(c.stream, resp.getOutputStream());
+            } else {
+              writeContent(c.rdr, resp.getWriter());
+            }
+          }
+        }
       }
 
       return pcr;
@@ -756,6 +815,74 @@ public abstract class WebdavNsIntf implements Serializable {
         error(t);
       }
       throw new WebdavException(t);
+    }
+  }
+
+  /** size of buffer used for copying content to response.
+   */
+  private static final int bufferSize = 4096;
+
+  /**
+   * @param in
+   * @param out
+   * @throws WebdavException
+   */
+  public void writeContent(final Reader in,
+                           final Writer out) throws WebdavException {
+    try {
+      char[] buff = new char[bufferSize];
+      int len;
+
+      while (true) {
+        len = in.read(buff);
+
+        if (len < 0) {
+          break;
+        }
+
+        out.write(buff, 0, len);
+      }
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    } finally {
+      try {
+        in.close();
+      } catch (Throwable t) {}
+      try {
+        out.close();
+      } catch (Throwable t) {}
+    }
+  }
+
+  /**
+   * @param in
+   * @param out
+   * @throws WebdavException
+   */
+  public void streamContent(final InputStream in,
+                            final OutputStream out) throws WebdavException {
+    try {
+      byte[] buff = new byte[bufferSize];
+      int len;
+
+      while (true) {
+        len = in.read(buff);
+
+        if (len < 0) {
+          break;
+        }
+
+        out.write(buff, 0, len);
+      }
+    } catch (Throwable t) {
+      throw new WebdavException(t);
+    } finally {
+      try {
+        in.close();
+      } catch (Throwable t) {}
+      try {
+        out.close();
+      } catch (Throwable t) {}
     }
   }
 
