@@ -144,7 +144,7 @@ public abstract class WebdavNsNode implements Serializable {
 
     /* Supported reports */
 
-    supportedReports.add(WebdavTags.expandProperty);          // Version
+//    supportedReports.add(WebdavTags.expandProperty);          // Version
     supportedReports.add(WebdavTags.aclPrincipalPropSet);     // Acl
     supportedReports.add(WebdavTags.principalMatch);          // Acl
     supportedReports.add(WebdavTags.principalPropertySearch); // Acl

@@ -464,7 +464,16 @@ public class ReportMethod extends MethodBase {
                                      final HttpServletResponse resp,
                                      final int depth,
                                      final WebdavNsIntf intf) throws WebdavException {
-    return;
+    resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+    resp.setContentType("text/xml; charset=UTF-8");
+
+    startEmit(resp);
+
+    openTag(WebdavTags.multistatus);
+
+    closeTag(WebdavTags.multistatus);
+
+    flush();
   }
 
   private void processSyncReport(final HttpServletRequest req,
