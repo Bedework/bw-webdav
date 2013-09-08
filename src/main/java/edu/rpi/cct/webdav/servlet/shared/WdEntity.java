@@ -18,8 +18,9 @@
 */
 package edu.rpi.cct.webdav.servlet.shared;
 
+import org.bedework.util.misc.Util;
+
 import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.sss.util.Util;
 
 import javax.xml.namespace.QName;
 

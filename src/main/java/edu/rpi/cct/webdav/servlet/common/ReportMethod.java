@@ -18,6 +18,10 @@
 */
 package edu.rpi.cct.webdav.servlet.common;
 
+import org.bedework.util.misc.Util;
+import org.bedework.util.xml.XmlUtil;
+import org.bedework.util.xml.tagdefs.WebdavTags;
+
 import edu.rpi.cct.webdav.servlet.common.PropFindMethod.PropRequest;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch;
 import edu.rpi.cct.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
@@ -28,9 +32,6 @@ import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsNode;
 import edu.rpi.cct.webdav.servlet.shared.WebdavStatusCode;
-import edu.rpi.sss.util.Util;
-import edu.rpi.sss.util.xml.XmlUtil;
-import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -18,13 +18,14 @@
 */
 package edu.rpi.cct.webdav.servlet.common;
 
+import org.bedework.util.servlet.io.CharArrayWrappedResponse;
+import org.bedework.util.xml.XmlEmit;
+import org.bedework.util.xml.tagdefs.WebdavTags;
+
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
-import edu.rpi.sss.util.servlets.io.CharArrayWrappedResponse;
-import edu.rpi.sss.util.xml.XmlEmit;
-import edu.rpi.sss.util.xml.tagdefs.WebdavTags;
 
 import org.apache.log4j.Logger;
 
