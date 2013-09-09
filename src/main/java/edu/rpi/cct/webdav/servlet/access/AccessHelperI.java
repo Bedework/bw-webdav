@@ -20,13 +20,14 @@ package edu.rpi.cct.webdav.servlet.access;
 
 //import org.bedework.carddav.util.User;
 
+import org.bedework.access.Access.AccessCb;
+import org.bedework.access.AccessPrincipal;
+import org.bedework.access.Ace;
+import org.bedework.access.AceWho;
+import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.PrivilegeDefs;
+
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.cmt.access.Ace;
-import edu.rpi.cmt.access.AceWho;
-import edu.rpi.cmt.access.PrivilegeDefs;
-import edu.rpi.cmt.access.Access.AccessCb;
-import edu.rpi.cmt.access.Acl.CurrentAccess;
 
 import java.io.Serializable;
 import java.util.Collection;

@@ -19,12 +19,13 @@
 
 package edu.rpi.cct.webdav.servlet.common;
 
+import org.bedework.access.AccessException;
+import org.bedework.util.xml.tagdefs.WebdavTags;
+
 import edu.rpi.cct.webdav.servlet.shared.WebdavBadRequest;
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf;
 import edu.rpi.cct.webdav.servlet.shared.WebdavServerError;
-import edu.rpi.cmt.access.AccessException;
-import org.bedework.util.xml.tagdefs.WebdavTags;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class to handle WebDav ACLs
  *
- *  @author Mike Douglass   douglm@rpi.edu
+ *  @author Mike Douglass   douglm@bedework.edu
  */
 public class AclMethod extends MethodBase {
   /** Called at each request

@@ -31,13 +31,13 @@ import javax.servlet.http.HttpServletResponse;
  * Get the content of a node. Note this is subclassed by HeadMethod which
  * overrides init and sets doContent false.
  *
- *   @author Mike Douglass   douglm@rpi.edu
+ *   @author Mike Douglass   douglm@bedework.edu
  */
 public class GetMethod extends MethodBase {
   protected boolean doContent;
 
   /* (non-Javadoc)
-   * @see edu.rpi.cct.webdav.servlet.common.MethodBase#init()
+   * @see edu.bedework.cct.webdav.servlet.common.MethodBase#init()
    */
   @Override
   public void init() {

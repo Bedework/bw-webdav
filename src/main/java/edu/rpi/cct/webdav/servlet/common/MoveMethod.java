@@ -6,9 +6,9 @@
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
-        
+
     http://www.apache.org/licenses/LICENSE-2.0
-        
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -26,11 +26,11 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle MOVE
  *
- *   @author Mike Douglass   douglm@rpi.edu
+ *   @author Mike Douglass   douglm@bedework.edu
  */
 public class MoveMethod extends CopyMethod {
   /* (non-Javadoc)
-   * @see edu.rpi.cct.webdav.servlet.common.CopyMethod#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+   * @see edu.bedework.cct.webdav.servlet.common.CopyMethod#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
    */
   public void doMethod(HttpServletRequest req,
                         HttpServletResponse resp) throws WebdavException {

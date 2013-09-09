@@ -18,8 +18,9 @@
 */
 package edu.rpi.cct.webdav.servlet.access;
 
+import org.bedework.access.Acl.CurrentAccess;
+
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-import edu.rpi.cmt.access.Acl.CurrentAccess;
 
 import java.util.HashMap;
 import java.util.Map;

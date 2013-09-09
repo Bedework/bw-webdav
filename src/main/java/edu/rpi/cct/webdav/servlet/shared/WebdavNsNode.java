@@ -18,14 +18,15 @@
 */
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf.Content;
-import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.cmt.access.AccessXmlUtil;
-import edu.rpi.cmt.access.Acl.CurrentAccess;
-import edu.rpi.cmt.access.PrivilegeSet;
+import org.bedework.access.AccessPrincipal;
+import org.bedework.access.AccessXmlUtil;
+import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.PrivilegeSet;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
+
+import edu.rpi.cct.webdav.servlet.shared.WebdavNsIntf.Content;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;

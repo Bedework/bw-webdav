@@ -27,7 +27,7 @@ import edu.rpi.cct.webdav.servlet.common.MethodBase;
 import edu.rpi.cct.webdav.servlet.common.MethodBase.MethodInfo;
 import edu.rpi.cct.webdav.servlet.common.WebdavServlet;
 import edu.rpi.cct.webdav.servlet.common.WebdavUtils;
-import edu.rpi.cmt.access.Acl;
+import org.bedework.access.Acl;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlUtil;
@@ -441,7 +441,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * The name should be globally unique in a global sense so don't return
    * something like "RPI:"
    *
-   * <p>Something more like "http://ahost.rpi.edu/webdav/"
+   * <p>Something more like "http://ahost.bedework.edu/webdav/"
    *
    * @param xml
    * @throws WebdavException

@@ -20,7 +20,7 @@ package edu.rpi.cct.webdav.servlet.shared;
 
 import org.bedework.util.misc.Util;
 
-import edu.rpi.cmt.access.AccessPrincipal;
+import org.bedework.access.AccessPrincipal;
 
 import javax.xml.namespace.QName;
 

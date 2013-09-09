@@ -19,7 +19,7 @@
 package edu.rpi.cct.webdav.servlet.common;
 
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
-import edu.rpi.cmt.access.AccessXmlUtil;
+import org.bedework.access.AccessXmlUtil;
 import org.bedework.util.xml.XmlEmit;
 
 import javax.xml.namespace.QName;

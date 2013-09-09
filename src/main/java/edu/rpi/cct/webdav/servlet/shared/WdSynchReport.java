@@ -22,7 +22,7 @@ import java.util.List;
 
 /** Data for Synch Report
  *
- *   @author Mike Douglass   douglm@rpi.edu
+ *   @author Mike Douglass   douglm@bedework.edu
  */
 public class WdSynchReport {
   /** The changed entity may be an event or a collection. If it is deleted then

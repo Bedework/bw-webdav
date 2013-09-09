@@ -19,9 +19,9 @@
 
 package edu.rpi.cct.webdav.servlet.shared;
 
-import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.cmt.access.Acl.CurrentAccess;
-import edu.rpi.cmt.access.WhoDefs;
+import org.bedework.access.AccessPrincipal;
+import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.WhoDefs;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.tagdefs.WebdavTags;
 

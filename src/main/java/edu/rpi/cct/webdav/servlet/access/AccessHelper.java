@@ -18,15 +18,16 @@
 */
 package edu.rpi.cct.webdav.servlet.access;
 
+import org.bedework.access.Access;
+import org.bedework.access.AccessPrincipal;
+import org.bedework.access.Ace;
+import org.bedework.access.AceWho;
+import org.bedework.access.Acl;
+import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.PrivilegeSet;
+
 import edu.rpi.cct.webdav.servlet.shared.WebdavException;
 import edu.rpi.cct.webdav.servlet.shared.WebdavForbidden;
-import edu.rpi.cmt.access.Access;
-import edu.rpi.cmt.access.AccessPrincipal;
-import edu.rpi.cmt.access.Ace;
-import edu.rpi.cmt.access.AceWho;
-import edu.rpi.cmt.access.Acl;
-import edu.rpi.cmt.access.PrivilegeSet;
-import edu.rpi.cmt.access.Acl.CurrentAccess;
 
 import org.apache.log4j.Logger;
 
@@ -177,7 +178,7 @@ public class AccessHelper implements AccessHelperI {
   }
 
   /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#defaultAccess(org.bedework.calfacade.base.SharedEntity, edu.rpi.cmt.access.AceWho)
+   * @see org.bedework.calcorei.AccessUtilI#defaultAccess(org.bedework.calfacade.base.SharedEntity, AceWho)
    */
   public void defaultAccess(final SharedEntity ent,
                             final AceWho who) throws WebdavException {
