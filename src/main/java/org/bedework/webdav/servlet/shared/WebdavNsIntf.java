@@ -653,6 +653,12 @@ public abstract class WebdavNsIntf implements Serializable {
     public boolean emitEtag;
   }
 
+  /**
+   *
+   * @return a valid content type string
+   */
+  public abstract String getAcceptContentType(HttpServletRequest req);
+
   /** Put content for the PUT or POST methods
    *
    * @param req
@@ -736,17 +742,14 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (!node.getContentBinary() &&
           returnRep) {
+        String ctype = getAcceptContentType(req);
+
         // Try to get the content
-        resp.setContentType(req.getContentType());
+        resp.setContentType(ctype);
 
         if (!pcr.emitEtag) {
           /* Do it now */
           resp.setHeader("ETag", node.getEtagValue(true));
-        }
-
-        String ctype = null;
-        if ((contentTypePars != null) && (contentTypePars.length > 0)) {
-          ctype = contentTypePars[0];
         }
 
         c = getContent(req, resp, ctype, node);
