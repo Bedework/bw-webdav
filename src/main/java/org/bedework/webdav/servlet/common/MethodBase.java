@@ -562,9 +562,18 @@ public abstract class MethodBase {
    * @param val
    * @throws WebdavException
    */
-  public void cdataProperty(final QName tag, final String val) throws WebdavException {
+  public void cdataProperty(final QName tag,
+                            final String attrName,
+                            final String arrtVal,
+                            final String val) throws WebdavException {
     try {
-      xml.cdataProperty(tag, val);
+      if (attrName == null) {
+        xml.cdataProperty(tag, val);
+      } else {
+        xml.openTagSameLine(tag, attrName, arrtVal);
+        xml.cdataValue(val);
+        xml.closeTagSameLine(tag);
+      }
     } catch (Throwable t) {
       throw new WebdavException(t);
     }
