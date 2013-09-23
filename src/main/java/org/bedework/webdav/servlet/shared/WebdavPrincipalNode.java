@@ -172,7 +172,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getContentLen()
    */
   @Override
-  public long getContentLen() throws WebdavException {
+  public long getContentLen(final String contentType) throws WebdavException {
     return 0;
   }
 

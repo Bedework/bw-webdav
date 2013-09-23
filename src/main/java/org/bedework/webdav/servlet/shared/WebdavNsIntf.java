@@ -657,7 +657,7 @@ public abstract class WebdavNsIntf implements Serializable {
    *
    * @return a valid content type string
    */
-  public abstract String getAcceptContentType(HttpServletRequest req);
+  public abstract String getAcceptContentType(HttpServletRequest req) throws WebdavException;
 
   /** Put content for the PUT or POST methods
    *

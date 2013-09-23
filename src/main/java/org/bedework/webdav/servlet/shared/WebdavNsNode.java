@@ -528,7 +528,7 @@ public abstract class WebdavNsNode implements Serializable {
           xml.property(tag, "0");
           return true;
         }
-        xml.property(tag, String.valueOf(getContentLen()));
+        xml.property(tag, String.valueOf(getContentLen(null)));
         return true;
       }
 
@@ -834,7 +834,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public WebdavNsIntf.Content getContent(final String contentType) throws WebdavException {
-    String cont = getContentString();
+    String cont = getContentString(contentType);
 
     if (cont == null) {
       return null;
@@ -844,7 +844,7 @@ public abstract class WebdavNsNode implements Serializable {
 
     c.rdr = new StringReader(cont);
     c.contentType = getContentType();
-    c.contentLength = getContentLen();
+    c.contentLength = getContentLen(c.contentType);
 
     return c;
   }
@@ -863,7 +863,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @return String       content.
    * @throws WebdavException
    */
-  public String getContentString() throws WebdavException {
+  public String getContentString(String contentType) throws WebdavException {
     return null;
   }
 
@@ -906,7 +906,7 @@ public abstract class WebdavNsNode implements Serializable {
    * @return long content length
    * @throws WebdavException
    */
-  public abstract long getContentLen() throws WebdavException;
+  public abstract long getContentLen(String contentType) throws WebdavException;
 
   /** A content type of null implies no content (or we don't know)
    *
