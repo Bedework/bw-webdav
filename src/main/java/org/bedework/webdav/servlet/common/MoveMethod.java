@@ -26,12 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle MOVE
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class MoveMethod extends CopyMethod {
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.common.CopyMethod#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-   */
+  @Override
   public void doMethod(HttpServletRequest req,
                         HttpServletResponse resp) throws WebdavException {
     process(req, resp, false);

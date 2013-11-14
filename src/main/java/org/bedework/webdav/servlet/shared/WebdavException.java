@@ -20,12 +20,11 @@
 package org.bedework.webdav.servlet.shared;
 
 import javax.servlet.http.HttpServletResponse;
-
 import javax.xml.namespace.QName;
 
 /** Base exception thrown by webdav classes
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class WebdavException extends Throwable {
   /** > 0 if set

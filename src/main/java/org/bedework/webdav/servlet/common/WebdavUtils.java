@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 
 /** Place for utility methods
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class WebdavUtils {
   /** Get the prefix from the request

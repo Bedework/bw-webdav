@@ -23,6 +23,7 @@ import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
 import org.bedework.webdav.servlet.common.PropFindMethod.PropRequest;
 import org.bedework.webdav.servlet.shared.PrincipalPropertySearch;
+import org.bedework.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 import org.bedework.webdav.servlet.shared.WdSynchReport;
 import org.bedework.webdav.servlet.shared.WdSynchReport.WdSynchReportItem;
 import org.bedework.webdav.servlet.shared.WebdavBadRequest;
@@ -41,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle POST
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public class ReportMethod extends MethodBase {
   private final static int reportTypeExpandProperty = 0;
@@ -71,9 +72,6 @@ public class ReportMethod extends MethodBase {
 
   private boolean syncRecurse;
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.common.MethodBase#init()
-   */
   @Override
   public void init() {
   }
@@ -359,7 +357,7 @@ public class ReportMethod extends MethodBase {
         Element curnode = children[i];
 
         if (XmlUtil.nodeMatches(curnode, WebdavTags.propertySearch)) {
-          PrincipalPropertySearch.PropertySearch ps = new PrincipalPropertySearch.PropertySearch();
+          PropertySearch ps = new PropertySearch();
 
           pps.propertySearches.add(ps);
 

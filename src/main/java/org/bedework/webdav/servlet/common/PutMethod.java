@@ -18,6 +18,7 @@
 */
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.webdav.servlet.common.Headers.IfHeaders;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle PUT
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class PutMethod extends MethodBase {
   @Override
@@ -43,7 +44,7 @@ public class PutMethod extends MethodBase {
 
     WebdavNsIntf intf = getNsIntf();
 
-    Headers.IfHeaders ifHeaders = Headers.processIfHeaders(req);
+    IfHeaders ifHeaders = Headers.processIfHeaders(req);
     if ((ifHeaders.ifHeader != null) &&
         !intf.syncTokenMatch(ifHeaders.ifHeader)) {
       intf.rollback();

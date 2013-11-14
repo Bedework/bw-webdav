@@ -28,12 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle DELETE
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class DeleteMethod extends MethodBase {
-  /* (non-Javadoc)
-   * @see MethodBase#init()
-   */
   @Override
   public void init() {
   }

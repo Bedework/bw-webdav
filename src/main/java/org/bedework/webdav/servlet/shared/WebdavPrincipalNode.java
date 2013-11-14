@@ -36,7 +36,7 @@ import javax.xml.namespace.QName;
 /** Class to represent a principal in webdav.
  *
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public class WebdavPrincipalNode extends WebdavNsNode {
   private AccessPrincipal account;
@@ -70,17 +70,11 @@ public class WebdavPrincipalNode extends WebdavNsNode {
 //    }
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getOwner()
-   */
   @Override
   public AccessPrincipal getOwner() throws WebdavException {
     return account;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#update()
-   */
   @Override
   public void update() throws WebdavException {
   }
@@ -105,17 +99,11 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     return "W/\"" + val + "\"";
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#trailSlash()
-   */
   @Override
   public boolean trailSlash() {
     return true;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getChildren()
-   */
   @Override
   public Collection<? extends WdEntity> getChildren() throws WebdavException {
     return null;
@@ -152,57 +140,36 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getContentBinary()
-   */
   @Override
   public boolean getContentBinary() throws WebdavException {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getContentLang()
-   */
   @Override
   public String getContentLang() throws WebdavException {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getContentLen()
-   */
   @Override
   public long getContentLen() throws WebdavException {
     return 0;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getContentType()
-   */
   @Override
   public String getContentType() throws WebdavException {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getCreDate()
-   */
   @Override
   public String getCreDate() throws WebdavException {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getDisplayname()
-   */
   @Override
   public String getDisplayname() throws WebdavException {
     return account.getAccount();
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#getLastmodDate()
-   */
   @Override
   public String getLastmodDate() throws WebdavException {
     return null;
@@ -212,9 +179,6 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    *                   Property methods
    * ==================================================================== */
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#removeProperty(org.w3c.dom.Element)
-   */
   @Override
   public boolean removeProperty(final Element val,
                                 final SetPropertyResult spr) throws WebdavException {
@@ -223,9 +187,6 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#setProperty(org.w3c.dom.Element)
-   */
   @Override
   public boolean setProperty(final Element val,
                              final SetPropertyResult spr) throws WebdavException {
@@ -236,9 +197,6 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#knownProperty(edu.bedework.sss.util.xml.QName)
-   */
   @Override
   public boolean knownProperty(final QName tag) {
     if (propertyNames.get(tag) != null) {
@@ -249,9 +207,6 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     return super.knownProperty(tag);
   }
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.shared.WebdavNsNode#generatePropertyValue(edu.bedework.sss.util.xml.QName, edu.bedework.cct.webdav.servlet.shared.WebdavNsIntf, boolean)
-   */
   @Override
   public boolean generatePropertyValue(final QName tag,
                                        final WebdavNsIntf intf,

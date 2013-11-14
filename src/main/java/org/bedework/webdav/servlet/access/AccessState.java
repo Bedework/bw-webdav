@@ -27,7 +27,7 @@ import java.util.Map;
 /** An object to preserve the current state of access calculations. Embedding
  * this in an entity instance avoids recalculation.
  *
- * @author Mike Douglass douglm @ bedework.edu
+ * @author Mike Douglass douglm   rpi.edu
  * @version 1.0
  */
 public class AccessState {

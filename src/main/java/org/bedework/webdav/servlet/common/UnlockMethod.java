@@ -26,12 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle UNLOCK
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class UnlockMethod extends MethodBase {
-  /* (non-Javadoc)
-   * @see edu.bedework.webdav.servlet.common.MethodBase#init()
-   */
+  @Override
   public void init() {
   }
 

@@ -30,19 +30,13 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle MKCOL
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class MkcolMethod extends PropPatchMethod {
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.common.MethodBase#init()
-   */
   @Override
   public void init() {
   }
 
-  /* (non-Javadoc)
-   * @see MethodBase#doMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-   */
   @Override
   public void doMethod(final HttpServletRequest req,
                         final HttpServletResponse resp) throws WebdavException {

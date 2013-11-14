@@ -18,16 +18,20 @@
 */
 package org.bedework.webdav.servlet.shared;
 
-import org.bedework.webdav.servlet.common.AccessUtil;
-import org.bedework.webdav.servlet.common.Headers;
-import org.bedework.webdav.servlet.common.MethodBase;
-import org.bedework.webdav.servlet.common.WebdavServlet;
-import org.bedework.webdav.servlet.common.WebdavUtils;
 import org.bedework.access.Acl;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
+import org.bedework.webdav.servlet.common.AccessUtil;
+import org.bedework.webdav.servlet.common.Headers;
+import org.bedework.webdav.servlet.common.Headers.IfHeader;
+import org.bedework.webdav.servlet.common.Headers.IfHeader.TagOrToken;
+import org.bedework.webdav.servlet.common.Headers.IfHeaders;
+import org.bedework.webdav.servlet.common.MethodBase;
+import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
+import org.bedework.webdav.servlet.common.WebdavServlet;
+import org.bedework.webdav.servlet.common.WebdavUtils;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
@@ -95,7 +99,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Table of methods - set by servlet
    */
-  protected HashMap<String, MethodBase.MethodInfo> methods;
+  protected HashMap<String, MethodInfo> methods;
 
   /** Table of created methods
   private HashMap<String, MethodBase> createdMethods = new HashMap<String, MethodBase>();
@@ -118,7 +122,7 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public void init(final WebdavServlet servlet,
                    final HttpServletRequest req,
-                   final HashMap<String, MethodBase.MethodInfo> methods,
+                   final HashMap<String, MethodInfo> methods,
                    final boolean dumpContent) throws WebdavException {
     this.servlet = servlet;
     this.req = req;
@@ -180,7 +184,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * @return false for a mismatch
    * @throws WebdavException for invalid if header
    */
-  public boolean syncTokenMatch(final Headers.IfHeader ih) throws WebdavException {
+  public boolean syncTokenMatch(final IfHeader ih) throws WebdavException {
     if (ih.resourceTag == null) {
       throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
                                 "Bad If header - no resource tag");
@@ -191,7 +195,7 @@ public abstract class WebdavNsIntf implements Serializable {
           "Bad If header - only 1 state-token allowed");
     }
 
-    Headers.IfHeader.TagOrToken tt = ih.tagsAndTokens.get(0);
+    TagOrToken tt = ih.tagsAndTokens.get(0);
 
     if (tt.entityTag) {
       throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
@@ -291,7 +295,7 @@ public abstract class WebdavNsIntf implements Serializable {
       throw new WebdavException(t);
     }
     */
-    MethodBase.MethodInfo mi = methods.get(name);
+    MethodInfo mi = methods.get(name);
 
     if ((mi == null) || (getAnonymous() && mi.getRequiresAuth())) {
       return null;
@@ -437,7 +441,7 @@ public abstract class WebdavNsIntf implements Serializable {
    * The name should be globally unique in a global sense so don't return
    * something like "RPI:"
    *
-   * <p>Something more like "http://ahost.bedework.edu/webdav/"
+   * <p>Something more like "http://ahost.rpi.edu/webdav/"
    *
    * @param xml
    * @throws WebdavException
@@ -671,7 +675,7 @@ public abstract class WebdavNsIntf implements Serializable {
   public PutContentResult putContent(final HttpServletRequest req,
                                      final HttpServletResponse resp,
                                      final boolean fromPost,
-                                     final Headers.IfHeaders ifHeaders) throws WebdavException {
+                                     final IfHeaders ifHeaders) throws WebdavException {
     try {
       /* We get a node to represent the entity we are creating or updating. */
       int existance;
@@ -901,7 +905,7 @@ public abstract class WebdavNsIntf implements Serializable {
                                               WebdavNsNode node,
                                               String[] contentTypePars,
                                               Reader contentRdr,
-                                              Headers.IfHeaders ifHeaders)
+                                              IfHeaders ifHeaders)
       throws WebdavException;
 
   /** Set the content from a Stream
@@ -918,7 +922,7 @@ public abstract class WebdavNsIntf implements Serializable {
                                                     WebdavNsNode node,
                                                     String[] contentTypePars,
                                                     InputStream contentStream,
-                                                    Headers.IfHeaders ifHeaders)
+                                                    IfHeaders ifHeaders)
       throws WebdavException;
 
   /** Create a new node.

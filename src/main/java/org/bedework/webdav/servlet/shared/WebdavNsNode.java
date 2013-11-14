@@ -25,6 +25,7 @@ import org.bedework.access.PrivilegeSet;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
+import org.bedework.webdav.servlet.shared.WebdavNsIntf.Content;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
@@ -45,7 +46,7 @@ import javax.xml.namespace.QName;
  * servlet is acting as a gateway. This could be a file system, a set of
  * dynamically created objects or some sort of CMS for example.
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public abstract class WebdavNsNode implements Serializable {
   protected boolean debug;
@@ -833,14 +834,14 @@ public abstract class WebdavNsNode implements Serializable {
    * @return Content object
    * @throws WebdavException
    */
-  public WebdavNsIntf.Content getContent(final String contentType) throws WebdavException {
+  public Content getContent(final String contentType) throws WebdavException {
     String cont = getContentString(contentType);
 
     if (cont == null) {
       return null;
     }
 
-    WebdavNsIntf.Content c = new WebdavNsIntf.Content();
+    Content c = new Content();
 
     c.rdr = new StringReader(cont);
     c.contentType = getContentType();

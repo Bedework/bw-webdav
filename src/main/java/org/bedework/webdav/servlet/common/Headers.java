@@ -30,7 +30,7 @@ import javax.xml.ws.Holder;
 
 /** Retrieve and process Webdav header values
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public class Headers {
   /** */

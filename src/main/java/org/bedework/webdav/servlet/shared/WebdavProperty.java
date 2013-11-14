@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 
 /** One of these for each property in a request.
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class WebdavProperty implements Serializable {
   private QName tag;

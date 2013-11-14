@@ -21,6 +21,7 @@ package org.bedework.webdav.servlet.common;
 import org.bedework.util.servlet.io.CharArrayWrappedResponse;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.tagdefs.WebdavTags;
+import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavForbidden;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
@@ -47,7 +48,7 @@ import javax.xml.namespace.QName;
  * This abstract servlet handles the request/response nonsense and calls
  * abstract routines to interact with an underlying data source.
  *
- * @author Mike Douglass   douglm@bedework.edu
+ * @author Mike Douglass   douglm   rpi.edu
  * @version 1.0
  */
 public abstract class WebdavServlet extends HttpServlet
@@ -65,7 +66,7 @@ public abstract class WebdavServlet extends HttpServlet
 
   /** Table of methods - set at init
    */
-  protected HashMap<String, MethodBase.MethodInfo> methods = new HashMap<String, MethodBase.MethodInfo>();
+  protected HashMap<String, MethodInfo> methods = new HashMap<>();
 
   /* Try to serialize requests from a single session
    * This is very imperfect.
@@ -337,19 +338,19 @@ public abstract class WebdavServlet extends HttpServlet
    *
    */
   protected void addMethods() {
-    methods.put("ACL", new MethodBase.MethodInfo(AclMethod.class, false));
-    methods.put("COPY", new MethodBase.MethodInfo(CopyMethod.class, false));
-    methods.put("GET", new MethodBase.MethodInfo(GetMethod.class, false));
-    methods.put("HEAD", new MethodBase.MethodInfo(HeadMethod.class, false));
-    methods.put("OPTIONS", new MethodBase.MethodInfo(OptionsMethod.class, false));
-    methods.put("PROPFIND", new MethodBase.MethodInfo(PropFindMethod.class, false));
+    methods.put("ACL", new MethodInfo(AclMethod.class, false));
+    methods.put("COPY", new MethodInfo(CopyMethod.class, false));
+    methods.put("GET", new MethodInfo(GetMethod.class, false));
+    methods.put("HEAD", new MethodInfo(HeadMethod.class, false));
+    methods.put("OPTIONS", new MethodInfo(OptionsMethod.class, false));
+    methods.put("PROPFIND", new MethodInfo(PropFindMethod.class, false));
 
-    methods.put("DELETE", new MethodBase.MethodInfo(DeleteMethod.class, true));
-    methods.put("MKCOL", new MethodBase.MethodInfo(MkcolMethod.class, true));
-    methods.put("MOVE", new MethodBase.MethodInfo(MoveMethod.class, true));
-    methods.put("POST", new MethodBase.MethodInfo(PostMethod.class, true));
-    methods.put("PROPPATCH", new MethodBase.MethodInfo(PropPatchMethod.class, true));
-    methods.put("PUT", new MethodBase.MethodInfo(PutMethod.class, true));
+    methods.put("DELETE", new MethodInfo(DeleteMethod.class, true));
+    methods.put("MKCOL", new MethodInfo(MkcolMethod.class, true));
+    methods.put("MOVE", new MethodInfo(MoveMethod.class, true));
+    methods.put("POST", new MethodInfo(PostMethod.class, true));
+    methods.put("PROPPATCH", new MethodInfo(PropPatchMethod.class, true));
+    methods.put("PUT", new MethodInfo(PutMethod.class, true));
 
     //methods.put("LOCK", new MethodInfo(LockMethod.class, true));
     //methods.put("UNLOCK", new MethodInfo(UnlockMethod.class, true));

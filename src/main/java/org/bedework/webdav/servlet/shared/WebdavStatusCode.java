@@ -20,12 +20,11 @@
 package org.bedework.webdav.servlet.shared;
 
 import java.util.HashMap;
-
 import javax.servlet.http.HttpServletResponse;
 
 /** Define webdav status codes.
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public class WebdavStatusCode {
   /** multi-status OK response */

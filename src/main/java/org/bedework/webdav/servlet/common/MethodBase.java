@@ -564,13 +564,13 @@ public abstract class MethodBase {
    */
   public void cdataProperty(final QName tag,
                             final String attrName,
-                            final String arrtVal,
+                            final String attrVal,
                             final String val) throws WebdavException {
     try {
       if (attrName == null) {
         xml.cdataProperty(tag, val);
       } else {
-        xml.openTagSameLine(tag, attrName, arrtVal);
+        xml.openTagSameLine(tag, attrName, attrVal);
         xml.cdataValue(val);
         xml.closeTagSameLine(tag);
       }

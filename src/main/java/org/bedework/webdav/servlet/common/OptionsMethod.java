@@ -30,12 +30,10 @@ import javax.servlet.http.HttpServletResponse;
  * url refers to and send a response which shows the allowable methods on that
  * resource.
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class OptionsMethod extends MethodBase {
-  /* (non-Javadoc)
-   * @see MethodBase#init()
-   */
+  @Override
   public void init() {
   }
 

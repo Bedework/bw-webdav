@@ -38,12 +38,9 @@ import javax.xml.namespace.QName;
 
 /** Class called to handle PROPPATCH
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm  rpi.edu
  */
 public class PropPatchMethod extends MethodBase {
-  /* (non-Javadoc)
-   * @see MethodBase#init()
-   */
   @Override
   public void init() {
   }

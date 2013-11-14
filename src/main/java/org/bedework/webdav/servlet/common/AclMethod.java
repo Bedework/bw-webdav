@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class to handle WebDav ACLs
  *
- *  @author Mike Douglass   douglm@bedework.edu
+ *  @author Mike Douglass   douglm  rpi.edu
  */
 public class AclMethod extends MethodBase {
   /** Called at each request

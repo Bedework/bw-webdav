@@ -21,12 +21,10 @@ package org.bedework.webdav.servlet.common;
 
 /** Class called to handle HEAD
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public class HeadMethod extends GetMethod {
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.common.MethodBase#init()
-   */
+  @Override
   public void init() {
     doContent = false;
   }

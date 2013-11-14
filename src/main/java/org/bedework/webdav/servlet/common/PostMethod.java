@@ -29,9 +29,7 @@ import javax.servlet.http.HttpServletResponse;
  *   @author Mike Douglass   douglm@rpi.edu
  */
 public class PostMethod extends MethodBase {
-  /* (non-Javadoc)
-   * @see org.bedework.webdav.servlet.common.MethodBase#init()
-   */
+  @Override
   public void init() {
   }
 

@@ -176,9 +176,6 @@ public class AccessHelper implements AccessHelperI {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#defaultAccess(org.bedework.calfacade.base.SharedEntity, AceWho)
-   */
   public void defaultAccess(final SharedEntity ent,
                             final AceWho who) throws WebdavException {
     try {

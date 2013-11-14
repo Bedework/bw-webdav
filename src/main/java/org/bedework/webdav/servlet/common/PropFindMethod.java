@@ -24,6 +24,7 @@ import org.bedework.webdav.servlet.shared.WebdavBadRequest;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 import org.bedework.webdav.servlet.shared.WebdavNsNode;
+import org.bedework.webdav.servlet.shared.WebdavNsNode.PropertyTagEntry;
 import org.bedework.webdav.servlet.shared.WebdavProperty;
 import org.bedework.webdav.servlet.shared.WebdavStatusCode;
 
@@ -38,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Class called to handle PROPFIND
  *
- *   @author Mike Douglass   douglm@bedework.edu
+ *   @author Mike Douglass   douglm   rpi.edu
  */
 public class PropFindMethod extends MethodBase {
   /**
@@ -68,9 +69,6 @@ public class PropFindMethod extends MethodBase {
 
   private PropRequest parsedReq;
 
-  /* (non-Javadoc)
-   * @see edu.bedework.cct.webdav.servlet.common.MethodBase#init()
-   */
   @Override
   public void init() {
   }
@@ -299,7 +297,7 @@ public class PropFindMethod extends MethodBase {
   private void doPropNames(final WebdavNsNode node) throws WebdavException {
     openTag(WebdavTags.prop);
 
-    for (WebdavNsNode.PropertyTagEntry pte: node.getPropertyNames()) {
+    for (PropertyTagEntry pte: node.getPropertyNames()) {
       if (pte.inPropAll) {
         emptyTag(pte.tag);
       }
@@ -323,7 +321,7 @@ public class PropFindMethod extends MethodBase {
       property(WebdavTags.supportedlock, sl);
     }
 
-    for (WebdavNsNode.PropertyTagEntry pte: node.getPropertyNames()) {
+    for (PropertyTagEntry pte: node.getPropertyNames()) {
       if (pte.inPropAll) {
         intf.generatePropValue(node, new WebdavProperty(pte.tag, null), true);
       }

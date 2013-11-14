@@ -42,7 +42,7 @@ import java.util.Collection;
  * take place within the core implementation.
  *
  *
- * @author Mike Douglass   douglm  bedework.edu
+ * @author Mike Douglass   douglm  rpi.edu
  */
 public interface AccessHelperI extends PrivilegeDefs, Serializable {
   /** Methods called to obtain system information.
