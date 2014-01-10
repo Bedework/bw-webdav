@@ -32,15 +32,4 @@ public abstract class WdCollection <T> extends WdEntity<T> {
   public WdCollection() throws WebdavException {
     super();
   }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder("WdCollection{");
-
-    toStringSegment(sb);
-
-    sb.append("}");
-
-    return sb.toString();
-  }
 }

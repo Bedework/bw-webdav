@@ -18,9 +18,9 @@
 */
 package org.bedework.webdav.servlet.shared;
 
-import org.bedework.util.misc.Util;
-
 import org.bedework.access.AccessPrincipal;
+import org.bedework.util.misc.ToString;
+import org.bedework.util.misc.Util;
 
 import javax.xml.namespace.QName;
 
@@ -274,62 +274,22 @@ public abstract class WdEntity <T> implements Comparable<WdEntity> {
   }
 
   /**
-   * @param sb
+   * @param ts
    */
-  public void toStringSegment(final StringBuilder sb) {
+  public void toStringSegment(final ToString ts) {
     try {
-      addStringSegmentNoComma(sb, "name", getName());
-
-      addStringSegment(sb, "displayName", getDisplayName());
-
-      addStringSegment(sb, "path", getPath());
-
-      addStringSegment(sb, "parentPath", getParentPath());
-
-      addStringSegment(sb, "owner", getOwner());
-
-      addStringSegment(sb, "created", getCreated());
-
-      addStringSegment(sb, "lastmod", getLastmod());
-
-      addStringSegment(sb, "etag", getEtag());
-
-      addStringSegment(sb, "previousEtag", getPreviousEtag());
-
-      addStringSegment(sb, "description", getDescription());
+      ts.append("name", getName());
+      ts.append("displayName", getDisplayName());
+      ts.append("path", getPath());
+      ts.append("parentPath", getParentPath());
+      ts.append("owner", getOwner());
+      ts.append("created", getCreated());
+      ts.append("lastmod", getLastmod());
+      ts.append("etag", getEtag());
+      ts.append("previousEtag", getPreviousEtag());
+      ts.append("description", getDescription());
     } catch (Throwable t) {
-      sb.append(t);
-    }
-  }
-
-  /**
-   * @param sb
-   * @param name
-   * @param val
-   * @throws Throwable
-   */
-  public void addStringSegment(final StringBuilder sb,
-                               final String name,
-                               final Object val) throws Throwable {
-    sb.append(", ");
-    addStringSegmentNoComma(sb, name, val);
-  }
-
-  /**
-   * @param sb
-   * @param name
-   * @param val
-   * @throws Throwable
-   */
-  public void addStringSegmentNoComma(final StringBuilder sb,
-                                      final String name,
-                                      final Object val) throws Throwable {
-    sb.append(name);
-    sb.append("=");
-    if (val == null) {
-      sb.append("<<null>>");
-    } else {
-      sb.append(String.valueOf(val));
+      ts.append(t);
     }
   }
 
@@ -361,12 +321,10 @@ public abstract class WdEntity <T> implements Comparable<WdEntity> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("WdEntity{");
+    ToString ts = new ToString(this);
 
-    toStringSegment(sb);
+    toStringSegment(ts);
 
-    sb.append("}");
-
-    return sb.toString();
+    return ts.toString();
   }
 }
