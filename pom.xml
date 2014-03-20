@@ -14,8 +14,8 @@
 		<!-- Bedework Versions -->
 		<bedework.releases.repo.url>scp://dev.bedework.org/data/repository/maven/maven2</bedework.releases.repo.url>
 		<bedework.snapshots.repo.url>scp://dev.bedework.org/data/repository/maven/maven2</bedework.snapshots.repo.url>
-		<bw-util.version>4.0.0-SNAPSHOT</bw-util.version>
-		<bw-access.version>4.0.0-SNAPSHOT</bw-access.version>
+		<bw-util.version>4.0.0</bw-util.version>
+		<bw-access.version>4.0.0</bw-access.version>
 		<!-- Third Party Library Versions -->
 		<commons-codec.version>1.5</commons-codec.version>
 		<apache-http.version>4.2.2</apache-http.version>
