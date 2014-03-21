@@ -533,15 +533,17 @@ public abstract class WebdavNsIntf implements Serializable {
   /** Retrieves a node by uri, following any links.
    *
    * @param uri              String decoded uri of the node to retrieve
-   * @param existance        Say's something about the state of existance
+   * @param existence        Say's something about the state of existence
    * @param nodeType         Say's something about the type of node
+   * @param addMember        Called from POST with addMember
    * @return WebdavNsNode    node specified by the URI or the node aliased by
    *                         the node at the URI.
    * @throws WebdavException
    */
   public abstract WebdavNsNode getNode(String uri,
-                                       int existance,
-                                       int nodeType)
+                                       int existence,
+                                       int nodeType,
+                                       boolean addMember)
       throws WebdavException;
 
   /** Stores/updates an object.
@@ -686,15 +688,17 @@ public abstract class WebdavNsIntf implements Serializable {
                                      final IfHeaders ifHeaders) throws WebdavException {
     try {
       /* We get a node to represent the entity we are creating or updating. */
-      final int existance;
+      final int existence;
+      boolean addMember = false;
 
       if (ifHeaders.create) {
-        existance = existanceNot;
+        existence = existanceNot;
       } else if (!fromPost) {
-        existance = existanceMay;
+        existence = existanceMay;
       } else {
-        /* POST is targetted at the collection */
-        existance = existanceMust;
+        /* POST is targeted at the collection */
+        existence = existanceNot;
+        addMember = true;
       }
 
       final String ruri;
@@ -706,8 +710,9 @@ public abstract class WebdavNsIntf implements Serializable {
       }
 
       final WebdavNsNode node = getNode(ruri,
-                                        existance,
-                                        nodeTypeEntity);
+                                        existence,
+                                        nodeTypeEntity,
+                                        addMember);
 
       if (node == null) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -763,7 +768,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (!node.getContentBinary() &&
           returnRep) {
-        String ctype = getAcceptContentType(req);
+        final String ctype = getAcceptContentType(req);
 
         // Try to get the content
         resp.setContentType(ctype);
@@ -796,7 +801,7 @@ public abstract class WebdavNsIntf implements Serializable {
         }
 
         if (node.getLastmodDate() != null) {
-          resp.addHeader("Last-Modified", node.getLastmodDate().toString());
+          resp.addHeader("Last-Modified", node.getLastmodDate());
         }
 
 
@@ -822,15 +827,15 @@ public abstract class WebdavNsIntf implements Serializable {
       }
 
       return pcr;
-    } catch (WebdavForbidden wdf) {
+    } catch (final WebdavForbidden wdf) {
       resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw wdf;
-    } catch (WebdavException we) {
+    } catch (final WebdavException we) {
       if (debug) {
         error(we);
       }
       throw we;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       if (debug) {
         error(t);
       }

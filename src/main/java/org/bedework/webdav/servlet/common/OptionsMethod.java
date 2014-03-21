@@ -46,7 +46,8 @@ public class OptionsMethod extends MethodBase {
     try {
       WebdavNsNode node = getNsIntf().getNode(getResourceUri(req),
                                               WebdavNsIntf.existanceMust,
-                                              WebdavNsIntf.nodeTypeUnknown);
+                                              WebdavNsIntf.nodeTypeUnknown,
+                                              false);
 
       /* Apparently if the node doesn't exist we're supposed to respond
        * not found, rather than indicate if PUT is allowed for example.

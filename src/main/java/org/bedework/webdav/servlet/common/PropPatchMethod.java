@@ -60,7 +60,8 @@ public class PropPatchMethod extends MethodBase {
 
     WebdavNsNode node = getNsIntf().getNode(resourceUri,
                                             WebdavNsIntf.existanceMust,
-                                            WebdavNsIntf.nodeTypeUnknown);
+                                            WebdavNsIntf.nodeTypeUnknown,
+                                            false);
 
     if ((node == null) || !node.getExists()) {
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

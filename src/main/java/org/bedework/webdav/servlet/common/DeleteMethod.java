@@ -54,7 +54,8 @@ public class DeleteMethod extends MethodBase {
 
       WebdavNsNode node = intf.getNode(getResourceUri(req),
                                        WebdavNsIntf.existanceMust,
-                                       WebdavNsIntf.nodeTypeUnknown);
+                                       WebdavNsIntf.nodeTypeUnknown,
+                                       false);
 
       if ((node == null) || !node.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

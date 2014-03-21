@@ -87,7 +87,8 @@ public class CopyMethod extends MethodBase {
       WebdavNsIntf intf = getNsIntf();
       WebdavNsNode from = intf.getNode(getResourceUri(req),
                                        WebdavNsIntf.existanceMust,
-                                       WebdavNsIntf.nodeTypeUnknown);
+                                       WebdavNsIntf.nodeTypeUnknown,
+                                       false);
 
       if ((from == null) || !from.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -102,7 +103,9 @@ public class CopyMethod extends MethodBase {
       }
 
       WebdavNsNode to = intf.getNode(intf.getUri(dest),
-                                     WebdavNsIntf.existanceMay, toNodeType);
+                                     WebdavNsIntf.existanceMay,
+                                     toNodeType,
+                                     false);
 
       if (from.equals(to)) {
         throw new WebdavForbidden("source and destination equal");

@@ -61,7 +61,8 @@ public class MkcolMethod extends PropPatchMethod {
 
     WebdavNsNode node = intf.getNode(resourceUri,
                                      WebdavNsIntf.existanceNot,
-                                     WebdavNsIntf.nodeTypeCollection);
+                                     WebdavNsIntf.nodeTypeCollection,
+                                     false);
 
     node.setDefaults(WebdavTags.mkcol);
 

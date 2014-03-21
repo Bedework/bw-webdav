@@ -200,7 +200,8 @@ public class PropFindMethod extends MethodBase {
 
     WebdavNsNode node = getNsIntf().getNode(resourceUri,
                                             WebdavNsIntf.existanceMust,
-                                            WebdavNsIntf.nodeTypeUnknown);
+                                            WebdavNsIntf.nodeTypeUnknown,
+                                            false);
 
     addHeaders(resp, node);
 

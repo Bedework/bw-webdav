@@ -524,7 +524,8 @@ public class ReportMethod extends MethodBase {
     String resourceUri = getResourceUri(req);
     WebdavNsNode node = intf.getNode(resourceUri,
                                      WebdavNsIntf.existanceMust,
-                                     WebdavNsIntf.nodeTypeUnknown);
+                                     WebdavNsIntf.nodeTypeUnknown,
+                                     false);
 
     Collection<String> hrefs = intf.getAclPrincipalInfo(node);
 
@@ -540,7 +541,8 @@ public class ReportMethod extends MethodBase {
       for (String href: hrefs) {
         WebdavNsNode pnode = getNsIntf().getNode(getNsIntf().getUri(href),
                                                  WebdavNsIntf.existanceMay,
-                                                 WebdavNsIntf.nodeTypePrincipal);
+                                                 WebdavNsIntf.nodeTypePrincipal,
+                                                 false);
         if (pnode != null) {
           pm.doNodeProperties(pnode, propReq);
         }

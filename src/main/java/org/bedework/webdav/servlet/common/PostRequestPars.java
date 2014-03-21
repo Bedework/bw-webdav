@@ -36,17 +36,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /**
  */
 public class PostRequestPars {
-  private HttpServletRequest req;
+  private final HttpServletRequest req;
 
-  private WebdavNsIntf intf;
+  private final WebdavNsIntf intf;
 
-  private String method;
+  private final String method;
 
-  private String resourceUri;
+  private final String resourceUri;
 
   private String noPrefixResourceUri;
 
-  private String acceptType;
+  private final String acceptType;
 
   private String contentType;
 
@@ -57,7 +57,7 @@ public class PostRequestPars {
   /** Set if the content type is xml */
   private Document xmlDoc;
 
-  private boolean addMember;
+  protected boolean addMember;
 
   protected boolean getTheReader = true;
 
@@ -90,21 +90,26 @@ public class PostRequestPars {
    * @throws WebdavException
    */
   public boolean processRequest() throws WebdavException {
-    if (resourceUri != null) {
-      final String addMemberSuffix = intf.getAddMemberSuffix();
+    final String addMemberSuffix = intf.getAddMemberSuffix();
 
-      if (addMemberSuffix != null) {
-        final int pos = resourceUri.lastIndexOf("/");
+    if (addMemberSuffix == null) {
+      return false;
+    }
 
-        if ((pos > 0) && resourceUri.regionMatches(pos + 1,
-                                                   addMemberSuffix,
-                                                   0,
-                                                   addMemberSuffix.length())) {
-          addMember = true;
-          this.resourceUri = resourceUri.substring(0, pos);
-          return true;
-        }
-      }
+    final String reqUri = req.getRequestURI();
+
+    if (reqUri == null) {
+      return false;
+    }
+
+    final int pos = reqUri.lastIndexOf("/");
+
+    if ((pos > 0) && reqUri.regionMatches(pos + 1,
+                                          addMemberSuffix,
+                                          0,
+                                          addMemberSuffix.length())) {
+      addMember = true;
+      return true;
     }
 
     return false;
