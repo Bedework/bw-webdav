@@ -22,6 +22,7 @@ import org.bedework.access.AccessPrincipal;
 import org.bedework.access.AccessXmlUtil;
 import org.bedework.access.Acl.CurrentAccess;
 import org.bedework.access.PrivilegeSet;
+import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
@@ -92,9 +93,9 @@ public abstract class WebdavNsNode implements Serializable {
   protected int status = HttpServletResponse.SC_OK;
 
   private final static HashMap<QName, PropertyTagEntry> propertyNames =
-    new HashMap<QName, PropertyTagEntry>();
+    new HashMap<>();
 
-  private final static Collection<QName> supportedReports = new ArrayList<QName>();
+  private final static Collection<QName> supportedReports = new ArrayList<>();
 
   /** */
   public static class PropertyTagEntry {
@@ -104,14 +105,14 @@ public abstract class WebdavNsNode implements Serializable {
     public boolean inPropAll = false;
 
     /**
-     * @param tag
+     * @param tag a QName
      */
     public PropertyTagEntry(final QName tag) {
       this.tag = tag;
     }
 
     /**
-     * @param tag
+     * @param tag a QName
      * @param inPropAll
      */
     public PropertyTagEntry(final QName tag, final boolean inPropAll) {
@@ -123,6 +124,7 @@ public abstract class WebdavNsNode implements Serializable {
   static {
     addPropEntry(propertyNames, WebdavTags.acl);
     // addPropEntry(propertyNames, WebdavTags.aclRestrictons, false);
+    addPropEntry(propertyNames, WebdavTags.addMember, false);
     addPropEntry(propertyNames, WebdavTags.creationdate, true);
     addPropEntry(propertyNames, WebdavTags.currentUserPrincipal, true);
     addPropEntry(propertyNames, WebdavTags.currentUserPrivilegeSet);
@@ -210,8 +212,8 @@ public abstract class WebdavNsNode implements Serializable {
     public QName rootElement;
 
     /**
-     * @param prop
-     * @param rootElement allow nodes to determine what is tryingto set things
+     * @param prop the property element
+     * @param rootElement allow nodes to determine what is trying to set things
      */
     public SetPropertyResult(final Element prop,
                              final QName rootElement) {
@@ -249,7 +251,7 @@ public abstract class WebdavNsNode implements Serializable {
    * ==================================================================== */
 
   /**
-   * @param xml
+   * @param xml emitter
    * @throws WebdavException
    */
   public void generateHref(final XmlEmit xml) throws WebdavException {
@@ -265,7 +267,7 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   /**
-   * @param xml
+   * @param xml emitter
    * @param uri
    * @throws WebdavException
    */
@@ -291,7 +293,7 @@ public abstract class WebdavNsNode implements Serializable {
   }
 
   /**
-   * @param xml
+   * @param xml emitter
    * @param tag
    * @param uri
    * @param exists - true if we KNOW it exists
@@ -443,8 +445,8 @@ public abstract class WebdavNsNode implements Serializable {
   public boolean generatePropertyValue(final QName tag,
                                        final WebdavNsIntf intf,
                                        final boolean allProp) throws WebdavException {
-    String ns = tag.getNamespaceURI();
-    XmlEmit xml = intf.getXmlEmit();
+    final String ns = tag.getNamespaceURI();
+    final XmlEmit xml = intf.getXmlEmit();
 
     if (!ns.equals(WebdavTags.namespace)) {
       // Not ours
@@ -459,10 +461,22 @@ public abstract class WebdavNsNode implements Serializable {
         return true;
       }
 
+      if (tag.equals(WebdavTags.addMember)) {
+        xml.openTag(tag);
+
+        generateHref(xml,
+                     Util.buildPath(false, uri, "/",
+                                    intf.getAddMemberSuffix()));
+
+        xml.closeTag(tag);
+
+        return true;
+      }
+
       if (tag.equals(WebdavTags.creationdate)) {
         // dav 13.1
 
-        String val = getCreDate();
+        final String val = getCreDate();
         if (val == null) {
           return true;
         }

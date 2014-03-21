@@ -42,16 +42,16 @@ public class PutMethod extends MethodBase {
       trace("PutMethod: doMethod");
     }
 
-    WebdavNsIntf intf = getNsIntf();
+    final WebdavNsIntf intf = getNsIntf();
 
-    IfHeaders ifHeaders = Headers.processIfHeaders(req);
+    final IfHeaders ifHeaders = Headers.processIfHeaders(req);
     if ((ifHeaders.ifHeader != null) &&
         !intf.syncTokenMatch(ifHeaders.ifHeader)) {
       intf.rollback();
       throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED);
     }
 
-    intf.putContent(req, resp, false, ifHeaders);
+    intf.putContent(req, null, resp, false, ifHeaders);
   }
 }
 

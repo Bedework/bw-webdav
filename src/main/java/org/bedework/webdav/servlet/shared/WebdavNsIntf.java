@@ -244,12 +244,18 @@ public abstract class WebdavNsIntf implements Serializable {
   public abstract AccessUtil getAccessUtil() throws WebdavException;
 
   /** Return true if we can PUT this resource/entity
-  *
-  * @param node
-  * @return  boolean
-  * @throws WebdavException
-  */
- public abstract boolean canPut(WebdavNsNode node) throws WebdavException;
+   *
+   * @param node
+   * @return  boolean
+   * @throws WebdavException
+   */
+  public abstract boolean canPut(WebdavNsNode node) throws WebdavException;
+
+  /**
+   * @return - null if DAV:add-member not supported
+   * @throws WebdavException
+   */
+  public abstract String getAddMemberSuffix() throws WebdavException;
 
   /**
    * @return Collection of method names.
@@ -665,32 +671,43 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Put content for the PUT or POST methods
    *
-   * @param req
-   * @param resp
+   * @param req the request
+   * @param resourceUri if not null use this otherwise obtain from request
+   * @param resp the response
    * @param fromPost          POST style - create
    * @param ifHeaders         info from headers
    * @return PutContentResult result of creating
    * @throws WebdavException
    */
   public PutContentResult putContent(final HttpServletRequest req,
+                                     final String resourceUri,
                                      final HttpServletResponse resp,
                                      final boolean fromPost,
                                      final IfHeaders ifHeaders) throws WebdavException {
     try {
       /* We get a node to represent the entity we are creating or updating. */
-      int existance;
+      final int existance;
 
       if (ifHeaders.create) {
         existance = existanceNot;
       } else if (!fromPost) {
         existance = existanceMay;
       } else {
+        /* POST is targetted at the collection */
         existance = existanceMust;
       }
 
-      WebdavNsNode node = getNode(getResourceUri(req),
-                                  existance,
-                                  nodeTypeEntity);
+      final String ruri;
+
+      if (resourceUri != null) {
+        ruri = resourceUri;
+      } else {
+        ruri = getResourceUri(req);
+      }
+
+      final WebdavNsNode node = getNode(ruri,
+                                        existance,
+                                        nodeTypeEntity);
 
       if (node == null) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -703,11 +720,11 @@ public abstract class WebdavNsIntf implements Serializable {
         return null;
       }
 
-      PutContentResult pcr;
+      final PutContentResult pcr;
 
       String[] contentTypePars = null;
-      String contentType = req.getContentType();
-      boolean returnRep = Headers.returnRepresentation(req);
+      final String contentType = req.getContentType();
+      final boolean returnRep = Headers.returnRepresentation(req);
       Content c = null;
 
       if (contentType != null) {
@@ -720,7 +737,7 @@ public abstract class WebdavNsIntf implements Serializable {
                                req.getInputStream(),
                                ifHeaders);
       } else {
-        Reader rdr = getReader(req);
+        final Reader rdr = getReader(req);
 
         if (rdr == null) {
           // No content?
