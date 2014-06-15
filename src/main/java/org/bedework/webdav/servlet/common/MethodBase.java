@@ -165,7 +165,7 @@ public abstract class MethodBase {
       return resourceUri;
     }
 
-    resourceUri = WebdavNsIntf.getResourceUri(req);
+    resourceUri = getNsIntf().getResourceUri(req);
 
     if (debug) {
       trace("resourceUri: " + resourceUri);
