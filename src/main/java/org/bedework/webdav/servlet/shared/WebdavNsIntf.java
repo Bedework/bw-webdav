@@ -911,6 +911,37 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
+  /**
+   * @param uri to check
+   * @return normalized form
+   * @throws WebdavException
+   */
+  public String normalizeUri(String uri) throws WebdavException {
+    /*Remove all "." and ".." components */
+    try {
+      uri = new URI(null, null, uri, null).toString();
+
+      uri = new URI(URLEncoder.encode(uri, "UTF-8")).normalize().getPath();
+
+      uri = URLDecoder.decode(uri, "UTF-8");
+
+      if ((uri.length() > 1) && uri.endsWith("/")) {
+        uri = uri.substring(0, uri.length() - 1);
+      }
+
+      if (debug) {
+        debugMsg("Normalized uri=" + uri);
+      }
+
+      return uri;
+    } catch (final Throwable t) {
+      if (debug) {
+        error(t);
+      }
+      throw new WebdavBadRequest("Bad uri: " + uri);
+    }
+  }
+
   /** Set the content from a Reader
    *
    * @param req
