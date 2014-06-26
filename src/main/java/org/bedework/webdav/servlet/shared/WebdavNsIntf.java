@@ -18,44 +18,32 @@
 */
 package org.bedework.webdav.servlet.shared;
 
+import org.apache.log4j.Logger;
 import org.bedework.access.Acl;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
-import org.bedework.webdav.servlet.common.AccessUtil;
-import org.bedework.webdav.servlet.common.Headers;
+import org.bedework.webdav.servlet.common.*;
 import org.bedework.webdav.servlet.common.Headers.IfHeader;
 import org.bedework.webdav.servlet.common.Headers.IfHeader.TagOrToken;
 import org.bedework.webdav.servlet.common.Headers.IfHeaders;
-import org.bedework.webdav.servlet.common.MethodBase;
 import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
-import org.bedework.webdav.servlet.common.WebdavServlet;
-import org.bedework.webdav.servlet.common.WebdavUtils;
-
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.io.FilterReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /** This acts as an interface to the underlying namespace for which this
  * servlet is acting as a gateway. This could be a file system, a set of
