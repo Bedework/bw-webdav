@@ -19,6 +19,8 @@
 
 package org.bedework.webdav.servlet.shared;
 
+import org.bedework.util.misc.ToString;
+
 import java.io.Serializable;
 
 import javax.xml.namespace.QName;
@@ -28,7 +30,7 @@ import javax.xml.namespace.QName;
  *   @author Mike Douglass   douglm  rpi.edu
  */
 public class WebdavProperty implements Serializable {
-  private QName tag;
+  private final QName tag;
   private String pval;
 
   /** Constructor
@@ -36,37 +38,39 @@ public class WebdavProperty implements Serializable {
    * @param tag  QName name
    * @param pval String value
    */
-  public WebdavProperty(QName tag,
-                        String pval) {
+  public WebdavProperty(final QName tag,
+                        final String pval) {
     this.tag = tag;
     this.pval = pval;
   }
 
   /**
-   * @param val
-   */
-  public void setTag(QName val) {
-    tag = val;
-  }
-
-  /**
-   * @return QName tage name
+   * @return QName tag name
    */
   public QName getTag() {
     return tag;
   }
 
   /**
-   * @param val
+   * @param val the value
    */
-  public void setPval(String val) {
+  public void setPval(final String val) {
     pval = val;
   }
 
   /**
-   * @return STring value
+   * @return String value
    */
   public String getPval() {
     return pval;
+  }
+
+  public String toString() {
+    final ToString ts = new ToString(this);
+
+    ts.append("tag", getTag());
+    ts.append("pval", getPval());
+
+    return ts.toString();
   }
 }

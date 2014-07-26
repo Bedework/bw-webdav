@@ -134,7 +134,7 @@ public class ReportMethod extends MethodBase {
   /* Apply a node to a parsed request - or the other way - whatever.
    */
   protected void doNodeProperties(final WebdavNsNode node) throws WebdavException {
-    int status = node.getStatus();
+    final int status = node.getStatus();
 
     openTag(WebdavTags.response);
 
@@ -349,26 +349,29 @@ public class ReportMethod extends MethodBase {
                                             final int depth,
                                             final WebdavNsIntf intf) throws WebdavException {
     try {
-      Element[] children = getChildrenArray(root);
+      final Element[] children = getChildrenArray(root);
 
       pps = new PrincipalPropertySearch();
 
       for (int i = 0; i < children.length; i++) {
-        Element curnode = children[i];
+        final Element curnode = children[i];
 
         if (XmlUtil.nodeMatches(curnode, WebdavTags.propertySearch)) {
-          PropertySearch ps = new PropertySearch();
-
-          pps.propertySearches.add(ps);
-
-          Element[] pschildren = getChildrenArray(curnode);
+          final Element[] pschildren = getChildrenArray(curnode);
 
           if (pschildren.length != 2) {
             throw new WebdavBadRequest();
           }
 
-          ps.props = intf.parseProp(pschildren[0]);
-          ps.match = pschildren[1];
+          final String match = XmlUtil.getElementContent(pschildren[1]);
+          final Collection<WebdavProperty> props = intf.parseProp(pschildren[0]);
+
+          if (!Util.isEmpty(props)) {
+            for (final WebdavProperty wd: props) {
+              wd.setPval(match);
+              pps.props.add(wd);
+            }
+          }
         } else if (XmlUtil.nodeMatches(curnode, WebdavTags.prop)) {
           pps.pr = pm.parseProps(curnode);
           preq = pps.pr;
@@ -390,9 +393,9 @@ public class ReportMethod extends MethodBase {
           break;
         }
       }
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       System.err.println(t.getMessage());
       if (debug) {
         t.printStackTrace();
@@ -572,13 +575,14 @@ public class ReportMethod extends MethodBase {
 
     startEmit(resp);
 
-    String resourceUri = getResourceUri(req);
+    final String resourceUri = getResourceUri(req);
 
-    Collection<? extends WebdavNsNode> principals = intf.getPrincipals(resourceUri, pps);
+    final Collection<? extends WebdavNsNode> principals =
+            intf.getPrincipals(resourceUri, pps);
 
     openTag(WebdavTags.multistatus);
 
-    for (WebdavNsNode node: principals) {
+    for (final WebdavNsNode node: principals) {
       doNodeProperties(node);
     }
 

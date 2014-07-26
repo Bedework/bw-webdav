@@ -20,8 +20,6 @@ package org.bedework.webdav.servlet.shared;
 
 import org.bedework.webdav.servlet.common.PropFindMethod;
 
-import org.w3c.dom.Element;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,22 +27,9 @@ import java.util.Collection;
  * @author Mike Douglass
  */
 public class PrincipalPropertySearch {
-  /**
+  /** Each of these must match
    */
-  public static class PropertySearch {
-    /**
-     */
-    public Collection<WebdavProperty> props;
-
-    /**
-     */
-    public Element match;
-  }
-
-  /** Collection of PropertySearch objects.
-   */
-  public Collection<PropertySearch> propertySearches =
-    new ArrayList<PropertySearch>();
+  public Collection<WebdavProperty> props = new ArrayList<>();
 
   /** Properties to be returned
    */
