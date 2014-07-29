@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,7 +64,7 @@ public class PropFindMethod extends MethodBase {
 
     /** For the prop element we build a Collection of WebdavProperty
      */
-    public Collection<WebdavProperty> props;
+    public List<WebdavProperty> props;
   }
 
   private PropRequest parsedReq;

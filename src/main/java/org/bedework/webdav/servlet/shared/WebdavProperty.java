@@ -20,8 +20,11 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.util.misc.ToString;
+import edu.rpi.sss.util.Util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -32,6 +35,19 @@ import javax.xml.namespace.QName;
 public class WebdavProperty implements Serializable {
   private final QName tag;
   private String pval;
+
+  private List<Attribute> attrs;
+
+  public static class Attribute implements Serializable {
+    public String name;
+    public String value;
+
+    Attribute(final String name,
+              final String value) {
+      this.name = name;
+      this.value = value;
+    }
+  }
 
   /** Constructor
    *
@@ -65,11 +81,48 @@ public class WebdavProperty implements Serializable {
     return pval;
   }
 
+  /**
+   * @return attribute list - never null
+   */
+  public List<Attribute> getAttrs() {
+    if (attrs == null) {
+      attrs = new ArrayList<>();
+    }
+
+    return attrs;
+  }
+
+  /**
+   * @return true if we have some attributes
+   */
+  public boolean hasAttrs() {
+    return !Util.isEmpty(attrs);
+  }
+
+  public String getAttr(final String name) {
+    if (!hasAttrs()) {
+      return null;
+    }
+
+    for (Attribute attr: attrs) {
+      if (attr.name.equals(name)) {
+        return attr.value;
+      }
+    }
+
+    return null;
+  }
+
+  public void addAttr(final String name, final String val) {
+    getAttrs().add(new Attribute(name, val));
+  }
+
   public String toString() {
     final ToString ts = new ToString(this);
 
     ts.append("tag", getTag());
     ts.append("pval", getPval());
+    ts.append("attrs", attrs);
 
     return ts.toString();
   }

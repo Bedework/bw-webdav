@@ -30,12 +30,17 @@ import org.bedework.webdav.servlet.common.Headers.IfHeader.TagOrToken;
 import org.bedework.webdav.servlet.common.Headers.IfHeaders;
 import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
-import java.io.*;
+import java.io.FilterReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackReader;
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -43,7 +48,12 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
 
 /** This acts as an interface to the underlying namespace for which this
  * servlet is acting as a gateway. This could be a file system, a set of
@@ -1212,28 +1222,27 @@ public abstract class WebdavNsIntf implements Serializable {
 
   /** Parse a <prop> list of property names in any namespace.
    *
-   * @param nd
+   * @param nd the props node
    * @return Collection
    * @throws WebdavException
    */
-  public Collection<WebdavProperty> parseProp(final Node nd) throws WebdavException {
-    Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
+  public List<WebdavProperty> parseProp(final Node nd) throws WebdavException {
+    final List<WebdavProperty> props = new ArrayList<>();
 
-    Element[] children = getChildren(nd);
+    final Element[] children = getChildren(nd);
 
-    for (int i = 0; i < children.length; i++) {
-      Element propnode = children[i];
-      String ns = propnode.getNamespaceURI();
+    for (final Element propnode : children) {
+      final String ns = propnode.getNamespaceURI();
 
       if (xml.getNameSpace(ns) == null) {
         try {
           xml.addNs(new NameSpace(ns, null), false);
-        } catch (IOException e) {
+        } catch (final IOException e) {
           throw new WebdavException(e);
         }
       }
 
-      WebdavProperty prop = makeProp(propnode);
+      final WebdavProperty prop = makeProp(propnode);
 
       if (debug) {
         trace("prop: " + prop.getTag());
@@ -1252,9 +1261,20 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public WebdavProperty makeProp(final Element propnode) throws WebdavException {
-    return new WebdavProperty(new QName(propnode.getNamespaceURI(),
-                                        propnode.getLocalName()),
-                                        null);
+    final WebdavProperty wd =
+            new WebdavProperty(new QName(propnode.getNamespaceURI(),
+                                         propnode.getLocalName()),
+                               null);
+    final NamedNodeMap nnm = propnode.getAttributes();
+
+    for (int i = 0; i < nnm.getLength(); i++) {
+      final Node n = nnm.item(i);
+
+      wd.addAttr(n.getLocalName(),
+                 n.getNodeValue());
+    }
+
+    return wd;
   }
 
   /** Properties we can process */
