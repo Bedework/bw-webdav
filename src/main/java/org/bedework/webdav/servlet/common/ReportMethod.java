@@ -23,13 +23,13 @@ import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
 import org.bedework.webdav.servlet.common.PropFindMethod.PropRequest;
 import org.bedework.webdav.servlet.shared.PrincipalPropertySearch;
-import org.bedework.webdav.servlet.shared.PrincipalPropertySearch.PropertySearch;
 import org.bedework.webdav.servlet.shared.WdSynchReport;
 import org.bedework.webdav.servlet.shared.WdSynchReport.WdSynchReportItem;
 import org.bedework.webdav.servlet.shared.WebdavBadRequest;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 import org.bedework.webdav.servlet.shared.WebdavNsNode;
+import org.bedework.webdav.servlet.shared.WebdavProperty;
 import org.bedework.webdav.servlet.shared.WebdavStatusCode;
 
 import org.w3c.dom.Document;
