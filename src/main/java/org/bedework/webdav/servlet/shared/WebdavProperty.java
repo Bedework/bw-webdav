@@ -20,7 +20,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.util.misc.ToString;
-import edu.rpi.sss.util.Util;
+import org.bedework.util.misc.Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
