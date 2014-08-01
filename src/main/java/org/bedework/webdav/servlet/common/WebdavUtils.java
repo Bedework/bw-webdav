@@ -33,23 +33,33 @@ public class WebdavUtils {
    * @param req
    * @return String prefix
    */
-  public static String getUrlPrefix(HttpServletRequest req) {
+  public static String getUrlPrefix(final HttpServletRequest req) {
     try {
       String url = req.getRequestURL().toString();
 
-      int pos = url.indexOf(req.getContextPath());
+      String contextPath = req.getContextPath();
+      if ((contextPath == null) || (contextPath.equals("."))) {
+        contextPath = "/";
+      }
+
+      String sp = req.getServletPath();
+      if ((sp == null) || (sp.equals("."))) {
+        sp = "/";
+      }
+
+      String prefix = Util.buildPath(false, contextPath, "/", sp);
+      if (prefix.equals("/")) {
+        prefix = "";
+      }
+
+      final int pos = url.indexOf(prefix);
 
       if (pos > 0) {
         url = url.substring(0, pos);
       }
 
-      String context = req.getContextPath();
-      if ((context == null) || (context.equals("."))) {
-        context = "";
-      }
-
-      return url + context;
-    } catch (Throwable t) {
+      return url + prefix;
+    } catch (final Throwable t) {
       Logger.getLogger(WebdavUtils.class).warn(
           "Unable to get url from " + req);
       return "BogusURL.this.is.probably.a.portal";

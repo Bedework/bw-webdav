@@ -18,6 +18,7 @@
 */
 package org.bedework.webdav.servlet.shared;
 
+import org.bedework.util.misc.Util;
 import org.bedework.webdav.servlet.common.WebdavUtils;
 
 import org.apache.log4j.Logger;
@@ -40,8 +41,8 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
   /** If relative we assume urls are relative to the host + port.
    * Internally we need to strip off the host + port + context.
    *
-   * @param req
-   * @param relative
+   * @param req the incoming request
+   * @param relative true for relative urls
    * @throws WebdavException
    */
   public UrlHandler(final HttpServletRequest req,
@@ -49,11 +50,18 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
     this.relative = relative;
 
     try {
-      context = req.getContextPath();
-      if ((context == null) || (context.equals("."))) {
-        /* XXX Not at all sure why I did this.
-         * Context is "" for the root context anyway.
-         */
+      String contextPath = req.getContextPath();
+      if ((contextPath == null) || (contextPath.equals("."))) {
+        contextPath = "/";
+      }
+
+      String sp = req.getServletPath();
+      if ((sp == null) || (sp.equals("."))) {
+        sp = "/";
+      }
+
+      context = Util.buildPath(false, contextPath, "/", sp);
+      if (context.equals("/")) {
         context = "";
       }
 
@@ -69,7 +77,7 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
       if (pos > 0) {
         urlPrefix = urlPrefix.substring(0, pos);
       }
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       Logger.getLogger(WebdavUtils.class).warn(
           "Unable to get url from " + req);
       throw new WebdavException(t);
