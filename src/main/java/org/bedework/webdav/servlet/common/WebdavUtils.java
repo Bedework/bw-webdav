@@ -19,9 +19,13 @@
 
 package org.bedework.webdav.servlet.common;
 
-import java.util.Collection;
-import javax.servlet.http.HttpServletRequest;
+import org.bedework.util.misc.Util;
+
 import org.apache.log4j.Logger;
+
+import java.util.Collection;
+
+import javax.servlet.http.HttpServletRequest;
 
 /** Place for utility methods
  *
