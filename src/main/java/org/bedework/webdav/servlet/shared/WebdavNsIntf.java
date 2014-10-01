@@ -18,17 +18,22 @@
 */
 package org.bedework.webdav.servlet.shared;
 
-import org.apache.log4j.Logger;
 import org.bedework.access.Acl;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
-import org.bedework.webdav.servlet.common.*;
+import org.bedework.webdav.servlet.common.AccessUtil;
+import org.bedework.webdav.servlet.common.Headers;
 import org.bedework.webdav.servlet.common.Headers.IfHeader;
 import org.bedework.webdav.servlet.common.Headers.IfHeader.TagOrToken;
 import org.bedework.webdav.servlet.common.Headers.IfHeaders;
+import org.bedework.webdav.servlet.common.MethodBase;
 import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
+import org.bedework.webdav.servlet.common.WebdavServlet;
+import org.bedework.webdav.servlet.common.WebdavUtils;
+
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -923,9 +928,9 @@ public abstract class WebdavNsIntf implements Serializable {
 
       uri = URLDecoder.decode(uri, "UTF-8");
 
-      if ((uri.length() > 1) && uri.endsWith("/")) {
-        uri = uri.substring(0, uri.length() - 1);
-      }
+      //if ((uri.length() > 1) && uri.endsWith("/")) {
+      //  uri = uri.substring(0, uri.length() - 1);
+      //}
 
       if (debug) {
         debugMsg("Normalized uri=" + uri);
