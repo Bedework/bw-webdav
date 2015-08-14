@@ -1300,10 +1300,10 @@ public abstract class WebdavNsIntf implements Serializable {
    */
   public boolean knownProperty(final WebdavNsNode node,
                                final WebdavProperty pr) {
-    QName tag = pr.getTag();
+    final QName tag = pr.getTag();
 
-    for (int i = 0; i < knownProperties.length; i++) {
-      if (tag.equals(knownProperties[i])) {
+    for (final QName knownProperty : knownProperties) {
+      if (tag.equals(knownProperty)) {
         return true;
       }
     }

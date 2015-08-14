@@ -23,6 +23,7 @@ import org.bedework.access.AccessPrincipal;
 import org.bedework.access.Acl.CurrentAccess;
 import org.bedework.access.WhoDefs;
 import org.bedework.util.xml.XmlEmit;
+import org.bedework.util.xml.tagdefs.AppleServerTags;
 import org.bedework.util.xml.tagdefs.WebdavTags;
 
 import org.w3c.dom.Element;
@@ -39,29 +40,35 @@ import javax.xml.namespace.QName;
  *   @author Mike Douglass   douglm   rpi.edu
  */
 public class WebdavPrincipalNode extends WebdavNsNode {
-  private AccessPrincipal account;
+  private final AccessPrincipal account;
 
   private final static HashMap<QName, PropertyTagEntry> propertyNames =
-    new HashMap<QName, PropertyTagEntry>();
+    new HashMap<>();
 
   static {
     addPropEntry(propertyNames, WebdavTags.groupMemberSet);
     addPropEntry(propertyNames, WebdavTags.groupMembership);
+    addPropEntry(propertyNames, WebdavTags.notificationURL);
+
+    addPropEntry(propertyNames, AppleServerTags.notificationURL);
   }
 
   /**
+   * @param sysi system interface
    * @param urlHandler - needed for building hrefs.
    * @param path - resource path
-   * @param account
+   * @param account - the principal
    * @param collection - true if this is a collection
-   * @param uri
+   * @param uri of request
    * @throws WebdavException
    */
-  public WebdavPrincipalNode(final UrlHandler urlHandler, final String path,
+  public WebdavPrincipalNode(final WdSysIntf sysi,
+                             final UrlHandler urlHandler,
+                             final String path,
                              final AccessPrincipal account,
                              final boolean collection,
                              final String uri) throws WebdavException {
-    super(urlHandler, path, collection, uri);
+    super(sysi, urlHandler, path, collection, uri);
     this.account = account;
     userPrincipal = account.getKind() == WhoDefs.whoTypeUser;
     groupPrincipal = account.getKind() == WhoDefs.whoTypeGroup;
@@ -90,7 +97,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
 
   @Override
   public String getEtagValue(final boolean strong) throws WebdavException {
-    String val = "1234567890";
+    final String val = "1234567890";
 
     if (strong) {
       return "\"" + val + "\"";
@@ -211,14 +218,8 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   public boolean generatePropertyValue(final QName tag,
                                        final WebdavNsIntf intf,
                                        final boolean allProp) throws WebdavException {
-    String ns = tag.getNamespaceURI();
-    XmlEmit xml = intf.getXmlEmit();
-
-    /* Deal with webdav properties */
-    if (!ns.equals(WebdavTags.namespace)) {
-      // Not ours
-      return super.generatePropertyValue(tag, intf, allProp);
-    }
+    final String ns = tag.getNamespaceURI();
+    final XmlEmit xml = intf.getXmlEmit();
 
     try {
       if (tag.equals(WebdavTags.groupMemberSet)) {
@@ -233,9 +234,23 @@ public class WebdavPrincipalNode extends WebdavNsNode {
         return true;
       }
 
+      if (tag.equals(WebdavTags.notificationURL) ||
+          tag.equals(AppleServerTags.notificationURL)) {
+        if (wdSysIntf.getNotificationURL() == null) {
+          return false;
+        }
+
+        xml.openTag(tag);
+        generateHref(xml,
+                     wdSysIntf.getNotificationURL());
+        xml.closeTag(tag);
+
+        return true;
+      }
+
       // Not known - try higher
       return super.generatePropertyValue(tag, intf, allProp);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }

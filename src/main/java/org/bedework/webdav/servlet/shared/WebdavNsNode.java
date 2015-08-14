@@ -57,6 +57,8 @@ public abstract class WebdavNsNode implements Serializable {
 
   private transient Logger log;
 
+  protected WdSysIntf wdSysIntf;
+
   /** Uri of the node. These are relative to the root of the namespace this
    * interface represents and should start with a "/". For example, if this
    * namespace is part of a file system starting at uabc in /var/local/uabc
@@ -166,13 +168,17 @@ public abstract class WebdavNsNode implements Serializable {
 
   /** Constructor
    *
+   * @param sysi system interface
    * @param urlHandler - needed for building hrefs.
    * @param path - resource path
    * @param collection - true if this is a collection
    * @param uri - the uri (XXX is that the same as the path?)
    */
-  public WebdavNsNode(final UrlHandler urlHandler, final String path,
+  public WebdavNsNode(final WdSysIntf sysi,
+                      final UrlHandler urlHandler,
+                      final String path,
                       final boolean collection, final String uri) {
+    wdSysIntf = sysi;
     this.urlHandler = urlHandler;
     this.path = path;
     this.collection = collection;
@@ -634,7 +640,7 @@ public abstract class WebdavNsNode implements Serializable {
       }
 
       if (tag.equals(WebdavTags.syncToken)) {
-        if (!allowsSyncReport()) {
+        if (!wdSysIntf.allowsSyncReport(getCollection(false))) {
           return false;
         }
         xml.property(tag, getSyncToken());
@@ -688,16 +694,16 @@ public abstract class WebdavNsNode implements Serializable {
     return res;
   }
 
-  /** Return a set of Qname defining reports this node supports.
+  /** Return a set of QName defining reports this node supports.
    *
    * @return Collection of QName
    * @throws WebdavException
    */
   public Collection<QName> getSupportedReports() throws WebdavException {
-    Collection<QName> res = new ArrayList<QName>();
+    final Collection<QName> res = new ArrayList<>();
     res.addAll(supportedReports);
 
-    if (allowsSyncReport()) {
+    if (wdSysIntf.allowsSyncReport(getCollection(false))) {
       res.add(WebdavTags.syncCollection);
     }
 
@@ -745,9 +751,18 @@ public abstract class WebdavNsNode implements Serializable {
    * @throws WebdavException
    */
   public String getEncodedUri() throws WebdavException {
+    return getEncodedUri(getUri());
+  }
+
+  /**
+   * @param uri to be encoded
+   * @return String encoded uri
+   * @throws WebdavException
+   */
+  public String getEncodedUri(final String uri) throws WebdavException {
     try {
-      return new URI(null, null, getUri(), null).toString();
-    } catch (Throwable t) {
+      return new URI(null, null, uri, null).toString();
+    } catch (final Throwable t) {
       if (debug) {
         error(t);
       }
