@@ -39,10 +39,13 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -172,6 +175,76 @@ public abstract class MethodBase {
     }
 
     return resourceUri;
+  }
+
+  /** Return a path, broken into its elements, after "." and ".." are removed.
+   * If the parameter path attempts to go above the root we return null.
+   *
+   * Other than the backslash thing why not use URI?
+   *
+   * @param path      String path to be fixed
+   * @return String[]   fixed path broken into elements
+   * @throws WebdavException
+   */
+  public static List<String> fixPath(final String path) throws WebdavException {
+    if (path == null) {
+      return null;
+    }
+
+    String decoded;
+    try {
+      decoded = URLDecoder.decode(path, "UTF8");
+    } catch (final Throwable t) {
+      throw new WebdavException("bad path: " + path);
+    }
+
+    if (decoded == null) {
+      return (null);
+    }
+
+    /** Make any backslashes into forward slashes.
+     */
+    if (decoded.indexOf('\\') >= 0) {
+      decoded = decoded.replace('\\', '/');
+    }
+
+    /** Ensure a leading '/'
+     */
+    if (!decoded.startsWith("/")) {
+      decoded = "/" + decoded;
+    }
+
+    /** Remove all instances of '//'.
+     */
+    while (decoded.contains("//")) {
+      decoded = decoded.replaceAll("//", "/");
+    }
+
+    /** Somewhere we may have /./ or /../
+     */
+
+    final StringTokenizer st = new StringTokenizer(decoded, "/");
+
+    final ArrayList<String> al = new ArrayList<String>();
+    while (st.hasMoreTokens()) {
+      final String s = st.nextToken();
+
+      if (s.equals(".")) {
+        // ignore
+      } else if (s.equals("..")) {
+        // Back up 1
+        if (al.size() == 0) {
+          // back too far
+          return null;
+        }
+
+        al.remove(al.size() - 1);
+      } else {
+        al.add(s);
+      }
+    }
+
+    return al;
   }
 
   protected int defaultDepth(final int depth, final int def) {
