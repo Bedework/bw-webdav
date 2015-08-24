@@ -259,7 +259,7 @@ public class ReportMethod extends MethodBase {
                                final int depth,
                                final WebdavNsIntf intf) throws WebdavException {
     try {
-      Element[] children = getChildrenArray(root);
+      final Element[] children = getChildrenArray(root);
 
       if ((children.length < 2) || (children.length > 4)) {
         throw new WebdavBadRequest("Expect 2 - 4 child elements");
@@ -275,9 +275,9 @@ public class ReportMethod extends MethodBase {
       syncLimit = -1;
 
       if (XmlUtil.nodeMatches(children[1], WebdavTags.synclevel)) {
-        String lvl = XmlUtil.getElementContent(children[1]);
+        final String lvl = XmlUtil.getElementContent(children[1]);
 
-        if (lvl != "1") {
+        if (lvl.equals("1")) {
           syncLevel = 1;
         } else if (lvl.equals("infinity")) {
           syncLevel = Headers.depthInfinity;
