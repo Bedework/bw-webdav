@@ -84,6 +84,29 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
     }
   }
 
+  /**
+   * @param urlPrefix Usually host + port + "/" e.g. example.com:8080/
+   * @param context null, zero length or the servlet context, e.g. caldav
+   * @param relative true if we want relative (to the server) urls
+   * @throws WebdavException
+   */
+  public UrlHandler(final String urlPrefix,
+                    final String context,
+                    final boolean relative) throws WebdavException {
+    this.relative = relative;
+
+    if ((context == null) ||
+        context.equals("/")) {
+      this.context = "";
+    } else if (context.endsWith("/")) {
+      this.context = context.substring(0, context.length() - 1);
+    } else {
+      this.context = context;
+    }
+
+    this.urlPrefix = urlPrefix;
+  }
+
   @Override
   public String prefix(final String val) throws WebdavException {
     try {
@@ -94,7 +117,7 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
       String enc = new URI(null, null, val, null).toString();
       enc = new URI(enc).toASCIIString();  // XXX ???????
 
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
       if (!relative) {
         sb.append(getUrlPrefix());
