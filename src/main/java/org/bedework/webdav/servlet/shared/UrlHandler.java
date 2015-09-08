@@ -110,6 +110,10 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
   @Override
   public String prefix(final String val) throws WebdavException {
     try {
+      if (val == null) {
+        return null;
+      }
+
       if (val.toLowerCase().startsWith("mailto:")) {
         return val;
       }
@@ -129,13 +133,17 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
       append(sb, enc);
 
       return sb.toString();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }
 
   @Override
   public String unprefix(String val) throws WebdavException {
+    if (val == null) {
+      return null;
+    }
+
     if (val.startsWith(getUrlPrefix())) {
       val = val.substring(getUrlPrefix().length());
     }
