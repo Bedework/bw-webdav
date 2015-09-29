@@ -32,6 +32,8 @@ import org.bedework.webdav.servlet.common.MethodBase;
 import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
 import org.bedework.webdav.servlet.common.WebdavServlet;
 import org.bedework.webdav.servlet.common.WebdavUtils;
+import org.bedework.webdav.servlet.shared.serverInfo.Feature;
+import org.bedework.webdav.servlet.shared.serverInfo.ServerInfo;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
@@ -52,6 +54,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -113,6 +116,8 @@ public abstract class WebdavNsIntf implements Serializable {
   boolean returnMultistatusOk = true;
 
   private String urlPrefix;
+
+  private ServerInfo serverInfo;
 
   /** Called before any other method is called to allow initialisation to
    * take place at the first or subsequent requests
@@ -180,6 +185,29 @@ public abstract class WebdavNsIntf implements Serializable {
     }
 
     return "1, 3, access-control, extended-mkcol";
+  }
+
+  /**
+   *
+   * @return server info populated for basic webdav
+   */
+  public ServerInfo getServerInfo() {
+    if (serverInfo != null) {
+      return serverInfo;
+    }
+
+    serverInfo = new ServerInfo();
+
+    serverInfo.setToken(new Date(System.currentTimeMillis()).toString());
+
+    serverInfo.addFeature(new Feature(WebdavTags.accessControl));
+    serverInfo.addFeature(new Feature(WebdavTags.addMember));
+    serverInfo.addFeature(new Feature(WebdavTags.class1));
+    serverInfo.addFeature(new Feature(WebdavTags.class2));
+    serverInfo.addFeature(new Feature(WebdavTags.extendedMkcol));
+    serverInfo.addFeature(new Feature(WebdavTags.syncCollection));
+
+    return serverInfo;
   }
 
   /**
