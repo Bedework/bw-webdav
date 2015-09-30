@@ -203,7 +203,7 @@ public class PropFindMethod extends MethodBase {
                                             WebdavNsIntf.nodeTypeUnknown,
                                             false);
 
-    addHeaders(resp, node);
+    addHeaders(req, resp, node);
 
     openTag(WebdavTags.multistatus);
 

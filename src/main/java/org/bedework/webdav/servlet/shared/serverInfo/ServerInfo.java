@@ -102,6 +102,10 @@ public class ServerInfo {
   public void toXml(final XmlEmit xml) throws Throwable {
     xml.openTag(WebdavTags.serverinfo);
 
+    if (getToken() != null) {
+      xml.property(WebdavTags.token, getToken());
+    }
+
     features.toXml(xml);
 
     if (!Util.isEmpty(getApplications())) {
@@ -116,5 +120,4 @@ public class ServerInfo {
 
     xml.closeTag(WebdavTags.serverinfo);
   }
-
 }

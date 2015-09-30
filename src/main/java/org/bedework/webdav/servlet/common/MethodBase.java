@@ -285,17 +285,16 @@ public abstract class MethodBase {
     }
   }
 
-  protected void addHeaders(final HttpServletResponse resp,
+  protected void addHeaders(final HttpServletRequest req,
+                            final HttpServletResponse resp,
                             final WebdavNsNode node) throws WebdavException {
     addDavHeader(resp, node);
 
     // Lisa say's we need this
     resp.addHeader("MS-Author-Via", "DAV");
 
-    // This probably needs changes
-
-    StringBuilder methods = new StringBuilder();
-    for (String name: getNsIntf().getMethodNames()) {
+    final StringBuilder methods = new StringBuilder();
+    for (final String name: getNsIntf().getMethodNames()) {
       if (methods.length() > 0) {
         methods.append(", ");
       }
@@ -304,6 +303,29 @@ public abstract class MethodBase {
     }
 
     resp.addHeader("Allow", methods.toString());
+  }
+
+  public void checkServerInfo(final HttpServletRequest req,
+                              final HttpServletResponse resp) throws WebdavException {
+    // This probably needs changes
+
+    final String curToken = getNsIntf().getServerInfo().getToken();
+
+    final String method = req.getMethod();
+    boolean sendServerInfoUrl = false;
+
+    final String theirToken = req.getHeader("server-info-token");
+
+    if (theirToken == null) {
+      sendServerInfoUrl = method.equalsIgnoreCase("options");
+    } else if (!theirToken.equals(curToken)) {
+      sendServerInfoUrl = true;
+    }
+
+    if (sendServerInfoUrl) {
+      resp.addHeader("server-info-url",
+                     getNsIntf().makeServerInfoUrl(req));
+    }
   }
 
   protected void addDavHeader(final HttpServletResponse resp,

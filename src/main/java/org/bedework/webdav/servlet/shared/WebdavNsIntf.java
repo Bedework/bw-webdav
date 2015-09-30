@@ -54,7 +54,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -117,7 +116,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
   private String urlPrefix;
 
-  private ServerInfo serverInfo;
+  private static ServerInfo serverInfo;
 
   /** Called before any other method is called to allow initialisation to
    * take place at the first or subsequent requests
@@ -198,7 +197,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
     serverInfo = new ServerInfo();
 
-    serverInfo.setToken(new Date(System.currentTimeMillis()).toString());
+    serverInfo.setToken(String.valueOf(System.currentTimeMillis()));
 
     serverInfo.addFeature(new Feature(WebdavTags.accessControl));
     serverInfo.addFeature(new Feature(WebdavTags.addMember));
@@ -1141,6 +1140,19 @@ public abstract class WebdavNsIntf implements Serializable {
    * @throws WebdavException
    */
   public abstract String makeUserHref(String id) throws WebdavException;
+
+  /** TODO - make the url value configurable
+   *
+   * @param req
+   * @return
+   * @throws WebdavException
+   */
+  public String makeServerInfoUrl(final HttpServletRequest req)
+          throws WebdavException {
+    final UrlHandler uh = new UrlHandler(req, false);
+
+    return uh.prefix("serverinfo/serverinfo.xml");
+  }
 
   /** Object class passed around as we parse access.
    */

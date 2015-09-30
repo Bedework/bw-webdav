@@ -37,8 +37,8 @@ public class OptionsMethod extends MethodBase {
   public void init() {
   }
 
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) throws WebdavException {
     if (debug) {
       trace("OptionsMethod: doMethod");
     }
@@ -57,7 +57,7 @@ public class OptionsMethod extends MethodBase {
         return;
       }
 
-      addHeaders(resp, node);
+      addHeaders(req, resp, node);
     } catch (WebdavException we) {
       throw we;
     } catch (Throwable t) {

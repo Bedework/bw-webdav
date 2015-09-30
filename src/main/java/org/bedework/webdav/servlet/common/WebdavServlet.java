@@ -134,7 +134,7 @@ public abstract class WebdavServlet extends HttpServlet
         methodName = req.getMethod();
       }
 
-      MethodBase method = intf.getMethod(methodName);
+      final MethodBase method = intf.getMethod(methodName);
 
       /*
               if request.headers.hasHeader("origin"):
@@ -177,11 +177,12 @@ public abstract class WebdavServlet extends HttpServlet
         // ================================================================
         resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
       } else {
+        method.checkServerInfo(req, resp);
         method.doMethod(req, resp);
       }
-    } catch (WebdavForbidden wdf) {
+    } catch (final WebdavForbidden wdf) {
       sendError(intf, wdf, resp);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       serverError = handleException(intf, t, resp, serverError);
     } finally {
       if (intf != null) {
