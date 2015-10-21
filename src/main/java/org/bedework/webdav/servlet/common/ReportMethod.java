@@ -492,16 +492,17 @@ public class ReportMethod extends MethodBase {
 
     if (wsr != null) {
       if (!Util.isEmpty(wsr.items)) {
-        for (WdSynchReportItem wsri: wsr.items) {
+        for (final WdSynchReportItem wsri: wsr.items) {
           openTag(WebdavTags.response);
 
           if (wsri.getCanSync()) {
-            pm.doNodeProperties(wsri.getNode(), propReq);
-
             /* No status for changed element - 404 for deleted */
 
             if (wsri.getNode().getDeleted()) {
+              wsri.getNode().generateHref(xml);
               addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+            } else {
+              pm.doNodeProperties(wsri.getNode(), propReq);
             }
           } else {
             wsri.getNode().generateHref(xml);
