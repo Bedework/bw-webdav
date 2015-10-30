@@ -63,10 +63,7 @@ public class AccessHelper implements AccessHelperI {
 
   private transient Logger log;
 
-  /**
-   * @param cb
-   * @throws WebdavException
-   */
+  @Override
   public void init(final CallBack cb) throws WebdavException {
     this.cb = cb;
     debug = getLog().isDebugEnabled();
@@ -77,51 +74,39 @@ public class AccessHelper implements AccessHelperI {
     }
   }
 
-  /** Indicate if we are in superuser mode.
-   * @param val
-   */
+  @Override
   public void setSuperUser(final boolean val) {
     superUser = val;
   }
 
-  /**
-   * @return boolean
-   */
+  @Override
   public boolean getSuperUser() {
     return superUser;
   }
 
   /**
-   * @param val
+   * @param val priv set
    */
+  @SuppressWarnings("unused")
   public void setMaximumAllowedPrivs(final PrivilegeSet val) {
     maxAllowedPrivs = val;
   }
 
-  /** Set the current authenticated principal.
-   *
-   * @param val
-   */
+  @Override
   public void setAuthPrincipal(final AccessPrincipal val) {
     authPrincipal = val;
   }
 
-  /** Called at request start
-   *
-   */
+  @Override
   public void open() {
   }
 
-  /** Called at request end
-   *
-   */
+  @Override
   public void close() {
     //pathInfoMap.flush();
   }
 
-  /* (non-Javadoc)
-   * @see org.bedework.carddav.server.access.AccessUtilI#getParent(org.bedework.carddav.server.access.SharedEntity)
-   */
+  @Override
   public SharedEntity getParent(final SharedEntity val) throws WebdavException {
     if (val.getParentPath() == null) {
       return null;
@@ -134,23 +119,17 @@ public class AccessHelper implements AccessHelperI {
    *                   Access control
    * ==================================================================== */
 
-  /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#getDefaultPublicAccess()
-   */
+  @Override
   public String getDefaultPublicAccess() {
     return Access.getDefaultPublicAccess();
   }
 
-  /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#getDefaultPersonalAccess()
-   */
+  @Override
   public String getDefaultPersonalAccess() {
     return Access.getDefaultPersonalAccess();
   }
 
-  /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#changeAccess(org.bedework.calfacade.base.SharedEntity, java.util.Collection, boolean)
-   */
+  @Override
   public void changeAccess(final SharedEntity ent,
                            final Collection<Ace> aces,
                            final boolean replaceAll) throws WebdavException {
@@ -176,6 +155,7 @@ public class AccessHelper implements AccessHelperI {
     }
   }
 
+  @Override
   public void defaultAccess(final SharedEntity ent,
                             final AceWho who) throws WebdavException {
     try {
@@ -195,15 +175,13 @@ public class AccessHelper implements AccessHelperI {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#checkAccess(java.util.Collection, int, boolean)
-   */
+  @Override
   public Collection<? extends SharedEntity>
                 checkAccess(final Collection<? extends SharedEntity> ents,
                                 final int desiredAccess,
                                 final boolean alwaysReturn)
           throws WebdavException {
-    TreeSet<SharedEntity> out = new TreeSet<SharedEntity>();
+    TreeSet<SharedEntity> out = new TreeSet<>();
 
     for (SharedEntity sdbe: ents) {
       if (checkAccess(sdbe, desiredAccess, alwaysReturn).getAccessAllowed()) {
@@ -214,9 +192,7 @@ public class AccessHelper implements AccessHelperI {
     return out;
   }
 
-  /* (non-Javadoc)
-   * @see org.bedework.calcorei.AccessUtilI#checkAccess(org.bedework.calfacade.base.SharedEntity, int, boolean)
-   */
+  @Override
   public CurrentAccess checkAccess(final SharedEntity ent,
                                    final int desiredAccess,
                         final boolean alwaysReturnResult) throws WebdavException {
@@ -262,7 +238,7 @@ public class AccessHelper implements AccessHelperI {
       AccessPrincipal owner = cb.getPrincipal(ent.getOwnerHref());
       PrivilegeSet maxPrivs = null;
 
-      char[] aclChars = null;
+      char[] aclChars;
 
       if (ent.isCollection()) {
         String path = ent.getPath();
@@ -273,7 +249,7 @@ public class AccessHelper implements AccessHelperI {
 
         if (!getSuperUser()) {
           if (cb.getUserHomeRoot().equals(path)) {
-            ca = new CurrentAccess();
+            //ca = new CurrentAccess();
 
             ca = Acl.defaultNonOwnerAccess;
           } else if (path.equals(cb.getUserHomeRoot() + owner.getAccount() + "/")){
@@ -370,7 +346,7 @@ public class AccessHelper implements AccessHelperI {
     String path = container.getPath();
 
     String aclStr;
-    char[] aclChars = null;
+    char[] aclChars;
 
     /* Get access for the parent first if we have one */
     SharedEntity parent = getParent(container);
@@ -380,15 +356,13 @@ public class AccessHelper implements AccessHelperI {
                                  parent.getPath(),
                                  container.getAccess()));
     } else if (container.getAccess() != null) {
-      aclStr = new String(container.getAccess());
+      aclStr = container.getAccess();
     } else {
       // At root
       throw new WebdavException("Collections must have default access set at root");
     }
 
-    if (aclStr != null) {
-      aclChars = aclStr.toCharArray();
-    }
+    aclChars = aclStr.toCharArray();
 
     if (ent.isCollection()) {
       return aclChars;

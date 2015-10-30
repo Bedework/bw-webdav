@@ -48,11 +48,11 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
   /** Methods called to obtain system information.
    *
    */
-  public static abstract class CallBack implements AccessCb, Serializable {
+  abstract class CallBack implements AccessCb, Serializable {
     /**
      * @param href
      * @return AccessPrincipal or null for not valid
-     * @throws WebdavException
+     * @throws WebdavException on error
      */
     public abstract AccessPrincipal getPrincipal(String href) throws WebdavException;
 
@@ -60,7 +60,7 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
      * the root of the file system for which we are evaluating access.
      *
      * @return String root - must be prefixed and suffixed with "/"
-     * @throws WebdavException
+     * @throws WebdavException on error
      */
     public abstract String getUserHomeRoot() throws WebdavException;
 
@@ -68,51 +68,51 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
      *
      * @param  path          String path of collection
      * @return SharedEntity null for unknown collection
-     * @throws WebdavException
+     * @throws WebdavException on error
      */
     public abstract SharedEntity getCollection(String path) throws WebdavException;
   }
 
   /**
    *
-   * @param cb
-   * @throws WebdavException
+   * @param cb callback
+   * @throws WebdavException on error
    */
-  public void init(CallBack cb) throws WebdavException;
+  void init(CallBack cb) throws WebdavException;
 
   /** Indicate if we are in superuser mode.
-   * @param val
+   * @param val true for superuser
    */
-  public void setSuperUser(boolean val);
+  void setSuperUser(boolean val);
 
   /**
    * @return boolean
    */
-  public boolean getSuperUser();
+  boolean getSuperUser();
 
   /** Set the current authenticated user.
    *
-   * @param val
+   * @param val principal
    */
-  public void setAuthPrincipal(AccessPrincipal val);
+  void setAuthPrincipal(AccessPrincipal val);
 
   /** Called at request start
    *
    */
-  public void open();
+  void open();
 
   /** Called at request end
    *
    */
-  public void close();
+  void close();
 
   /** Called to get the parent object for a shared entity.
    *
-   * @param val
+   * @param val entity
    * @return parent calendar or null.
-   * @throws WebdavException
+   * @throws WebdavException on error
    */
-  public SharedEntity getParent(SharedEntity val) throws WebdavException;
+  SharedEntity getParent(SharedEntity val) throws WebdavException;
 
   /* ====================================================================
    *                   Access control
@@ -122,13 +122,13 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
    *
    * @return String value for default access
    */
-  public String getDefaultPublicAccess();
+  String getDefaultPublicAccess();
 
   /**
    *
    * @return String default user access
    */
-  public String getDefaultPersonalAccess();
+  String getDefaultPersonalAccess();
 
   /** Change the access to the given calendar entity using the supplied aces.
    * We are changing access so we remove all access for each who in the list and
@@ -137,19 +137,19 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
    * @param ent        DbEntity
    * @param aces       Collection of ace objects
    * @param replaceAll true to replace the entire access list.
-   * @throws WebdavException
+   * @throws WebdavException on error
    */
-  public void changeAccess(SharedEntity ent,
-                           Collection<Ace> aces,
-                           boolean replaceAll) throws WebdavException;
+  void changeAccess(SharedEntity ent,
+                    Collection<Ace> aces,
+                    boolean replaceAll) throws WebdavException;
 
   /** Remove any explicit access for the given who to the given calendar entity.
   *
   * @param ent      DbEntity
   * @param who      AceWho
-  * @throws WebdavException
+   * @throws WebdavException on error
   */
- public void defaultAccess(SharedEntity ent,
+ void defaultAccess(SharedEntity ent,
                            AceWho who) throws WebdavException;
 
   /** Return a Collection of the objects after checking access
@@ -160,10 +160,10 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
    * @return Collection   of checked objects
    * @throws WebdavException for no access or other failure
    */
-  public Collection<? extends SharedEntity>
-                 checkAccess(Collection<? extends SharedEntity> ents,
-                                int desiredAccess,
-                                boolean alwaysReturn)
+  Collection<? extends SharedEntity>
+        checkAccess(Collection<? extends SharedEntity> ents,
+                    int desiredAccess,
+                    boolean alwaysReturn)
           throws WebdavException;
 
   /** Check access for the given entity. Returns the current access
@@ -181,12 +181,12 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
    * Specific access should be no more than read, write-content to the home
    * directory.
    *
-   * @param ent
-   * @param desiredAccess
-   * @param alwaysReturnResult
+   * @param ent shred entity
+   * @param desiredAccess access
+   * @param alwaysReturnResult true to return always
    * @return  CurrentAccess
-   * @throws WebdavException
+   * @throws WebdavException on error
    */
-  public CurrentAccess checkAccess(SharedEntity ent, int desiredAccess,
-                        boolean alwaysReturnResult) throws WebdavException;
+  CurrentAccess checkAccess(SharedEntity ent, int desiredAccess,
+                            boolean alwaysReturnResult) throws WebdavException;
 }

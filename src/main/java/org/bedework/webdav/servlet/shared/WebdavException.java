@@ -27,14 +27,14 @@ import javax.xml.namespace.QName;
  *   @author Mike Douglass   douglm  rpi.edu
  */
 public class WebdavException extends Throwable {
-  /** > 0 if set
+  /** gt 0 if set
    */
   int statusCode = -1;
   QName errorTag;
 
   /** Constructor
    *
-   * @param s
+   * @param s message
    */
   public WebdavException(String s) {
     super(s);
@@ -45,7 +45,7 @@ public class WebdavException extends Throwable {
 
   /** Constructor
    *
-   * @param t
+   * @param t throwable
    */
   public WebdavException(Throwable t) {
     super(t);
@@ -56,7 +56,7 @@ public class WebdavException extends Throwable {
 
   /** Constructor
    *
-   * @param st
+   * @param st status
    */
   public WebdavException(int st) {
     statusCode = st;
@@ -64,8 +64,8 @@ public class WebdavException extends Throwable {
 
   /** Constructor
    *
-   * @param st
-   * @param msg
+   * @param st status
+   * @param msg message
    */
   public WebdavException(int st, String msg) {
     super(msg);
@@ -74,8 +74,8 @@ public class WebdavException extends Throwable {
 
   /** Constructor
    *
-   * @param st
-   * @param errorTag
+   * @param st status
+   * @param errorTag QName identify error
    */
   public WebdavException(int st, QName errorTag) {
     statusCode = st;
@@ -84,9 +84,9 @@ public class WebdavException extends Throwable {
 
   /** Constructor
    *
-   * @param st
-   * @param errorTag
-   * @param msg
+   * @param st status
+   * @param errorTag QName identify error
+   * @param msg message
    */
   public WebdavException(int st, QName errorTag, String msg) {
     super(msg);
@@ -97,6 +97,7 @@ public class WebdavException extends Throwable {
   /** Set the status
    * @param val int status
    */
+  @SuppressWarnings("unused")
   public void setStatusCode(int val) {
     statusCode = val;
   }
