@@ -266,11 +266,13 @@ public abstract class WebdavServlet extends HttpServlet
   private void sendError(final WebdavNsIntf intf, final Throwable t,
                          final HttpServletResponse resp) {
     try {
-      intf.rollback();
+      try {
+        intf.rollback();
+      } catch (final Throwable ignored) {}
 
       if (t instanceof WebdavException) {
-        WebdavException wde = (WebdavException)t;
-        QName errorTag = wde.getErrorTag();
+        final WebdavException wde = (WebdavException)t;
+        final QName errorTag = wde.getErrorTag();
 
         if (errorTag != null) {
           if (debug) {
@@ -290,7 +292,7 @@ public abstract class WebdavServlet extends HttpServlet
                          " message=" + wde.getMessage());
               }
               resp.sendError(wde.getStatusCode(), sw.toString());
-            } catch (Throwable t1) {
+            } catch (final Throwable ignored) {
             }
           }
         } else {
@@ -308,8 +310,9 @@ public abstract class WebdavServlet extends HttpServlet
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                        t.getMessage());
       }
-    } catch (Throwable t1) {
+    } catch (final Throwable ignored) {
       // Pretty much screwed if we get here
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
 
