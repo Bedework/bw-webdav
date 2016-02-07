@@ -235,7 +235,7 @@ public class PropFindMethod extends MethodBase {
                                 final PropRequest pr) throws WebdavException {
     node.generateHref(xml);
 
-    if ((pr == null) || (!node.getExists())) {
+    if ((pr == null) || Util.isEmpty(pr.props) || (!node.getExists())) {
       openTag(WebdavTags.propstat);
       addStatus(node.getStatus(), null);
       closeTag(WebdavTags.propstat);
