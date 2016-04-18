@@ -18,17 +18,17 @@
 */
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.util.xml.XmlEmit;
+import org.bedework.util.xml.XmlEmit.NameSpace;
+import org.bedework.util.xml.XmlEmit.Notifier;
+import org.bedework.util.xml.XmlUtil;
+import org.bedework.util.xml.tagdefs.WebdavTags;
 import org.bedework.webdav.servlet.shared.WebdavBadRequest;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 import org.bedework.webdav.servlet.shared.WebdavNsNode;
 import org.bedework.webdav.servlet.shared.WebdavProperty;
 import org.bedework.webdav.servlet.shared.WebdavStatusCode;
-import org.bedework.util.xml.XmlEmit;
-import org.bedework.util.xml.XmlEmit.NameSpace;
-import org.bedework.util.xml.XmlEmit.Notifier;
-import org.bedework.util.xml.XmlUtil;
-import org.bedework.util.xml.tagdefs.WebdavTags;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -317,14 +317,18 @@ public abstract class MethodBase {
     final String theirToken = req.getHeader("server-info-token");
 
     if (theirToken == null) {
+      // Always send header for no token on OPTIONS
       sendServerInfoUrl = method.equalsIgnoreCase("options");
     } else if (!theirToken.equals(curToken)) {
+      // * will not match so covers that case
       sendServerInfoUrl = true;
     }
 
     if (sendServerInfoUrl) {
-      resp.addHeader("server-info-url",
-                     getNsIntf().makeServerInfoUrl(req));
+      resp.addHeader("Link",
+                     "<" + getNsIntf().makeServerInfoUrl(req) +
+                             ">; rel=\"server-info\"; " +
+                             "token=\"" + curToken + "\"");
     }
   }
 
