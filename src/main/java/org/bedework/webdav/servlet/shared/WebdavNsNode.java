@@ -996,6 +996,8 @@ public abstract class WebdavNsNode implements Serializable {
    */
   public abstract WdCollection getCollection(boolean deref) throws WebdavException;
 
+  public abstract WdCollection getImmediateTargetCollection() throws WebdavException;
+
   /**
    * @return true if this node allows a sync-report.
    * @throws WebdavException

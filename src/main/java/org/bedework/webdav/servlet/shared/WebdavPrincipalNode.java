@@ -122,6 +122,12 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   }
 
   @Override
+  public WdCollection getImmediateTargetCollection()
+          throws WebdavException {
+    return null;
+  }
+
+  @Override
   public boolean allowsSyncReport() throws WebdavException {
     return false;
   }
