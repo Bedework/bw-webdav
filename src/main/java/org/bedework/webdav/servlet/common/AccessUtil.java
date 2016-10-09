@@ -18,9 +18,9 @@
 */
 package org.bedework.webdav.servlet.common;
 
-import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.access.AccessXmlUtil;
 import org.bedework.util.xml.XmlEmit;
+import org.bedework.webdav.servlet.shared.WebdavException;
 
 import javax.xml.namespace.QName;
 

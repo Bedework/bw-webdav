@@ -24,7 +24,6 @@ import org.bedework.util.xml.tagdefs.WebdavTags;
 import org.bedework.webdav.servlet.common.PropFindMethod.PropRequest;
 import org.bedework.webdav.servlet.shared.PrincipalPropertySearch;
 import org.bedework.webdav.servlet.shared.WdSynchReport;
-import org.bedework.webdav.servlet.shared.WdSynchReport.WdSynchReportItem;
 import org.bedework.webdav.servlet.shared.WebdavBadRequest;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
@@ -479,10 +478,15 @@ public class ReportMethod extends MethodBase {
   private void processSyncReport(final HttpServletRequest req,
                                  final HttpServletResponse resp,
                                  final WebdavNsIntf intf) throws WebdavException {
-    WdSynchReport wsr = intf.getSynchReport(getResourceUri(req),
-                                            syncToken,
-                                            syncLimit,
-                                            syncRecurse);
+    final WdSynchReport wsr = intf.getSynchReport(getResourceUri(req),
+                                                  syncToken,
+                                                  syncLimit,
+                                                  syncRecurse);
+    if (wsr == null) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+    
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
 
@@ -490,32 +494,30 @@ public class ReportMethod extends MethodBase {
 
     openTag(WebdavTags.multistatus);
 
-    if (wsr != null) {
-      if (!Util.isEmpty(wsr.items)) {
-        for (final WdSynchReportItem wsri: wsr.items) {
-          openTag(WebdavTags.response);
+    if (!Util.isEmpty(wsr.items)) {
+      for (final WdSynchReport.WdSynchReportItem wsri: wsr.items) {
+        openTag(WebdavTags.response);
 
-          if (wsri.getCanSync()) {
+        if (wsri.getCanSync()) {
             /* No status for changed element - 404 for deleted */
 
-            if (wsri.getNode().getDeleted()) {
-              wsri.getNode().generateHref(xml);
-              addStatus(HttpServletResponse.SC_NOT_FOUND, null);
-            } else {
-              pm.doNodeProperties(wsri.getNode(), propReq);
-            }
-          } else {
+          if (wsri.getNode().getDeleted()) {
             wsri.getNode().generateHref(xml);
-            addStatus(HttpServletResponse.SC_FORBIDDEN, null);
-            propertyTagVal(WebdavTags.error, WebdavTags.syncTraversalSupported);
+            addStatus(HttpServletResponse.SC_NOT_FOUND, null);
+          } else {
+            pm.doNodeProperties(wsri.getNode(), propReq);
           }
-
-          closeTag(WebdavTags.response);
+        } else {
+          wsri.getNode().generateHref(xml);
+          addStatus(HttpServletResponse.SC_FORBIDDEN, null);
+          propertyTagVal(WebdavTags.error, WebdavTags.syncTraversalSupported);
         }
-      }
 
-      property(WebdavTags.syncToken, wsr.token);
+        closeTag(WebdavTags.response);
+      }
     }
+
+    property(WebdavTags.syncToken, wsr.token);
 
     closeTag(WebdavTags.multistatus);
 
