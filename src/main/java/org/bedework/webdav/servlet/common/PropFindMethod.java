@@ -96,12 +96,14 @@ public class PropFindMethod extends MethodBase {
     if (depth == Headers.depthNone) {
       depth = Headers.depthInfinity;
     }
+    
+    if (parsedReq == null) {
+      throw new WebdavBadRequest("PROPFIND: unexpected element");
+    }
 
     if (debug) {
       trace("PropFindMethod: depth=" + depth);
-      if (parsedReq != null) {
-        trace("                type=" + parsedReq.reqType);
-      }
+      trace("                type=" + parsedReq.reqType);
     }
 
     processResp(req, resp, depth);
