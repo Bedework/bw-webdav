@@ -198,33 +198,40 @@ public abstract class WebdavServlet extends HttpServlet
       } catch (Throwable t) {}
 
       if (debug && dumpContent &&
-          (resp instanceof CharArrayWrappedResponse)) {
+              (resp instanceof CharArrayWrappedResponse)) {
         /* instanceof check because we might get a subsequent exception before
          * we wrap the response
          */
-        CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
+        final CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
 
         if (wresp.getUsedOutputStream()) {
           debugMsg("------------------------ response written to output stream -------------------");
         } else {
-          String str = wresp.toString();
+          final String str = wresp.toString();
 
-          debugMsg("------------------------ Dump of response -------------------");
-          debugMsg(str);
-          debugMsg("---------------------- End dump of response -----------------");
+          if ((str == null) || (str.length() == 0)) {
+            debugMsg("------------------------ No response content -------------------");
+            resp.setContentLength(0);
+          } else {
+            debugMsg(
+                    "------------------------ Dump of response -------------------");
+            debugMsg(str);
+            debugMsg(
+                    "---------------------- End dump of response -----------------");
 
-          byte[] bs = str.getBytes();
-          resp = (HttpServletResponse)wresp.getResponse();
-          debugMsg("contentLength=" + bs.length);
-          resp.setContentLength(bs.length);
-          resp.getOutputStream().write(bs);
+            final byte[] bs = str.getBytes();
+            resp = (HttpServletResponse)wresp.getResponse();
+            debugMsg("contentLength=" + bs.length);
+            resp.setContentLength(bs.length);
+            resp.getOutputStream().write(bs);
+          }
         }
       }
 
       if (!webVersion) {
         /* WebDAV is stateless - toss away the session */
         try {
-          HttpSession sess = req.getSession(false);
+          final HttpSession sess = req.getSession(false);
           if (sess != null) {
             sess.invalidate();
           }
