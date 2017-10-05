@@ -19,6 +19,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.access.Acl;
+import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlUtil;
@@ -57,6 +58,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -731,7 +733,7 @@ public abstract class WebdavNsIntf implements Serializable {
         addMember = true;
       }
 
-      final String ruri;
+      String ruri;
 
       if (resourceUri != null) {
         ruri = resourceUri;
@@ -739,6 +741,11 @@ public abstract class WebdavNsIntf implements Serializable {
         ruri = getResourceUri(req);
       }
 
+      if (addMember) {
+        ruri = Util.buildPath(false, ruri, "/",
+                              UUID.randomUUID().toString(), ".ics");
+      }
+      
       final WebdavNsNode node = getNode(ruri,
                                         existence,
                                         nodeTypeEntity,
