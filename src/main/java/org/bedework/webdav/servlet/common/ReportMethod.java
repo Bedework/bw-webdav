@@ -79,7 +79,7 @@ public class ReportMethod extends MethodBase {
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("ReportMethod: doMethod");
+      debug("ReportMethod: doMethod");
     }
 
     /* Get hold of the PROPFIND method instance - we need it to process
@@ -104,7 +104,7 @@ public class ReportMethod extends MethodBase {
     int depth = Headers.depth(req, 0);
 
     if (debug) {
-      trace("ReportMethod: depth=" + depth);
+      debug("ReportMethod: depth=" + depth);
     }
 
     process(doc, depth, req, resp);

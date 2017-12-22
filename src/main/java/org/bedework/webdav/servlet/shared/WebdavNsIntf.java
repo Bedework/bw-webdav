@@ -19,6 +19,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.access.Acl;
+import org.bedework.util.misc.Logged;
 import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
@@ -36,7 +37,6 @@ import org.bedework.webdav.servlet.common.WebdavUtils;
 import org.bedework.webdav.servlet.shared.serverInfo.Feature;
 import org.bedework.webdav.servlet.shared.serverInfo.ServerInfo;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -79,11 +79,7 @@ import javax.xml.namespace.QName;
  *
  *   @author Mike Douglass
  */
-public abstract class WebdavNsIntf implements Serializable {
-  protected boolean debug;
-
-  protected transient Logger log;
-
+public abstract class WebdavNsIntf extends Logged implements Serializable {
   protected static class SessCt {
     int sessNum;
   }
@@ -138,8 +134,6 @@ public abstract class WebdavNsIntf implements Serializable {
     xml = new XmlEmit();
     this.methods = methods;
     this.dumpContent = dumpContent;
-
-    debug = getLogger().isDebugEnabled();
 
     synchronized (session) {
       session.sessNum++;
@@ -243,7 +237,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
     if (!token.equals(tt.value)) {
       if (debug) {
-        debugMsg("putContent: sync-token mismatch ifheader=" + tt.value +
+        debug("putContent: sync-token mismatch ifheader=" + tt.value +
                  "col-token=" + token);
       }
       return false;
@@ -845,13 +839,13 @@ public abstract class WebdavNsIntf implements Serializable {
         if (!c.written) {
           if ((c.stream == null) && (c.rdr == null)) {
             if (debug) {
-              debugMsg("status: " + HttpServletResponse.SC_NO_CONTENT);
+              debug("status: " + HttpServletResponse.SC_NO_CONTENT);
             }
 
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
           } else {
             if (debug) {
-              debugMsg("send content - length=" + c.contentLength);
+              debug("send content - length=" + c.contentLength);
             }
 
             if (c.stream != null) {
@@ -967,7 +961,7 @@ public abstract class WebdavNsIntf implements Serializable {
       //}
 
       if (debug) {
-        debugMsg("Normalized uri=" + uri);
+        debug("Normalized uri=" + uri);
       }
 
       return uri;
@@ -1297,7 +1291,7 @@ public abstract class WebdavNsIntf implements Serializable {
       final WebdavProperty prop = makeProp(propnode);
 
       if (debug) {
-        trace("prop: " + prop.getTag());
+        debug("prop: " + prop.getTag());
       }
 
       props.add(prop);
@@ -1449,7 +1443,7 @@ public abstract class WebdavNsIntf implements Serializable {
   public String getLocation(final WebdavNsNode node) throws WebdavException {
     try {
       if (debug) {
-        trace("Get url " + urlPrefix + node.getEncodedUri());
+        debug("Get url " + urlPrefix + node.getEncodedUri());
       }
 
       String url = urlPrefix + new URI(node.getEncodedUri()).toASCIIString();
@@ -1604,7 +1598,7 @@ public abstract class WebdavNsIntf implements Serializable {
     @Override
     public void close() throws IOException {
       if (sb != null) {
-        trace(sb.toString());
+        debug(sb.toString());
       }
 
       super.close();
@@ -1616,7 +1610,7 @@ public abstract class WebdavNsIntf implements Serializable {
 
       if (c == -1) {
         if (sb != null) {
-          trace(sb.toString());
+          debug(sb.toString());
           sb = null;
         }
         return c;
@@ -1625,7 +1619,7 @@ public abstract class WebdavNsIntf implements Serializable {
       if (sb != null) {
         char ch = (char)c;
         if (ch == '\n') {
-          trace(sb.toString());
+          debug(sb.toString());
           sb = new StringBuilder();
         } else {
           sb.append(ch);
@@ -1856,31 +1850,19 @@ public abstract class WebdavNsIntf implements Serializable {
     }
   }
 
-  protected Logger getLogger() {
-    if (log == null) {
-      log = Logger.getLogger(this.getClass());
-    }
-
-    return log;
-  }
-
-  protected void trace(final String msg) {
-    getLogger().debug("[" + sessNum + "] " + msg);
-  }
-
-  protected void debugMsg(final String msg) {
-    getLogger().debug("[" + sessNum + "] " + msg);
+  protected void debug(final String msg) {
+    super.debug("[" + sessNum + "] " + msg);
   }
 
   protected void warn(final String msg) {
-    getLogger().warn("[" + sessNum + "] " + msg);
+    super.warn("[" + sessNum + "] " + msg);
   }
 
   protected void error(final Throwable t) {
-    getLogger().error(this, t);
+    super.error(t);
   }
 
   protected void logIt(final String msg) {
-    getLogger().info("[" + sessNum + "] " + msg);
+    super.info("[" + sessNum + "] " + msg);
   }
 }

@@ -346,7 +346,6 @@ public class AccessHelper implements AccessHelperI {
     String path = container.getPath();
 
     String aclStr;
-    char[] aclChars;
 
     /* Get access for the parent first if we have one */
     SharedEntity parent = getParent(container);
@@ -362,7 +361,7 @@ public class AccessHelper implements AccessHelperI {
       throw new WebdavException("Collections must have default access set at root");
     }
 
-    aclChars = aclStr.toCharArray();
+    char[] aclChars = aclStr.toCharArray();
 
     if (ent.isCollection()) {
       return aclChars;

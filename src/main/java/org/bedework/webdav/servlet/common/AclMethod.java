@@ -47,7 +47,7 @@ public class AclMethod extends MethodBase {
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("AclMethod: doMethod");
+      debug("AclMethod: doMethod");
     }
 
     Document doc = parseContent(req, resp);

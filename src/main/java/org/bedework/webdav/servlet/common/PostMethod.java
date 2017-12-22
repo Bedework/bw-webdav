@@ -55,7 +55,7 @@ public class PostMethod extends MethodBase {
                                  final HttpServletResponse resp) throws WebdavException {
 
     if (debug) {
-      trace("PostMethod: doMethod");
+      debug("PostMethod: doMethod");
     }
 
     final WebdavNsIntf intf = getNsIntf();

@@ -49,7 +49,7 @@ public class PropPatchMethod extends MethodBase {
   public void doMethod(final HttpServletRequest req,
                         final HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("PropPatchMethod: doMethod");
+      debug("PropPatchMethod: doMethod");
     }
 
     /* Parse any content */

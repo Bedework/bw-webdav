@@ -60,7 +60,7 @@ public abstract class WebdavServlet extends HttpServlet
   /* If true we don't invalidate the session - this might allow the application
    * to be used as the server for CAS authenticated widgets etc.
    */
-  protected boolean webVersion;
+  protected boolean preserveSession;
 
   protected transient Logger log;
 
@@ -76,16 +76,20 @@ public abstract class WebdavServlet extends HttpServlet
     int waiting;
   }
 
-  private static volatile HashMap<String, Waiter> waiters = new HashMap<String, Waiter>();
+  private static volatile HashMap<String, Waiter> waiters = new HashMap<>();
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
 
     dumpContent = "true".equals(config.getInitParameter("dumpContent"));
-    webVersion = "true".equals(config.getInitParameter("web-version"));
+    preserveSession = "true".equals(config.getInitParameter("preserve-session"));
 
     addMethods();
+  }
+
+  public void setPreserveSession(final boolean val) {
+    preserveSession = val;
   }
 
   /** Get an interface for the namespace
@@ -228,7 +232,7 @@ public abstract class WebdavServlet extends HttpServlet
         }
       }
 
-      if (!webVersion) {
+      if (!preserveSession) {
         /* WebDAV is stateless - toss away the session */
         try {
           final HttpSession sess = req.getSession(false);

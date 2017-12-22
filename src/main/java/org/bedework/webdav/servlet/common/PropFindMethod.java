@@ -78,7 +78,7 @@ public class PropFindMethod extends MethodBase {
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("PropFindMethod: doMethod");
+      debug("PropFindMethod: doMethod");
     }
 
     Document doc = parseContent(req, resp);
@@ -102,8 +102,8 @@ public class PropFindMethod extends MethodBase {
     }
 
     if (debug) {
-      trace("PropFindMethod: depth=" + depth);
-      trace("                type=" + parsedReq.reqType);
+      debug("PropFindMethod: depth=" + depth);
+      debug("                type=" + parsedReq.reqType);
     }
 
     processResp(req, resp, depth);
@@ -130,7 +130,7 @@ public class PropFindMethod extends MethodBase {
       if (debug) {
         String nm = curnode.getLocalName();
 
-        trace("reqtype: " + nm + " ns: " + ns);
+        debug("reqtype: " + nm + " ns: " + ns);
       }
 
       parsedReq = tryPropRequest(curnode);
@@ -198,7 +198,7 @@ public class PropFindMethod extends MethodBase {
 
     String resourceUri = getResourceUri(req);
     if (debug) {
-      trace("About to get node at " + resourceUri);
+      debug("About to get node at " + resourceUri);
     }
 
     WebdavNsNode node = getNsIntf().getNode(resourceUri,
@@ -250,7 +250,7 @@ public class PropFindMethod extends MethodBase {
       openTag(WebdavTags.propstat);
 
       if (debug) {
-        trace("doNodeProperties type=" + pr.reqType);
+        debug("doNodeProperties type=" + pr.reqType);
       }
 
       if (pr.reqType == PropRequest.ReqType.propName) {

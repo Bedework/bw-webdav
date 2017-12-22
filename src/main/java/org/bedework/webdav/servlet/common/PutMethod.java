@@ -39,7 +39,7 @@ public class PutMethod extends MethodBase {
                        final HttpServletResponse resp) throws WebdavException {
 
     if (debug) {
-      trace("PutMethod: doMethod");
+      debug("PutMethod: doMethod");
     }
 
     final WebdavNsIntf intf = getNsIntf();

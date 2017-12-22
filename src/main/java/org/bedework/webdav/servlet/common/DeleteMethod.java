@@ -39,7 +39,7 @@ public class DeleteMethod extends MethodBase {
   public void doMethod(final HttpServletRequest req,
                         final HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("DeleteMethod: doMethod");
+      debug("DeleteMethod: doMethod");
     }
 
     try {

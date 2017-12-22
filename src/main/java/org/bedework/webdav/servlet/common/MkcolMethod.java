@@ -41,7 +41,7 @@ public class MkcolMethod extends PropPatchMethod {
   public void doMethod(final HttpServletRequest req,
                         final HttpServletResponse resp) throws WebdavException {
     if (debug) {
-      trace("MkcolMethod: doMethod");
+      debug("MkcolMethod: doMethod");
     }
 
     WebdavNsIntf intf = getNsIntf();

@@ -49,9 +49,9 @@ public class CopyMethod extends MethodBase {
                          boolean copy) throws WebdavException {
     if (debug) {
       if (copy) {
-        trace("CopyMethod: doMethod");
+        debug("CopyMethod: doMethod");
       } else {
-        trace("MoveMethod: doMethod");
+        debug("MoveMethod: doMethod");
       }
     }
 
@@ -59,7 +59,7 @@ public class CopyMethod extends MethodBase {
       String dest = req.getHeader("Destination");
       if (dest == null) {
         if (debug) {
-          debugMsg("No Destination");
+          debug("No Destination");
         }
         throw new WebdavNotFound("No Destination");
       }
