@@ -39,7 +39,7 @@ public interface WdSysIntf {
    * @return String - never null.
    * @throws WebdavException
    */
-  public String getDefaultContentType() throws WebdavException;
+  public String getDefaultContentType();
 
   /** Return notification URL for this principal.
    *

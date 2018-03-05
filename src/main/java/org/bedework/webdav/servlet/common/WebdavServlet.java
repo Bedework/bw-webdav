@@ -140,37 +140,6 @@ public abstract class WebdavServlet extends HttpServlet
 
       final MethodBase method = intf.getMethod(methodName);
 
-      /*
-              if request.headers.hasHeader("origin"):
-            response.headers.addRawHeader("Access-Control-Allow-Origin", "*")
-        if request.headers.hasHeader("Access-Control-Request-Method"):
-            for value in request.headers.getRawHeaders("Access-Control-Request-Method"):
-                response.headers.addRawHeader("Access-Control-Allow-Methods", value)
-        if request.headers.hasHeader("Access-Control-Request-Headers"):
-            for value in request.headers.getRawHeaders("Access-Control-Request-Headers"):
-                response.headers.addRawHeader("Access-Control-Allow-Headers", value)
-       */
-      // TODO this needs to be an option
-      if (req.getHeader("Origin") != null) {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-      }
-
-      if (req.getHeader("Access-Control-Request-Method") != null) {
-        Enumeration henum = req.getHeaders("Access-Control-Request-Method");
-        while (henum.hasMoreElements()) {
-          resp.addHeader("Access-Control-Allow-Methods",
-                         (String)henum.nextElement());
-        }
-      }
-
-      if (req.getHeader("Access-Control-Request-Headers") != null) {
-        Enumeration henum = req.getHeaders("Access-Control-Request-Headers");
-        while (henum.hasMoreElements()) {
-          resp.addHeader("Access-Control-Allow-Headers",
-                         (String)henum.nextElement());
-        }
-      }
-
       //resp.addHeader("DAV", intf.getDavHeader());
 
       if (method == null) {
@@ -202,7 +171,7 @@ public abstract class WebdavServlet extends HttpServlet
       } catch (Throwable t) {}
 
       if (debug && dumpContent &&
-              (resp instanceof CharArrayWrappedResponse)) {
+          (resp instanceof CharArrayWrappedResponse)) {
         /* instanceof check because we might get a subsequent exception before
          * we wrap the response
          */

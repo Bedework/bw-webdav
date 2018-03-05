@@ -170,7 +170,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
   /** Return DAV header
    *
-   * @param node
+   * @param node may be null for *
    * @return  String
    * @throws WebdavException on error
    */
@@ -956,9 +956,9 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
       uri = URLDecoder.decode(uri, "UTF-8");
 
-      //if ((uri.length() > 1) && uri.endsWith("/")) {
-      //  uri = uri.substring(0, uri.length() - 1);
-      //}
+      if ((uri.length() > 1) && uri.endsWith("/")) {
+        uri = uri.substring(0, uri.length() - 1);
+      }
 
       if (debug) {
         debug("Normalized uri=" + uri);

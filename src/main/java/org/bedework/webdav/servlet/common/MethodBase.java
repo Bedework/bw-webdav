@@ -281,6 +281,8 @@ public abstract class MethodBase extends Logged {
     }
   }
 
+  /* A node of null corresponds to * for an OPTIONS request
+   */
   protected void addHeaders(final HttpServletRequest req,
                             final HttpServletResponse resp,
                             final WebdavNsNode node) throws WebdavException {

@@ -44,29 +44,36 @@ public class OptionsMethod extends MethodBase {
     }
 
     try {
-      WebdavNsNode node = getNsIntf().getNode(getResourceUri(req),
-                                              WebdavNsIntf.existanceMust,
-                                              WebdavNsIntf.nodeTypeUnknown,
-                                              false);
+      final String resourceUri = getResourceUri(req);
 
-      /* Apparently if the node doesn't exist we're supposed to respond
+      final WebdavNsNode node;
+      if ("*".equals(resourceUri)) {
+        node = null;
+      } else {
+        node = getNsIntf().getNode(resourceUri,
+                                   WebdavNsIntf.existanceMust,
+                                   WebdavNsIntf.nodeTypeUnknown,
+                                   false);
+
+        /* Apparently if the node doesn't exist we're supposed to respond
        * not found, rather than indicate if PUT is allowed for example.
        */
-      if ((node == null) || !node.getExists()) {
-        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        return;
+        if ((node == null) || !node.getExists()) {
+          resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+          return;
+        }
       }
 
       addHeaders(req, resp, node);
-    } catch (WebdavException we) {
+    } catch (final WebdavException we) {
       throw we;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }
 
-  protected void addDavHeader(HttpServletResponse resp,
-                              WebdavNsNode node) throws WebdavException {
+  protected void addDavHeader(final HttpServletResponse resp,
+                              final WebdavNsNode node) throws WebdavException {
     resp.addHeader("DAV", getNsIntf().getDavHeader(node));
   }
 }

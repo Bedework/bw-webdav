@@ -19,9 +19,6 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.util.misc.Util;
-import org.bedework.webdav.servlet.common.WebdavUtils;
-
-import org.apache.log4j.Logger;
 
 import java.net.URI;
 
@@ -34,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
   private String urlPrefix;
 
-  private boolean relative;
+  private final boolean relative;
 
   private String context;
 
@@ -43,44 +40,37 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
    *
    * @param req the incoming request
    * @param relative true for relative urls
-   * @throws WebdavException
    */
   public UrlHandler(final HttpServletRequest req,
-                    final boolean relative) throws WebdavException {
+                    final boolean relative) {
     this.relative = relative;
 
-    try {
-      String contextPath = req.getContextPath();
-      if ((contextPath == null) || (contextPath.equals("."))) {
-        contextPath = "/";
-      }
+    String contextPath = req.getContextPath();
+    if ((contextPath == null) || (contextPath.equals("."))) {
+      contextPath = "/";
+    }
 
-      String sp = req.getServletPath();
-      if ((sp == null) || (sp.equals("."))) {
-        sp = "/";
-      }
+    String sp = req.getServletPath();
+    if ((sp == null) || (sp.equals("."))) {
+      sp = "/";
+    }
 
-      context = Util.buildPath(false, contextPath, "/", sp);
-      if (context.equals("/")) {
-        context = "";
-      }
+    context = Util.buildPath(false, contextPath, "/", sp);
+    if (context.equals("/")) {
+      context = "";
+    }
 
-      urlPrefix = req.getRequestURL().toString();
-      int pos;
+    urlPrefix = req.getRequestURL().toString();
+    final int pos;
 
-      if (context.length() > 0) {
-        pos = urlPrefix.indexOf(context);
-      } else {
-        pos = urlPrefix.indexOf(req.getRequestURI());
-      }
+    if (context.length() > 0) {
+      pos = urlPrefix.indexOf(context);
+    } else {
+      pos = urlPrefix.indexOf(req.getRequestURI());
+    }
 
-      if (pos > 0) {
-        urlPrefix = urlPrefix.substring(0, pos);
-      }
-    } catch (final Throwable t) {
-      Logger.getLogger(WebdavUtils.class).warn(
-          "Unable to get url from " + req);
-      throw new WebdavException(t);
+    if (pos > 0) {
+      urlPrefix = urlPrefix.substring(0, pos);
     }
   }
 
@@ -88,11 +78,10 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
    * @param urlPrefix Usually host + port + "/" e.g. example.com:8080/
    * @param context null, zero length or the servlet context, e.g. caldav
    * @param relative true if we want relative (to the server) urls
-   * @throws WebdavException
    */
   public UrlHandler(final String urlPrefix,
                     final String context,
-                    final boolean relative) throws WebdavException {
+                    final boolean relative) {
     this.relative = relative;
 
     if ((context == null) ||
