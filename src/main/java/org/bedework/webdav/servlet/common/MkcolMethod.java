@@ -44,9 +44,9 @@ public class MkcolMethod extends PropPatchMethod {
       debug("MkcolMethod: doMethod");
     }
 
-    WebdavNsIntf intf = getNsIntf();
+    final WebdavNsIntf intf = getNsIntf();
 
-    Headers.IfHeaders ifHeaders = Headers.processIfHeaders(req);
+    final Headers.IfHeaders ifHeaders = Headers.processIfHeaders(req);
     if ((ifHeaders.ifHeader != null) &&
         !intf.syncTokenMatch(ifHeaders.ifHeader)) {
       intf.rollback();
@@ -54,15 +54,15 @@ public class MkcolMethod extends PropPatchMethod {
     }
 
     /* Parse any content */
-    Document doc = parseContent(req, resp);
+    final Document doc = parseContent(req, resp);
 
     /* Create the node */
-    String resourceUri = getResourceUri(req);
+    final String resourceUri = getResourceUri(req);
 
-    WebdavNsNode node = intf.getNode(resourceUri,
-                                     WebdavNsIntf.existanceNot,
-                                     WebdavNsIntf.nodeTypeCollection,
-                                     false);
+    final WebdavNsNode node = intf.getNode(resourceUri,
+                                           WebdavNsIntf.existanceNot,
+                                           WebdavNsIntf.nodeTypeCollection,
+                                           false);
 
     node.setDefaults(WebdavTags.mkcol);
 
