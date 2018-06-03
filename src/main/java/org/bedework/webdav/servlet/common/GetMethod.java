@@ -75,12 +75,12 @@ public class GetMethod extends MethodBase {
       resp.setHeader("ETag", node.getEtagValue(true));
 
       if (node.getLastmodDate() != null) {
-        resp.addHeader("Last-Modified", node.getLastmodDate().toString());
+        resp.addHeader("Last-Modified", node.getLastmodDate());
       }
 
-      Content c = null;
+      Content c;
 
-      /** Get the content now to set up length, type etc.
+      /* Get the content now to set up length, type etc.
        */
 
       if (node.getContentBinary()) {
