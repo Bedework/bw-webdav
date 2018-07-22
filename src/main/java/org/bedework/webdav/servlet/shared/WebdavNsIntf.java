@@ -688,7 +688,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
      *
      * <p>If that is not the case this MUST be left FALSE
      */
-    public boolean emitEtag;
+    public boolean emitEtag = true;
   }
 
   /**
