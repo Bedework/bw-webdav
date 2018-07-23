@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
@@ -112,7 +113,8 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   }
 
   @Override
-  public Collection<? extends WdEntity> getChildren() throws WebdavException {
+  public Collection<? extends WdEntity> getChildren(
+          Supplier<Object> filterGetter) throws WebdavException {
     return null;
   }
 

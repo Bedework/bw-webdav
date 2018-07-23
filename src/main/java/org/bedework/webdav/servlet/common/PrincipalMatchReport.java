@@ -18,6 +18,7 @@
 */
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.util.misc.Logged;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
@@ -28,7 +29,6 @@ import org.bedework.webdav.servlet.shared.WebdavNsNode;
 import org.bedework.webdav.servlet.shared.WebdavProperty;
 import org.bedework.webdav.servlet.shared.WebdavStatusCode;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -40,14 +40,10 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Mike Douglass
  */
-public class PrincipalMatchReport {
-  private MethodBase mb;
+public class PrincipalMatchReport extends Logged {
+  private final MethodBase mb;
 
-  private WebdavNsIntf intf;
-
-  private boolean debug;
-
-  protected transient Logger log;
+  private final WebdavNsIntf intf;
 
   /** Match a resource which identifies the current user
    */
@@ -70,13 +66,12 @@ public class PrincipalMatchReport {
 
   /** Constructor
    *
-   * @param mb
-   * @param intf
+   * @param mb method base
+   * @param intf interface
    */
   public PrincipalMatchReport(final MethodBase mb, final WebdavNsIntf intf) {
     this.mb = mb;
     this.intf = intf;
-    debug = getLogger().isDebugEnabled();
   }
 
   /** Parse the principal match request.
@@ -90,20 +85,20 @@ public class PrincipalMatchReport {
    *    an href element that contains the URI of a principal
    *    <!ELEMENT self EMPTY>
    *
-   * @param root
-   * @param depth
-   * @throws WebdavException
+   * @param root of request
+   * @param depth how far down
+   * @throws WebdavException on fatal error
    */
   public void parse(final Element root,
                     final int depth) throws WebdavException {
     try {
       if (debug) {
-        trace("ReportMethod: parsePrincipalMatch");
+        debug("ReportMethod: parsePrincipalMatch");
       }
 
-      Element[] children = intf.getChildren(root);
+      final Element[] children = intf.getChildren(root);
 
-      int numch = children.length;
+      final int numch = children.length;
 
       if ((numch < 1) || (numch > 2)) {
         throw new WebdavBadRequest();
@@ -113,7 +108,7 @@ public class PrincipalMatchReport {
 
       if (XmlUtil.nodeMatches(curnode, WebdavTags.principalProperty)) {
         /* Only match owner for the moment */
-        Element[] ppchildren = intf.getChildren(curnode);
+        final Element[] ppchildren = intf.getChildren(curnode);
 
         if (ppchildren.length != 1) {
           throw new WebdavBadRequest();
@@ -130,7 +125,7 @@ public class PrincipalMatchReport {
         }
       } else if (XmlUtil.nodeMatches(curnode, WebdavTags.self)) {
         if (debug) {
-          trace("ReportMethod: self");
+          debug("ReportMethod: self");
         }
 
         self = true;
@@ -149,13 +144,13 @@ public class PrincipalMatchReport {
       }
 
       if (debug) {
-        trace("ReportMethod: do prop");
+        debug("ReportMethod: do prop");
       }
 
       props = intf.parseProp(curnode);
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       warn(t.getMessage());
       if (debug) {
         t.printStackTrace();
@@ -166,10 +161,10 @@ public class PrincipalMatchReport {
   }
 
   /**
-   * @param req
-   * @param resp
-   * @param depth
-   * @throws WebdavException
+   * @param req http request
+   * @param resp http response
+   * @param depth for search
+   * @throws WebdavException on fatal error
    */
   public void process(final HttpServletRequest req,
                       final HttpServletResponse resp,
@@ -178,14 +173,14 @@ public class PrincipalMatchReport {
       resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
       resp.setContentType("text/xml; charset=UTF-8");
 
-      XmlEmit xml = intf.getXmlEmit();
+      final XmlEmit xml = intf.getXmlEmit();
 
       xml.startEmit(resp.getWriter());
 
       xml.openTag(WebdavTags.multistatus);
 
-      String resourceUri = mb.getResourceUri(req);
-      Collection<WebdavNsNode> wdnodes = null;
+      final String resourceUri = mb.getResourceUri(req);
+      final Collection<WebdavNsNode> wdnodes;
 
       if (self) {
         /* Return all groups of which this account is a member
@@ -200,7 +195,7 @@ public class PrincipalMatchReport {
       }
 
       if (wdnodes != null) {
-        for (WebdavNsNode nd: wdnodes) {
+        for (final WebdavNsNode nd: wdnodes) {
           xml.openTag(WebdavTags.response);
           nd.generateHref(xml);
 
@@ -213,9 +208,9 @@ public class PrincipalMatchReport {
       xml.closeTag(WebdavTags.multistatus);
 
       xml.flush();
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       warn(t.getMessage());
       if (debug) {
         t.printStackTrace();
@@ -227,7 +222,7 @@ public class PrincipalMatchReport {
 
   private Collection<WebdavNsNode> doNodeAndChildren(final WebdavNsNode node)
           throws WebdavException {
-    Collection<WebdavNsNode> nodes = new ArrayList<WebdavNsNode>();
+    final Collection<WebdavNsNode> nodes = new ArrayList<>();
 
     if (!nodeMatches(node)) {
       // Stop here?
@@ -239,7 +234,7 @@ public class PrincipalMatchReport {
       return nodes;
     }
 
-    for (WebdavNsNode child: intf.getChildren(node)) {
+    for (final WebdavNsNode child: intf.getChildren(node, null)) {
       nodes.addAll(doNodeAndChildren(child));
     }
 
@@ -248,30 +243,14 @@ public class PrincipalMatchReport {
 
   private boolean nodeMatches(final WebdavNsNode node) throws WebdavException {
     if (owner) {
-      String account = intf.getAccount();
+      final String account = intf.getAccount();
 
       if (account == null) {
         return false;
       }
-      return account.equals(node.getOwner());
+      return account.equals(node.getOwner().getAccount());
     }
 
     return false;
-  }
-
-  protected Logger getLogger() {
-    if (log == null) {
-      log = Logger.getLogger(this.getClass());
-    }
-
-    return log;
-  }
-
-  protected void trace(final String msg) {
-    getLogger().debug(msg);
-  }
-
-  protected void warn(final String msg) {
-    getLogger().warn(msg);
   }
 }
