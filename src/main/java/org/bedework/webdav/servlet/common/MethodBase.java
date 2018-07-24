@@ -429,19 +429,19 @@ public abstract class MethodBase extends Logged {
    *
    * @param node
    * @param props
-   * @throws WebdavException
+   * @throws WebdavException on fatal error
    */
   public void doPropFind(final WebdavNsNode node,
                          final Collection<WebdavProperty> props) throws WebdavException {
-    WebdavNsIntf intf = getNsIntf();
-    Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
+    final WebdavNsIntf intf = getNsIntf();
+    final Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
 
-    Holder<Boolean> openFlag = new Holder<Boolean>(Boolean.FALSE);
-    XmlNotifier notifier = new XmlNotifier(openFlag);
+    final Holder<Boolean> openFlag = new Holder<Boolean>(Boolean.FALSE);
+    final XmlNotifier notifier = new XmlNotifier(openFlag);
     try {
       xml.setNotifier(notifier);
 
-      for (WebdavProperty pr: props) {
+      for (final WebdavProperty pr: props) {
         if (!intf.knownProperty(node, pr)) {
           unknowns.add(pr);
         } else  {
@@ -472,7 +472,7 @@ public abstract class MethodBase extends Logged {
         openTag(WebdavTags.propstat);
         openTag(WebdavTags.prop);
 
-        for (WebdavProperty prop: unknowns) {
+        for (final WebdavProperty prop: unknowns) {
           try {
             xml.emptyTag(prop.getTag());
           } catch (Throwable t) {
