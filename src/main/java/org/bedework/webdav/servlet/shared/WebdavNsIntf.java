@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -594,8 +595,9 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
    * @return Collection      of WebdavNsNode children
    * @throws WebdavException on error
    */
-  public abstract Collection<WebdavNsNode> getChildren(WebdavNsNode node)
-      throws WebdavException;
+  public abstract Collection<WebdavNsNode> getChildren(
+          WebdavNsNode node,
+          Supplier<Object> filterGetter) throws WebdavException;
 
   /** Returns the parent of a node.
    *
@@ -688,7 +690,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
      *
      * <p>If that is not the case this MUST be left FALSE
      */
-    public boolean emitEtag;
+    public boolean emitEtag = true;
   }
 
   /**
@@ -1748,7 +1750,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
   protected String generateHtml(final HttpServletRequest req,
                                 final WebdavNsNode node) throws WebdavException {
     try {
-      Sbuff sb = new Sbuff();
+      final Sbuff sb = new Sbuff();
 
       sb.lines(new String[] {"<html>",
                              "  <head>"});
@@ -1770,7 +1772,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
               "cellspacing=\"0\"" +
               " cellpadding=\"4\">");
 
-      for (WebdavNsNode child: getChildren(node)) {
+      for (final WebdavNsNode child: getChildren(node, null)) {
         /* icon would be nice */
 
         sb.line("<tr>");

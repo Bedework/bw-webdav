@@ -39,6 +39,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
@@ -240,10 +241,12 @@ public abstract class WebdavNsNode implements Serializable {
    *
    * <p>Default is to return null
    *
-   * @return Collection
-   * @throws WebdavException
+   * @param filterGetter non-null if there is a filter
+   * @return Collection of children
+   * @throws WebdavException on fatal error
    */
-  public abstract Collection<? extends WdEntity> getChildren() throws WebdavException;
+  public abstract Collection<? extends WdEntity> getChildren(
+          Supplier<Object> filterGetter) throws WebdavException;
 
   /**
    * @return String

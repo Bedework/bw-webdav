@@ -291,7 +291,7 @@ public class PropFindMethod extends MethodBase {
       return;
     }
 
-    for (WebdavNsNode child: getNsIntf().getChildren(node)) {
+    for (final WebdavNsNode child: getNsIntf().getChildren(node, null)) {
       doNodeAndChildren(child, curDepth, maxDepth);
     }
   }
@@ -301,7 +301,7 @@ public class PropFindMethod extends MethodBase {
   private void doPropNames(final WebdavNsNode node) throws WebdavException {
     openTag(WebdavTags.prop);
 
-    for (PropertyTagEntry pte: node.getPropertyNames()) {
+    for (final PropertyTagEntry pte: node.getPropertyNames()) {
       if (pte.inPropAll) {
         emptyTag(pte.tag);
       }
