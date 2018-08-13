@@ -55,9 +55,8 @@ public abstract class WdEntity <T> implements Comparable<WdEntity> {
 
   /** Constructor
    *
-   * @throws WebdavException
    */
-  public WdEntity() throws WebdavException {
+  public WdEntity() {
     super();
 
 //    Date dt = new Date();
