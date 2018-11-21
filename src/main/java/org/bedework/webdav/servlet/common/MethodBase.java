@@ -56,7 +56,7 @@ import javax.xml.ws.Holder;
 
 /** Base class for all webdav servlet methods.
  */
-public abstract class MethodBase extends Logged {
+public abstract class MethodBase extends Logged implements SecureXml {
   protected boolean dumpContent;
 
   protected boolean hasBriefHeader;
@@ -358,34 +358,13 @@ public abstract class MethodBase extends Logged {
 
   /** Parse a reader and return the DOM representation.
    *
-   * @param len        Content length
-   * @param rdr        Reader
+   * @param contentLength        Content length
+   * @param reader        Reader
    * @return Document  Parsed body or null for no body
    * @exception WebdavException Some error occurred.
    */
-  protected Document parseContent(final int len,
-                                  final Reader rdr) throws WebdavException{
-    if (len == 0) {
-      return null;
-    }
-
-    if (rdr == null) {
-      // No content?
-      return null;
-    }
-
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-
-      DocumentBuilder builder = factory.newDocumentBuilder();
-
-      return builder.parse(new InputSource(rdr));
-    } catch (SAXException e) {
-      throw new WebdavBadRequest();
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
+  protected Document parseContent(final int contentLength, final Reader reader) throws WebdavException{
+    return parseXmlSafely(contentLength, reader);
   }
 
   protected String formatHTTPDate(final Timestamp val) {
