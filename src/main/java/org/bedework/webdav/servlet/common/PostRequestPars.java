@@ -19,23 +19,18 @@
 package org.bedework.webdav.servlet.common;
 
 import org.bedework.util.misc.Util;
-import org.bedework.webdav.servlet.shared.WebdavBadRequest;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.Reader;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  */
-public class PostRequestPars {
+public class PostRequestPars implements SecureXml {
   private final HttpServletRequest req;
 
   private final WebdavNsIntf intf;
@@ -126,7 +121,7 @@ public class PostRequestPars {
       throw new WebdavException(t);
     }
 
-    xmlDoc = parseXml(reqRdr);
+    xmlDoc = parseXmlSafely(req.getContentLength(), reqRdr);
     getTheReader = false;
     return true;
   }
@@ -216,31 +211,7 @@ public class PostRequestPars {
   public boolean isAddMember() {
     return addMember;
   }
-
-  /**
-   * @param rdr for xml content
-   * @return parsed Document
-   * @throws WebdavException
-   */
-  private Document parseXml(final Reader rdr) throws WebdavException{
-    if (rdr == null) {
-      return null;
-    }
-
-    try {
-      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-
-      final DocumentBuilder builder = factory.newDocumentBuilder();
-
-      return builder.parse(new InputSource(rdr));
-    } catch (final SAXException e) {
-      throw new WebdavBadRequest();
-    } catch (final Throwable t) {
-      throw new WebdavException(t);
-    }
-  }
-
+  
   /**
    * @return true if we have an xml content
    */
