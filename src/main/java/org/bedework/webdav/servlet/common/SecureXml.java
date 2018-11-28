@@ -2,16 +2,20 @@ package org.bedework.webdav.servlet.common;
 
 import org.bedework.webdav.servlet.shared.WebdavBadRequest;
 import org.bedework.webdav.servlet.shared.WebdavException;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Reader;
 
-public interface SecureXml {
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+/**
+ * Contributed by https://github.com/viqueen
+ */
+public interface SecureXml {
   default Document parseXmlSafely(final int contentLength, final Reader reader) throws WebdavException {
     if (contentLength == 0) {
       return null;
