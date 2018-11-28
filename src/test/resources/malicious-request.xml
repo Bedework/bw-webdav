@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE invite-reply [
+        <!ENTITY xxe SYSTEM "file:///xxe">
+        ]>
+<A:invite-reply xmlns:A="http://calendarserver.org/ns/" xmlns:B="DAV:">
+    <A:invite-accepted>&xxe;</A:invite-accepted>
+    <B:href>/some/url</B:href>
+    <A:in-reply-to>something</A:in-reply-to>
+    <A:hosturl>
+        <B:href>/</B:href>
+    </A:hosturl>
+</A:invite-reply>
