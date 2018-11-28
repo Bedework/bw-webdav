@@ -23,46 +23,46 @@ import static org.mockito.Mockito.when;
 
 public class TestSecureXmlTypes {
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    private HttpServletRequest request;
-    @Mock
-    private HttpServletResponse response;
+  @Mock
+  private HttpServletRequest request;
+  @Mock
+  private HttpServletResponse response;
 
-    @Mock(answer = Answers.CALLS_REAL_METHODS)
-    private WebdavNsIntf webdavNsIntf;
+  @Mock(answer = Answers.CALLS_REAL_METHODS)
+  private WebdavNsIntf webdavNsIntf;
 
-    @Mock(answer = Answers.CALLS_REAL_METHODS)
-    private MethodBase methodBase;
+  @Mock(answer = Answers.CALLS_REAL_METHODS)
+  private MethodBase methodBase;
 
-    private PostRequestPars requestPars;
+  private PostRequestPars requestPars;
 
-    @Before
-    public void setup() throws WebdavException, IOException {
-        when(request.getContentType()).thenReturn("application/xml");
-        requestPars = new PostRequestPars(request, webdavNsIntf, UUID.randomUUID().toString());
+  @Before
+  public void setup() throws WebdavException, IOException {
+    when(request.getContentType()).thenReturn("application/xml");
+    requestPars = new PostRequestPars(request, webdavNsIntf, UUID.randomUUID().toString());
 
-        when(methodBase.getNsIntf()).thenReturn(webdavNsIntf);
+    when(methodBase.getNsIntf()).thenReturn(webdavNsIntf);
 
-        when(request.getContentLength()).thenReturn(1);
-        when(request.getReader()).thenReturn(getResource("/malicious-request.xml"));
-    }
+    when(request.getContentLength()).thenReturn(1);
+    when(request.getReader()).thenReturn(getResource("/malicious-request.xml"));
+  }
 
-    @Test
-    public void testPostRequestParsWithMaliciousRequest() throws WebdavException {
-        assertTrue(requestPars.processXml());
-    }
+  @Test
+  public void testPostRequestParsWithMaliciousRequest() throws WebdavException {
+    assertTrue(requestPars.processXml());
+  }
 
-    @Test
-    public void testMethodBaseWithMaliciousRequest() throws WebdavException {
-        assertNotNull(methodBase.parseContent(request, response));
-    }
+  @Test
+  public void testMethodBaseWithMaliciousRequest() throws WebdavException {
+    assertNotNull(methodBase.parseContent(request, response));
+  }
 
-    private BufferedReader getResource(final String name) {
-        return new BufferedReader(
-                new InputStreamReader(this.getClass().getResourceAsStream(name))
-        );
-    }
+  private BufferedReader getResource(final String name) {
+    return new BufferedReader(
+        new InputStreamReader(this.getClass().getResourceAsStream(name))
+    );
+  }
 }
