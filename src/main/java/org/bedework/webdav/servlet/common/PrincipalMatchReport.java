@@ -18,7 +18,7 @@
 */
 package org.bedework.webdav.servlet.common;
 
-import org.bedework.util.misc.Logged;
+import org.bedework.util.logging.Logged;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Mike Douglass
  */
-public class PrincipalMatchReport extends Logged {
+public class PrincipalMatchReport implements Logged {
   private final MethodBase mb;
 
   private final WebdavNsIntf intf;
@@ -92,7 +92,7 @@ public class PrincipalMatchReport extends Logged {
   public void parse(final Element root,
                     final int depth) throws WebdavException {
     try {
-      if (debug) {
+      if (debug()) {
         debug("ReportMethod: parsePrincipalMatch");
       }
 
@@ -124,7 +124,7 @@ public class PrincipalMatchReport extends Logged {
           principalProperty = ppchildren[0];
         }
       } else if (XmlUtil.nodeMatches(curnode, WebdavTags.self)) {
-        if (debug) {
+        if (debug()) {
           debug("ReportMethod: self");
         }
 
@@ -143,7 +143,7 @@ public class PrincipalMatchReport extends Logged {
         throw new WebdavBadRequest();
       }
 
-      if (debug) {
+      if (debug()) {
         debug("ReportMethod: do prop");
       }
 
@@ -152,7 +152,7 @@ public class PrincipalMatchReport extends Logged {
       throw wde;
     } catch (final Throwable t) {
       warn(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -211,8 +211,8 @@ public class PrincipalMatchReport extends Logged {
     } catch (final WebdavException wde) {
       throw wde;
     } catch (final Throwable t) {
-      warn(t.getMessage());
-      if (debug) {
+      error(t.getMessage());
+      if (debug()) {
         t.printStackTrace();
       }
 

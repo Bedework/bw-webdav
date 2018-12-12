@@ -18,7 +18,7 @@
 */
 package org.bedework.webdav.servlet.access;
 
-import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.CurrentAccess;
 import org.bedework.webdav.servlet.shared.WebdavException;
 
 import java.util.HashMap;

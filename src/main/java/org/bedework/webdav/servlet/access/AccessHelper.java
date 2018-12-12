@@ -23,7 +23,7 @@ import org.bedework.access.AccessPrincipal;
 import org.bedework.access.Ace;
 import org.bedework.access.AceWho;
 import org.bedework.access.Acl;
-import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.CurrentAccess;
 import org.bedework.access.PrivilegeSet;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavForbidden;

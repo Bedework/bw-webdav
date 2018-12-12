@@ -38,7 +38,7 @@ public class PutMethod extends MethodBase {
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
 
-    if (debug) {
+    if (debug()) {
       debug("PutMethod: doMethod");
     }
 

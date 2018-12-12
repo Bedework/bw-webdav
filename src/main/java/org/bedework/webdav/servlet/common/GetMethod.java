@@ -44,7 +44,7 @@ public class GetMethod extends MethodBase {
   @Override
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       debug("GetMethod: doMethod");
     }
 
@@ -91,7 +91,7 @@ public class GetMethod extends MethodBase {
       }
 
       if (c == null) {
-        if (debug) {
+        if (debug()) {
           debug("status: " + HttpServletResponse.SC_NO_CONTENT);
         }
 
@@ -116,13 +116,13 @@ public class GetMethod extends MethodBase {
       }
 
       if ((c.stream == null) && (c.rdr == null)) {
-        if (debug) {
+        if (debug()) {
           debug("status: " + HttpServletResponse.SC_NO_CONTENT);
         }
 
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
       } else {
-        if (debug) {
+        if (debug()) {
           debug("send content - length=" + c.contentLength);
         }
 

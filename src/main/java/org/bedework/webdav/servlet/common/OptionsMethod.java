@@ -39,7 +39,7 @@ public class OptionsMethod extends MethodBase {
 
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       debug("OptionsMethod: doMethod");
     }
 

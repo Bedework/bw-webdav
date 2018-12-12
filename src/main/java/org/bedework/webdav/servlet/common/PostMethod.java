@@ -54,7 +54,7 @@ public class PostMethod extends MethodBase {
   protected void handleAddMember(final PostRequestPars pars,
                                  final HttpServletResponse resp) throws WebdavException {
 
-    if (debug) {
+    if (debug()) {
       debug("PostMethod: doMethod");
     }
 

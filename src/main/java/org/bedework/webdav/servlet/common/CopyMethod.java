@@ -47,7 +47,7 @@ public class CopyMethod extends MethodBase {
   protected void process(HttpServletRequest req,
                          HttpServletResponse resp,
                          boolean copy) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       if (copy) {
         debug("CopyMethod: doMethod");
       } else {
@@ -58,7 +58,7 @@ public class CopyMethod extends MethodBase {
     try {
       String dest = req.getHeader("Destination");
       if (dest == null) {
-        if (debug) {
+        if (debug()) {
           debug("No Destination");
         }
         throw new WebdavNotFound("No Destination");

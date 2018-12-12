@@ -78,7 +78,7 @@ public class ReportMethod extends MethodBase {
   @Override
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       debug("ReportMethod: doMethod");
     }
 
@@ -103,7 +103,7 @@ public class ReportMethod extends MethodBase {
 
     int depth = Headers.depth(req, 0);
 
-    if (debug) {
+    if (debug()) {
       debug("ReportMethod: depth=" + depth);
     }
 
@@ -209,7 +209,7 @@ public class ReportMethod extends MethodBase {
       throw wde;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -246,7 +246,7 @@ public class ReportMethod extends MethodBase {
       throw wde;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -313,7 +313,7 @@ public class ReportMethod extends MethodBase {
       throw wde;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -396,7 +396,7 @@ public class ReportMethod extends MethodBase {
       throw wde;
     } catch (final Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -631,7 +631,7 @@ public class ReportMethod extends MethodBase {
       return -1;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 

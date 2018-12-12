@@ -128,8 +128,7 @@ public abstract class WebdavServlet extends HttpServlet
       }
 
       if (debug && dumpContent) {
-        resp = new CharArrayWrappedResponse(resp,
-                                            getLogger());
+        resp = new CharArrayWrappedResponse(resp);
       }
 
       String methodName = req.getHeader("X-HTTP-Method-Override");

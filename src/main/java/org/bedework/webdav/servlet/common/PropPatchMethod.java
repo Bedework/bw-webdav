@@ -49,7 +49,7 @@ public class PropPatchMethod extends MethodBase {
   @Override
   public void doMethod(final HttpServletRequest req,
                         final HttpServletResponse resp) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       debug("PropPatchMethod: doMethod");
     }
 
@@ -202,7 +202,7 @@ public class PropPatchMethod extends MethodBase {
       throw wde;
     } catch (final Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -257,7 +257,7 @@ public class PropPatchMethod extends MethodBase {
       throw wde;
     } catch (final Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 

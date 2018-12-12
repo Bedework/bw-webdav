@@ -77,7 +77,7 @@ public class PropFindMethod extends MethodBase {
   @Override
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       debug("PropFindMethod: doMethod");
     }
 
@@ -101,7 +101,7 @@ public class PropFindMethod extends MethodBase {
       throw new WebdavBadRequest("PROPFIND: unexpected element");
     }
 
-    if (debug) {
+    if (debug()) {
       debug("PropFindMethod: depth=" + depth);
       debug("                type=" + parsedReq.reqType);
     }
@@ -127,7 +127,7 @@ public class PropFindMethod extends MethodBase {
 
       addNs(ns);
 
-      if (debug) {
+      if (debug()) {
         String nm = curnode.getLocalName();
 
         debug("reqtype: " + nm + " ns: " + ns);
@@ -138,7 +138,7 @@ public class PropFindMethod extends MethodBase {
       throw wde;
     } catch (Throwable t) {
       System.err.println(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 
@@ -197,7 +197,7 @@ public class PropFindMethod extends MethodBase {
     startEmit(resp);
 
     String resourceUri = getResourceUri(req);
-    if (debug) {
+    if (debug()) {
       debug("About to get node at " + resourceUri);
     }
 
@@ -249,7 +249,7 @@ public class PropFindMethod extends MethodBase {
         (pr.reqType == PropRequest.ReqType.propAll)) {
       openTag(WebdavTags.propstat);
 
-      if (debug) {
+      if (debug()) {
         debug("doNodeProperties type=" + pr.reqType);
       }
 

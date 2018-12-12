@@ -46,7 +46,7 @@ public class AclMethod extends MethodBase {
   @Override
   public void doMethod(final HttpServletRequest req,
                        final HttpServletResponse resp) throws WebdavException {
-    if (debug) {
+    if (debug()) {
       debug("AclMethod: doMethod");
     }
 
@@ -91,7 +91,7 @@ public class AclMethod extends MethodBase {
       throw new WebdavBadRequest(ae.getMessage());
     } catch (Throwable t) {
       error(t.getMessage());
-      if (debug) {
+      if (debug()) {
         t.printStackTrace();
       }
 

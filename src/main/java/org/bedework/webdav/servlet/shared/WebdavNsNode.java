@@ -20,15 +20,15 @@ package org.bedework.webdav.servlet.shared;
 
 import org.bedework.access.AccessPrincipal;
 import org.bedework.access.AccessXmlUtil;
-import org.bedework.access.Acl.CurrentAccess;
+import org.bedework.access.CurrentAccess;
 import org.bedework.access.PrivilegeSet;
+import org.bedework.util.logging.Logged;
 import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf.Content;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 
 import java.io.InputStream;
@@ -50,13 +50,9 @@ import javax.xml.namespace.QName;
  *
  *   @author Mike Douglass   douglm   rpi.edu
  */
-public abstract class WebdavNsNode implements Serializable {
-  protected boolean debug;
-
+public abstract class WebdavNsNode implements Serializable, Logged {
   /** Does the resource exist? */
   protected boolean exists = true;
-
-  private transient Logger log;
 
   protected WdSysIntf wdSysIntf;
 
@@ -184,7 +180,6 @@ public abstract class WebdavNsNode implements Serializable {
     this.path = path;
     this.collection = collection;
     this.uri = uri;
-    debug = getLogger().isDebugEnabled();
   }
 
   /* ====================================================================
@@ -766,7 +761,7 @@ public abstract class WebdavNsNode implements Serializable {
     try {
       return new URI(null, null, uri, null).toString();
     } catch (final Throwable t) {
-      if (debug) {
+      if (debug()) {
         error(t);
       }
       throw new WebdavBadRequest();
@@ -1022,30 +1017,6 @@ public abstract class WebdavNsNode implements Serializable {
   /* ********************************************************************
    *                        Protected methods
    * ******************************************************************** */
-
-  protected Logger getLogger() {
-    if (log == null) {
-      log = Logger.getLogger(this.getClass());
-    }
-
-    return log;
-  }
-
-  protected void error(final Throwable t) {
-    getLogger().error(this, t);
-  }
-
-  protected void warn(final String msg) {
-    getLogger().warn(msg);
-  }
-
-  protected void debugMsg(final String msg) {
-    getLogger().debug(msg);
-  }
-
-  protected void logIt(final String msg) {
-    getLogger().info(msg);
-  }
 
   protected static void addPropEntry(final HashMap<QName, PropertyTagEntry> propertyNames,
                                      final QName tag) {

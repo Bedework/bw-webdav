@@ -19,7 +19,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.access.Acl;
-import org.bedework.util.misc.Logged;
+import org.bedework.util.logging.Logged;
 import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
@@ -80,7 +80,7 @@ import javax.xml.namespace.QName;
  *
  *   @author Mike Douglass
  */
-public abstract class WebdavNsIntf extends Logged implements Serializable {
+public abstract class WebdavNsIntf implements Logged, Serializable {
   protected static class SessCt {
     int sessNum;
   }
@@ -237,7 +237,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
     }
 
     if (!token.equals(tt.value)) {
-      if (debug) {
+      if (debug()) {
         debug("putContent: sync-token mismatch ifheader=" + tt.value +
                  "col-token=" + token);
       }
@@ -322,7 +322,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
       return mb;
     } catch (Throwable t) {
-      if (debug) {
+      if (debug()) {
         error(t);
       }
       throw new WebdavException(t);
@@ -341,7 +341,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
       return mb;
     } catch (Throwable t) {
-      if (debug) {
+      if (debug()) {
         error(t);
       }
       throw new WebdavException(t);
@@ -408,7 +408,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
       return path.substring(pos);
     } catch (Throwable t) {
-      if (debug) {
+      if (debug()) {
         error(t);
       }
       throw new WebdavBadRequest("bad URI " + href);
@@ -840,13 +840,13 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
         if (!c.written) {
           if ((c.stream == null) && (c.rdr == null)) {
-            if (debug) {
+            if (debug()) {
               debug("status: " + HttpServletResponse.SC_NO_CONTENT);
             }
 
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
           } else {
-            if (debug) {
+            if (debug()) {
               debug("send content - length=" + c.contentLength);
             }
 
@@ -864,12 +864,12 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
       resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw wdf;
     } catch (final WebdavException we) {
-      if (debug) {
+      if (debug()) {
         error(we);
       }
       throw we;
     } catch (final Throwable t) {
-      if (debug) {
+      if (debug()) {
         error(t);
       }
       throw new WebdavException(t);
@@ -962,13 +962,13 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
         uri = uri.substring(0, uri.length() - 1);
       }
 
-      if (debug) {
+      if (debug()) {
         debug("Normalized uri=" + uri);
       }
 
       return uri;
     } catch (final Throwable t) {
-      if (debug) {
+      if (debug()) {
         error(t);
       }
       throw new WebdavBadRequest("Bad uri: " + uri);
@@ -1292,7 +1292,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
 
       final WebdavProperty prop = makeProp(propnode);
 
-      if (debug) {
+      if (debug()) {
         debug("prop: " + prop.getTag());
       }
 
@@ -1444,7 +1444,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
    */
   public String getLocation(final WebdavNsNode node) throws WebdavException {
     try {
-      if (debug) {
+      if (debug()) {
         debug("Get url " + urlPrefix + node.getEncodedUri());
       }
 
@@ -1650,7 +1650,7 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
   public Reader getReader(final HttpServletRequest req) throws Throwable {
     Reader rdr;
 
-    if (debug) {
+    if (debug()) {
       rdr = new DebugReader(req.getReader());
     } else {
       rdr = req.getReader();
@@ -1687,8 +1687,8 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
     try {
       return XmlUtil.getElementsArray(nd);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest();
@@ -1705,8 +1705,8 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
     try {
       return XmlUtil.getOnlyElement(nd);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest();
@@ -1722,8 +1722,8 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
     try {
       return XmlUtil.getElementContent(el);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest();
@@ -1850,21 +1850,5 @@ public abstract class WebdavNsIntf extends Logged implements Serializable {
     public String toString() {
       return sb.toString();
     }
-  }
-
-  protected void debug(final String msg) {
-    super.debug("[" + sessNum + "] " + msg);
-  }
-
-  protected void warn(final String msg) {
-    super.warn("[" + sessNum + "] " + msg);
-  }
-
-  protected void error(final Throwable t) {
-    super.error(t);
-  }
-
-  protected void logIt(final String msg) {
-    super.info("[" + sessNum + "] " + msg);
   }
 }

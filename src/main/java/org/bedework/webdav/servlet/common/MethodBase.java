@@ -18,7 +18,7 @@
 */
 package org.bedework.webdav.servlet.common;
 
-import org.bedework.util.misc.Logged;
+import org.bedework.util.logging.Logged;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlEmit.Notifier;
@@ -34,8 +34,6 @@ import org.bedework.webdav.servlet.shared.WebdavStatusCode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -50,13 +48,11 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.ws.Holder;
 
 /** Base class for all webdav servlet methods.
  */
-public abstract class MethodBase extends Logged implements SecureXml {
+public abstract class MethodBase implements Logged, SecureXml {
   protected boolean dumpContent;
 
   protected boolean hasBriefHeader;
@@ -132,7 +128,6 @@ public abstract class MethodBase extends Logged implements SecureXml {
   public void init(final WebdavNsIntf nsIntf,
                    final boolean dumpContent) throws WebdavException{
     this.nsIntf = nsIntf;
-    debug = getLogger().isDebugEnabled();
     this.dumpContent = dumpContent;
 
 //    config = servlet.getServletConfig();
@@ -166,7 +161,7 @@ public abstract class MethodBase extends Logged implements SecureXml {
 
     resourceUri = getNsIntf().getResourceUri(req);
 
-    if (debug) {
+    if (debug()) {
       debug("resourceUri: " + resourceUri);
     }
 
@@ -477,8 +472,8 @@ public abstract class MethodBase extends Logged implements SecureXml {
     try {
       return XmlUtil.getElements(nd);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest(t.getMessage());
@@ -489,8 +484,8 @@ public abstract class MethodBase extends Logged implements SecureXml {
     try {
       return XmlUtil.getElementsArray(nd);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest(t.getMessage());
@@ -501,8 +496,8 @@ public abstract class MethodBase extends Logged implements SecureXml {
     try {
       return XmlUtil.getOnlyElement(nd);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest(t.getMessage());
@@ -513,8 +508,8 @@ public abstract class MethodBase extends Logged implements SecureXml {
     try {
       return XmlUtil.getElementContent(el);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest(t.getMessage());
@@ -525,8 +520,8 @@ public abstract class MethodBase extends Logged implements SecureXml {
     try {
       return XmlUtil.isEmpty(el);
     } catch (Throwable t) {
-      if (debug) {
-        getLogger().error(this, t);
+      if (debug()) {
+        getLogger().error(t);
       }
 
       throw new WebdavBadRequest(t.getMessage());
