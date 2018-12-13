@@ -22,6 +22,7 @@ package org.bedework.webdav.servlet.shared;
 import org.bedework.access.AccessPrincipal;
 import org.bedework.access.CurrentAccess;
 import org.bedework.access.WhoDefs;
+import org.bedework.util.logging.BwLogger;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.tagdefs.AppleServerTags;
 import org.bedework.util.xml.tagdefs.WebdavTags;
@@ -74,7 +75,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     userPrincipal = account.getKind() == WhoDefs.whoTypeUser;
     groupPrincipal = account.getKind() == WhoDefs.whoTypeGroup;
 //    if (displayName.startsWith("/")) {
-//      debugMsg(displayName);
+//      debug(displayName);
 //    }
   }
 
@@ -264,6 +265,17 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   }
 
   /* ====================================================================
-   *                   Private methods
+   *                   Logged methods
    * ==================================================================== */
+
+  private BwLogger logger = new BwLogger();
+
+  @Override
+  public BwLogger getLogger() {
+    if ((logger.getLoggedClass() == null) && (logger.getLoggedName() == null)) {
+      logger.setLoggedClass(getClass());
+    }
+
+    return logger;
+  }
 }

@@ -19,9 +19,8 @@
 
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.util.logging.BwLogger;
 import org.bedework.util.misc.Util;
-
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 
@@ -64,8 +63,9 @@ public class WebdavUtils {
 
       return url + prefix;
     } catch (final Throwable t) {
-      Logger.getLogger(WebdavUtils.class).warn(
+      new BwLogger().setLoggedClass(WebdavUtils.class).warn(
           "Unable to get url from " + req);
+
       return "BogusURL.this.is.probably.a.portal";
     }
   }

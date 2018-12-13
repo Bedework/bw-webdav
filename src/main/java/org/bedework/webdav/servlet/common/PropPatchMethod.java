@@ -286,7 +286,7 @@ public class PropPatchMethod extends MethodBase {
 
       plist.add(prop);
 
-      /* if (debug) {
+      /* if (debug()) {
         trace("reqtype: " + prop.getLocalName() +
               " ns: " + prop.getNamespaceURI() +
               " value: " + value);

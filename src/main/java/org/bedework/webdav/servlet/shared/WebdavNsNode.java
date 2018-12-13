@@ -22,6 +22,7 @@ import org.bedework.access.AccessPrincipal;
 import org.bedework.access.AccessXmlUtil;
 import org.bedework.access.CurrentAccess;
 import org.bedework.access.PrivilegeSet;
+import org.bedework.util.logging.BwLogger;
 import org.bedework.util.logging.Logged;
 import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
@@ -1050,5 +1051,20 @@ public abstract class WebdavNsNode implements Serializable, Logged {
     WebdavNsNode that = (WebdavNsNode)o;
 
     return uri.equals(that.uri);
+  }
+
+  /* ====================================================================
+   *                   Logged methods
+   * ==================================================================== */
+
+  private BwLogger logger = new BwLogger();
+
+  @Override
+  public BwLogger getLogger() {
+    if ((logger.getLoggedClass() == null) && (logger.getLoggedName() == null)) {
+      logger.setLoggedClass(getClass());
+    }
+
+    return logger;
   }
 }

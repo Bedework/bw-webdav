@@ -18,6 +18,7 @@
 */
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.util.logging.Logged;
 import org.bedework.util.servlet.io.CharArrayWrappedResponse;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.tagdefs.WebdavTags;
@@ -25,8 +26,6 @@ import org.bedework.webdav.servlet.common.MethodBase.MethodInfo;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavForbidden;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
-
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -52,17 +51,13 @@ import javax.xml.namespace.QName;
  * @version 1.0
  */
 public abstract class WebdavServlet extends HttpServlet
-        implements HttpSessionListener {
-  protected boolean debug;
-
+        implements Logged, HttpSessionListener {
   protected boolean dumpContent;
 
   /* If true we don't invalidate the session - this might allow the application
    * to be used as the server for CAS authenticated widgets etc.
    */
   protected boolean preserveSession;
-
-  protected transient Logger log;
 
   /** Table of methods - set at init
    */
@@ -109,10 +104,8 @@ public abstract class WebdavServlet extends HttpServlet
     boolean serverError = false;
 
     try {
-      debug = getLogger().isDebugEnabled();
-
-      if (debug) {
-        debugMsg("entry: " + req.getMethod());
+      if (debug()) {
+        debug("entry: " + req.getMethod());
         dumpRequest(req);
       }
 
@@ -122,12 +115,12 @@ public abstract class WebdavServlet extends HttpServlet
 
       if (req.getCharacterEncoding() == null) {
         req.setCharacterEncoding("UTF-8");
-        if (debug) {
-          debugMsg("No charset specified in request; forced to UTF-8");
+        if (debug()) {
+          debug("No charset specified in request; forced to UTF-8");
         }
       }
 
-      if (debug && dumpContent) {
+      if (debug() && dumpContent) {
         resp = new CharArrayWrappedResponse(resp);
       }
 
@@ -142,7 +135,7 @@ public abstract class WebdavServlet extends HttpServlet
       //resp.addHeader("DAV", intf.getDavHeader());
 
       if (method == null) {
-        logIt("No method for '" + methodName + "'");
+        info("No method for '" + methodName + "'");
 
         // ================================================================
         //     Set the correct response
@@ -169,7 +162,7 @@ public abstract class WebdavServlet extends HttpServlet
         tryWait(req, false);
       } catch (Throwable t) {}
 
-      if (debug && dumpContent &&
+      if (debug() && dumpContent &&
           (resp instanceof CharArrayWrappedResponse)) {
         /* instanceof check because we might get a subsequent exception before
          * we wrap the response
@@ -177,23 +170,23 @@ public abstract class WebdavServlet extends HttpServlet
         final CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
 
         if (wresp.getUsedOutputStream()) {
-          debugMsg("------------------------ response written to output stream -------------------");
+          debug("------------------------ response written to output stream -------------------");
         } else {
           final String str = wresp.toString();
 
           if ((str == null) || (str.length() == 0)) {
-            debugMsg("------------------------ No response content -------------------");
+            debug("------------------------ No response content -------------------");
             resp.setContentLength(0);
           } else {
-            debugMsg(
+            debug(
                     "------------------------ Dump of response -------------------");
-            debugMsg(str);
-            debugMsg(
+            debug(str);
+            debug(
                     "---------------------- End dump of response -----------------");
 
             final byte[] bs = str.getBytes();
             resp = (HttpServletResponse)wresp.getResponse();
-            debugMsg("contentLength=" + bs.length);
+            debug("contentLength=" + bs.length);
             resp.setContentLength(bs.length);
             resp.getOutputStream().write(bs);
           }
@@ -226,14 +219,14 @@ public abstract class WebdavServlet extends HttpServlet
 
         int status = wde.getStatusCode();
         if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-          getLogger().error(this, wde);
+          error(wde);
           serverError = true;
         }
         sendError(intf, wde, resp);
         return serverError;
       }
 
-      getLogger().error(this, t);
+      error(t);
       sendError(intf, t, resp);
       return true;
     } catch (Throwable t1) {
@@ -254,8 +247,8 @@ public abstract class WebdavServlet extends HttpServlet
         final QName errorTag = wde.getErrorTag();
 
         if (errorTag != null) {
-          if (debug) {
-            debugMsg("setStatus(" + wde.getStatusCode() + ")" +
+          if (debug()) {
+            debug("setStatus(" + wde.getStatusCode() + ")" +
                      " message=" + wde.getMessage());
           }
           resp.setStatus(wde.getStatusCode());
@@ -266,8 +259,8 @@ public abstract class WebdavServlet extends HttpServlet
             emitError(intf, errorTag, wde.getMessage(), sw);
 
             try {
-              if (debug) {
-                debugMsg("setStatus(" + wde.getStatusCode() + ")" +
+              if (debug()) {
+                debug("setStatus(" + wde.getStatusCode() + ")" +
                          " message=" + wde.getMessage());
               }
               resp.sendError(wde.getStatusCode(), sw.toString());
@@ -275,15 +268,15 @@ public abstract class WebdavServlet extends HttpServlet
             }
           }
         } else {
-          if (debug) {
-            debugMsg("setStatus(" + wde.getStatusCode() + ")" +
+          if (debug()) {
+            debug("setStatus(" + wde.getStatusCode() + ")" +
                      " message=" + wde.getMessage());
           }
           resp.sendError(wde.getStatusCode(), wde.getMessage());
         }
       } else {
-        if (debug) {
-          debugMsg("setStatus(" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + ")" +
+        if (debug()) {
+          debug("setStatus(" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + ")" +
                    " message=" + t.getMessage());
         }
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -370,8 +363,8 @@ public abstract class WebdavServlet extends HttpServlet
 
       wtr.waiting++;
       while (wtr.active) {
-        if (debug) {
-          log.debug("in: waiters=" + wtr.waiting);
+        if (debug()) {
+          debug("in: waiters=" + wtr.waiting);
         }
 
         wtr.wait();
@@ -381,16 +374,10 @@ public abstract class WebdavServlet extends HttpServlet
     }
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
-   */
   @Override
   public void sessionCreated(final HttpSessionEvent se) {
   }
 
-  /* (non-Javadoc)
-   * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
-   */
   @Override
   public void sessionDestroyed(final HttpSessionEvent se) {
     HttpSession session = se.getSession();
@@ -409,14 +396,12 @@ public abstract class WebdavServlet extends HttpServlet
    * @param req
    */
   public void dumpRequest(final HttpServletRequest req) {
-    Logger log = getLogger();
-
     try {
       Enumeration names = req.getHeaderNames();
 
       String title = "Request headers";
 
-      log.debug(title);
+      debug(title);
 
       while (names.hasMoreElements()) {
         String key = (String)names.nextElement();
@@ -431,7 +416,7 @@ public abstract class WebdavServlet extends HttpServlet
             val = "Basic **********";
           }
 
-          log.debug("  " + key + " = \"" + val + "\"");
+          debug("  " + key + " = \"" + val + "\"");
         }
       }
 
@@ -439,57 +424,26 @@ public abstract class WebdavServlet extends HttpServlet
 
       title = "Request parameters";
 
-      log.debug(title + " - global info and uris");
-      log.debug("getRemoteAddr = " + req.getRemoteAddr());
-      log.debug("getRequestURI = " + req.getRequestURI());
-      log.debug("getRemoteUser = " + req.getRemoteUser());
-      log.debug("getRequestedSessionId = " + req.getRequestedSessionId());
-      log.debug("HttpUtils.getRequestURL(req) = " + req.getRequestURL());
-      log.debug("contextPath=" + req.getContextPath());
-      log.debug("query=" + req.getQueryString());
-      log.debug("contentlen=" + req.getContentLength());
-      log.debug("request=" + req);
-      log.debug("parameters:");
+      debug(title + " - global info and uris");
+      debug("getRemoteAddr = " + req.getRemoteAddr());
+      debug("getRequestURI = " + req.getRequestURI());
+      debug("getRemoteUser = " + req.getRemoteUser());
+      debug("getRequestedSessionId = " + req.getRequestedSessionId());
+      debug("HttpUtils.getRequestURL(req) = " + req.getRequestURL());
+      debug("contextPath=" + req.getContextPath());
+      debug("query=" + req.getQueryString());
+      debug("contentlen=" + req.getContentLength());
+      debug("request=" + req);
+      debug("parameters:");
 
-      log.debug(title);
+      debug(title);
 
       while (names.hasMoreElements()) {
         String key = (String)names.nextElement();
         String val = req.getParameter(key);
-        log.debug("  " + key + " = \"" + val + "\"");
+        debug("  " + key + " = \"" + val + "\"");
       }
     } catch (Throwable t) {
     }
-  }
-
-  /**
-   * @return LOgger
-   */
-  public Logger getLogger() {
-    if (log == null) {
-      log = Logger.getLogger(this.getClass());
-    }
-
-    return log;
-  }
-
-  /** Debug
-   *
-   * @param msg
-   */
-  public void debugMsg(final String msg) {
-    getLogger().debug(msg);
-  }
-
-  /** Info messages
-   *
-   * @param msg
-   */
-  public void logIt(final String msg) {
-    getLogger().info(msg);
-  }
-
-  protected void error(final Throwable t) {
-    getLogger().error(this, t);
   }
 }

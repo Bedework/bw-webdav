@@ -19,6 +19,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.access.Acl;
+import org.bedework.util.logging.BwLogger;
 import org.bedework.util.logging.Logged;
 import org.bedework.util.misc.Util;
 import org.bedework.util.xml.XmlEmit;
@@ -1850,5 +1851,20 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
     public String toString() {
       return sb.toString();
     }
+  }
+
+  /* ====================================================================
+   *                   Logged methods
+   * ==================================================================== */
+
+  private BwLogger logger = new BwLogger();
+
+  @Override
+  public BwLogger getLogger() {
+    if ((logger.getLoggedClass() == null) && (logger.getLoggedName() == null)) {
+      logger.setLoggedClass(getClass());
+    }
+
+    return logger;
   }
 }

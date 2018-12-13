@@ -25,10 +25,10 @@ import org.bedework.access.AceWho;
 import org.bedework.access.Acl;
 import org.bedework.access.CurrentAccess;
 import org.bedework.access.PrivilegeSet;
+import org.bedework.util.logging.BwLogger;
+import org.bedework.util.logging.Logged;
 import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavForbidden;
-
-import org.apache.log4j.Logger;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -45,9 +45,7 @@ import java.util.TreeSet;
  *
  * @author Mike Douglass
  */
-public class AccessHelper implements AccessHelperI {
-  private boolean debug;
-
+public class AccessHelper implements Logged, AccessHelperI {
   /** For evaluating access control
    */
   private Access access;
@@ -61,12 +59,9 @@ public class AccessHelper implements AccessHelperI {
   /* Null allows all accesses according to user - otherwise restricted to this. */
   private PrivilegeSet maxAllowedPrivs;
 
-  private transient Logger log;
-
   @Override
   public void init(final CallBack cb) throws WebdavException {
     this.cb = cb;
-    debug = getLog().isDebugEnabled();
     try {
       access = new Access();
     } catch (Throwable t) {
@@ -217,7 +212,7 @@ public class AccessHelper implements AccessHelperI {
     }
 
     /*
-    if (debug) {
+    if (debug()) {
       String cname = ent.getClass().getName();
       String ident;
       if (ent instanceof DbCollection) {
@@ -273,8 +268,8 @@ public class AccessHelper implements AccessHelperI {
          */
         aclChars = getAclChars(ent);
 
-        if (debug) {
-          getLog().debug("aclChars = " + new String(aclChars));
+        if (debug()) {
+          debug("aclChars = " + new String(aclChars));
         }
 
         if (desiredAccess == privAny) {
@@ -295,8 +290,8 @@ public class AccessHelper implements AccessHelperI {
         /* Override rather than just create a readable access as code further
          * up expects a valid filled in object.
          */
-        if (debug && !ca.getAccessAllowed()) {
-          getLog().debug("Override for superuser");
+        if (debug() && !ca.getAccessAllowed()) {
+          debug("Override for superuser");
         }
         ca = Acl.forceAccessAllowed(ca);
       }
@@ -396,16 +391,19 @@ public class AccessHelper implements AccessHelperI {
     }
   }
 
-  private Logger getLog() {
-    if (log == null) {
-      log = Logger.getLogger(getClass());
+  /* ====================================================================
+   *                   Logged methods
+   * ==================================================================== */
+
+  private BwLogger logger = new BwLogger();
+
+  @Override
+  public BwLogger getLogger() {
+    if ((logger.getLoggedClass() == null) && (logger.getLoggedName() == null)) {
+      logger.setLoggedClass(getClass());
     }
 
-    return log;
+    return logger;
   }
-
-//  private void warn(String msg) {
-//    getLog().warn(msg);
-//  }
 }
 
