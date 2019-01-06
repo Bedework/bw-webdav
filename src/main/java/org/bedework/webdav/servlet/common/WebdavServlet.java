@@ -19,7 +19,7 @@
 package org.bedework.webdav.servlet.common;
 
 import org.bedework.util.logging.BwLogger;
-import org.bedework.util.logging.Logged;
+import org.bedework.util.servlet.HttpAppLogger;
 import org.bedework.util.servlet.io.CharArrayWrappedResponse;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.tagdefs.WebdavTags;
@@ -52,7 +52,7 @@ import javax.xml.namespace.QName;
  * @version 1.0
  */
 public abstract class WebdavServlet extends HttpServlet
-        implements Logged, HttpSessionListener {
+        implements HttpAppLogger, HttpSessionListener {
   protected boolean dumpContent;
 
   /* If true we don't invalidate the session - this might allow the application
@@ -74,6 +74,10 @@ public abstract class WebdavServlet extends HttpServlet
 
   private static volatile HashMap<String, Waiter> waiters = new HashMap<>();
 
+  public String getLogPrefix(HttpServletRequest request) {
+    return "webdav";
+  }
+
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
@@ -92,7 +96,7 @@ public abstract class WebdavServlet extends HttpServlet
    *
    * @param req       HttpServletRequest
    * @return WebdavNsIntf  or subclass of
-   * @throws WebdavException
+   * @throws WebdavException on fatal error
    */
   public abstract WebdavNsIntf getNsIntf(HttpServletRequest req)
       throws WebdavException;
@@ -105,6 +109,8 @@ public abstract class WebdavServlet extends HttpServlet
     boolean serverError = false;
 
     try {
+      logRequest(req);
+
       if (debug()) {
         debug("entry: " + req.getMethod());
         dumpRequest(req);
@@ -161,7 +167,7 @@ public abstract class WebdavServlet extends HttpServlet
 
       try {
         tryWait(req, false);
-      } catch (Throwable t) {}
+      } catch (final Throwable ignored) {}
 
       if (debug() && dumpContent &&
           (resp instanceof CharArrayWrappedResponse)) {
@@ -194,6 +200,10 @@ public abstract class WebdavServlet extends HttpServlet
         }
       }
 
+      try {
+        logRequestOut(req);
+      } catch (final Throwable ignored) {}
+
       if (!preserveSession) {
         /* WebDAV is stateless - toss away the session */
         try {
@@ -201,7 +211,7 @@ public abstract class WebdavServlet extends HttpServlet
           if (sess != null) {
             sess.invalidate();
           }
-        } catch (Throwable t) {}
+        } catch (final Throwable ignored) {}
       }
     }
   }

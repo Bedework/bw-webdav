@@ -15,7 +15,7 @@
 
 		<!-- Bedework Versions -->
     <bw-access.version>4.0.4</bw-access.version>
-    <bw-util.version>4.0.20</bw-util.version>
+    <bw-util.version>4.0.21-SNAPSHOT</bw-util.version>
     <bw-util-logging.version>4.0.0</bw-util-logging.version>
 
 		<!-- Third Party Library Versions -->
