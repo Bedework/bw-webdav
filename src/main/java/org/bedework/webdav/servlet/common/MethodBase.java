@@ -359,8 +359,16 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @return Document  Parsed body or null for no body
    * @exception WebdavException Some error occurred.
    */
-  protected Document parseContent(final int contentLength, final Reader reader) throws WebdavException{
-    return parseXmlSafely(contentLength, reader);
+  protected Document parseContent(final int contentLength,
+                                  final Reader reader) throws WebdavException{
+    Document doc = parseXmlSafely(contentLength, reader);
+    if (doc == null) {
+      debug("No document");
+    } else {
+      debug(doc.toString());
+    }
+
+    return doc;
   }
 
   protected String formatHTTPDate(final Timestamp val) {

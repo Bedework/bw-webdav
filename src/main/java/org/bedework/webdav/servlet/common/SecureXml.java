@@ -16,7 +16,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * Contributed by https://github.com/viqueen
  */
 public interface SecureXml {
-  default Document parseXmlSafely(final int contentLength, final Reader reader) throws WebdavException {
+  default Document parseXmlSafely(final int contentLength,
+                                  final Reader reader) throws WebdavException {
     if (contentLength == 0) {
       return null;
     }
@@ -28,7 +29,7 @@ public interface SecureXml {
 
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(false);
+      factory.setNamespaceAware(true);
       factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
       factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
