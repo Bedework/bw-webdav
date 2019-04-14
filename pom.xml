@@ -21,7 +21,7 @@
 		<!-- Third Party Library Versions -->
 		<commons-codec.version>1.5</commons-codec.version>
 		<apache-http.version>4.2.2</apache-http.version>
-		<servlet-api.version>2.5</servlet-api.version>
+		<servlet-api.version>4.0.0</servlet-api.version>
 
     <!-- test only -->
     <junit.version>4.8.2</junit.version>
@@ -122,7 +122,7 @@
 
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <version>${servlet-api.version}</version>
       <scope>provided</scope>
     </dependency>
