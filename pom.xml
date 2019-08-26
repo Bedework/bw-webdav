@@ -14,9 +14,9 @@
 		<maven.source.plugin.version>2.1.2</maven.source.plugin.version>
 
 		<!-- Bedework Versions -->
-    <bw-access.version>4.0.6</bw-access.version>
-    <bw-util.version>4.0.24</bw-util.version>
-    <bw-util-logging.version>4.0.2</bw-util-logging.version>
+    <bw-access.version>4.0.7</bw-access.version>
+    <bw-util.version>4.0.25</bw-util.version>
+    <bw-util-logging.version>4.0.4</bw-util-logging.version>
 
 		<!-- Third Party Library Versions -->
 		<commons-codec.version>1.5</commons-codec.version>
@@ -220,7 +220,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>3.1.1</version>
         <configuration>
           <!--<additionalparam>-Xdoclint:none</additionalparam>-->
           <failOnError>false</failOnError>
@@ -250,7 +250,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
+            <version>3.1.1</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
