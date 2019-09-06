@@ -22,6 +22,7 @@ import org.bedework.access.Acl;
 import org.bedework.util.logging.BwLogger;
 import org.bedework.util.logging.Logged;
 import org.bedework.util.misc.Util;
+import org.bedework.util.servlet.HttpServletUtils;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlUtil;
@@ -142,7 +143,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       sessNum = session.sessNum;
     }
 
-    account = req.getRemoteUser();
+    account = HttpServletUtils.remoteUser(req);
     anonymous = (account == null) || (account.length() == 0);
     urlPrefix = WebdavUtils.getUrlPrefix(req);
 
