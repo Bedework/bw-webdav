@@ -17,6 +17,7 @@
     <bw-access.version>4.0.7</bw-access.version>
     <bw-util.version>4.0.26</bw-util.version>
     <bw-util-logging.version>4.0.4</bw-util-logging.version>
+    <bw-util-network.version>4.1.0-SNAPSHOT</bw-util-network.version>
 
 		<!-- Third Party Library Versions -->
 		<commons-codec.version>1.5</commons-codec.version>
@@ -110,7 +111,7 @@
     <dependency>
       <groupId>org.bedework</groupId>
       <artifactId>bw-util-servlet</artifactId>
-      <version>${bw-util.version}</version>
+      <version>${bw-util-network.version}</version>
     </dependency>
 
 		<dependency>
