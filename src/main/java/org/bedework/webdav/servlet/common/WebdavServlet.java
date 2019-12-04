@@ -257,6 +257,10 @@ public abstract class WebdavServlet extends HttpServlet
         final WebdavException wde = (WebdavException)t;
         final QName errorTag = wde.getErrorTag();
 
+        if (debug()) {
+          error(wde);
+        }
+
         if (errorTag != null) {
           if (debug()) {
             debug("setStatus(" + wde.getStatusCode() + ")" +
