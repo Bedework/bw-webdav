@@ -230,23 +230,30 @@ public class PropFindMethod extends MethodBase {
 
   /** Generate response for a PROPFIND for the current node, then for the children.
    *
-   * @param node
-   * @param pr
+   * @param node current node
+   * @param pr the prop request
    * @throws WebdavException
    */
   public void doNodeProperties(final WebdavNsNode node,
                                 final PropRequest pr) throws WebdavException {
     node.generateHref(xml);
 
-    if ((pr == null) || Util.isEmpty(pr.props) || (!node.getExists())) {
+    var propNameOrAll = (pr.reqType == PropRequest.ReqType.propName) ||
+            (pr.reqType == PropRequest.ReqType.propAll);
+
+    if ((pr == null) ||
+            (!propNameOrAll && Util.isEmpty(pr.props)) ||
+            !node.getExists()) {
       openTag(WebdavTags.propstat);
+      if (node.getStatus() == HttpServletResponse.SC_OK) {
+        emptyTag(WebdavTags.prop);
+      }
       addStatus(node.getStatus(), null);
       closeTag(WebdavTags.propstat);
       return;
     }
 
-    if ((pr.reqType == PropRequest.ReqType.propName) ||
-        (pr.reqType == PropRequest.ReqType.propAll)) {
+    if (propNameOrAll) {
       openTag(WebdavTags.propstat);
 
       if (debug()) {
