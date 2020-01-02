@@ -278,7 +278,7 @@ public class ReportMethod extends MethodBase {
 
         if (lvl.equals("1")) {
           syncLevel = 1;
-        } else if (lvl.equals("infinity")) {
+        } else if (lvl.equals("infinite")) {
           syncLevel = Headers.depthInfinity;
         } else {
           throw new WebdavBadRequest("Bad sync-level " + lvl);
