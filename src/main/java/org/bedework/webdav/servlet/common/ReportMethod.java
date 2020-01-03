@@ -39,6 +39,8 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.bedework.util.xml.XmlUtil.nodeMatches;
+
 /** Class called to handle POST
  *
  *   @author Mike Douglass   douglm   rpi.edu
@@ -233,7 +235,7 @@ public class ReportMethod extends MethodBase {
       for (int i = 0; i < children.length; i++) {
         Element curnode = children[i];
 
-        if (XmlUtil.nodeMatches(curnode, WebdavTags.prop)) {
+        if (nodeMatches(curnode, WebdavTags.prop)) {
           if (hadProp) {
             throw new WebdavBadRequest("More than one DAV:prop element");
           }
@@ -264,7 +266,7 @@ public class ReportMethod extends MethodBase {
         throw new WebdavBadRequest("Expect 2 - 4 child elements");
       }
 
-      if (!XmlUtil.nodeMatches(children[0], WebdavTags.syncToken)) {
+      if (!nodeMatches(children[0], WebdavTags.syncToken)) {
         throw new WebdavBadRequest("Expect " + WebdavTags.syncToken);
       }
 
@@ -273,7 +275,7 @@ public class ReportMethod extends MethodBase {
       int childI = 1;
       syncLimit = -1;
 
-      if (XmlUtil.nodeMatches(children[1], WebdavTags.synclevel)) {
+      if (nodeMatches(children[1], WebdavTags.synclevel)) {
         final String lvl = XmlUtil.getElementContent(children[1]);
 
         if (lvl.equals("1")) {
@@ -296,12 +298,22 @@ public class ReportMethod extends MethodBase {
 
       syncRecurse = syncLevel == Headers.depthInfinity;
 
-      if (XmlUtil.nodeMatches(children[childI], WebdavTags.limit)) {
-        syncLimit = Integer.valueOf(XmlUtil.getElementContent(children[childI]));
+      if (nodeMatches(children[childI], WebdavTags.limit)) {
+        final Element[] chlimit = getChildrenArray(children[childI]);
+
+        if (chlimit.length > 1) {
+          throw new WebdavBadRequest("Expect 1 child element");
+        }
+
+        if (!nodeMatches(chlimit[0], WebdavTags.nresults)) {
+          throw new WebdavBadRequest("Expect limit/nresults");
+        }
+
+        syncLimit = Integer.parseInt(XmlUtil.getElementContent(chlimit[0]));
         childI++;
       }
 
-      if (!XmlUtil.nodeMatches(children[childI], WebdavTags.prop)) {
+      if (!nodeMatches(children[childI], WebdavTags.prop)) {
         throw new WebdavBadRequest("Expect " + WebdavTags.prop);
       }
 
@@ -355,7 +367,7 @@ public class ReportMethod extends MethodBase {
       for (int i = 0; i < children.length; i++) {
         final Element curnode = children[i];
 
-        if (XmlUtil.nodeMatches(curnode, WebdavTags.propertySearch)) {
+        if (nodeMatches(curnode, WebdavTags.propertySearch)) {
           final Element[] pschildren = getChildrenArray(curnode);
 
           if (pschildren.length != 2) {
@@ -371,13 +383,13 @@ public class ReportMethod extends MethodBase {
               pps.props.add(wd);
             }
           }
-        } else if (XmlUtil.nodeMatches(curnode, WebdavTags.prop)) {
+        } else if (nodeMatches(curnode, WebdavTags.prop)) {
           pps.pr = pm.parseProps(curnode);
           preq = pps.pr;
           i++;
 
           if (i < children.length) {
-            if (!XmlUtil.nodeMatches(children[i], WebdavTags.applyToPrincipalCollectionSet)) {
+            if (!nodeMatches(children[i], WebdavTags.applyToPrincipalCollectionSet)) {
               throw new WebdavBadRequest();
             }
 
@@ -604,27 +616,27 @@ public class ReportMethod extends MethodBase {
     try {
       Element root = doc.getDocumentElement();
 
-      if (XmlUtil.nodeMatches(root, WebdavTags.expandProperty)) {
+      if (nodeMatches(root, WebdavTags.expandProperty)) {
         return reportTypeExpandProperty;
       }
 
-      if (XmlUtil.nodeMatches(root, WebdavTags.syncCollection)) {
+      if (nodeMatches(root, WebdavTags.syncCollection)) {
         return reportTypeSync;
       }
 
-      if (XmlUtil.nodeMatches(root, WebdavTags.principalPropertySearch)) {
+      if (nodeMatches(root, WebdavTags.principalPropertySearch)) {
         return reportTypePrincipalPropertySearch;
       }
 
-      if (XmlUtil.nodeMatches(root, WebdavTags.principalMatch)) {
+      if (nodeMatches(root, WebdavTags.principalMatch)) {
         return reportTypePrincipalMatch;
       }
 
-      if (XmlUtil.nodeMatches(root, WebdavTags.aclPrincipalPropSet)) {
+      if (nodeMatches(root, WebdavTags.aclPrincipalPropSet)) {
         return reportTypeAclPrincipalPropSet;
       }
 
-      if (XmlUtil.nodeMatches(root, WebdavTags.principalSearchPropertySet)) {
+      if (nodeMatches(root, WebdavTags.principalSearchPropertySet)) {
         return reportTypePrincipalSearchPropertySet;
       }
 

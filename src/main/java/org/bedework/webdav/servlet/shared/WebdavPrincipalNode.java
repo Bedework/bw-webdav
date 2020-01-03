@@ -114,18 +114,18 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   }
 
   @Override
-  public Collection<? extends WdEntity> getChildren(
+  public Collection<? extends WdEntity<?>> getChildren(
           Supplier<Object> filterGetter) throws WebdavException {
     return null;
   }
 
   @Override
-  public WdCollection getCollection(final boolean deref) throws WebdavException {
+  public WdCollection<?> getCollection(final boolean deref) throws WebdavException {
     return null;
   }
 
   @Override
-  public WdCollection getImmediateTargetCollection()
+  public WdCollection<?> getImmediateTargetCollection()
           throws WebdavException {
     return null;
   }

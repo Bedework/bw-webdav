@@ -43,7 +43,7 @@ public abstract class WdCollectionBase <T> extends WdCollection<T> {
   }
 
   @Override
-  public String getAliasUri() throws WebdavException {
+  public String getAliasUri() {
     return null;
   }
 }

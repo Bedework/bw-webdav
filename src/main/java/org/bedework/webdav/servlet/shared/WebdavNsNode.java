@@ -241,7 +241,7 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @return Collection of children
    * @throws WebdavException on fatal error
    */
-  public abstract Collection<? extends WdEntity> getChildren(
+  public abstract Collection<? extends WdEntity<?>> getChildren(
           Supplier<Object> filterGetter) throws WebdavException;
 
   /**
@@ -670,9 +670,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Return true if this represents a principal
    *
    * @return boolean
-   * @throws WebdavException
    */
-  public boolean isPrincipal() throws WebdavException {
+  public boolean isPrincipal() {
     return userPrincipal || groupPrincipal;
   }
 
@@ -686,11 +685,7 @@ public abstract class WebdavNsNode implements Serializable, Logged {
       return propertyNames.values();
     }
 
-    Collection<PropertyTagEntry> res = new ArrayList<PropertyTagEntry>();
-
-    res.addAll(propertyNames.values());
-
-    return res;
+    return new ArrayList<>(propertyNames.values());
   }
 
   /** Return a set of QName defining reports this node supports.
@@ -699,8 +694,7 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @throws WebdavException
    */
   public Collection<QName> getSupportedReports() throws WebdavException {
-    final Collection<QName> res = new ArrayList<>();
-    res.addAll(supportedReports);
+    final Collection<QName> res = new ArrayList<>(supportedReports);
 
     if (wdSysIntf.allowsSyncReport(getCollection(false))) {
       res.add(WebdavTags.syncCollection);
@@ -711,17 +705,15 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
   /**
    * @param val  boolean true if node exists
-   * @throws WebdavException
    */
-  public void setExists(final boolean val) throws WebdavException {
+  public void setExists(final boolean val) {
     exists = val;
   }
 
   /**
    * @return boolean true if node exists
-   * @throws WebdavException
    */
-  public boolean getExists() throws WebdavException {
+  public boolean getExists() {
     return exists;
   }
 
@@ -771,25 +763,22 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
   /**
    * @return boolean true for a collection
-   * @throws WebdavException
    */
-  public boolean isCollection() throws WebdavException {
+  public boolean isCollection() {
     return collection;
   }
 
   /**
    * @param val boolean true if node allows get
-   * @throws WebdavException
    */
-  public void setAllowsGet(final boolean val) throws WebdavException {
+  public void setAllowsGet(final boolean val) {
     allowsGet = val;
   }
 
   /**
    * @return true if node allows get
-   * @throws WebdavException
    */
-  public boolean getAllowsGet() throws WebdavException {
+  public boolean getAllowsGet() {
     return allowsGet;
   }
 
@@ -993,9 +982,9 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @return Collection this node represents
    * @throws WebdavException
    */
-  public abstract WdCollection getCollection(boolean deref) throws WebdavException;
+  public abstract WdCollection<?> getCollection(boolean deref) throws WebdavException;
 
-  public abstract WdCollection getImmediateTargetCollection() throws WebdavException;
+  public abstract WdCollection<?> getImmediateTargetCollection() throws WebdavException;
 
   /**
    * @return true if this node allows a sync-report.

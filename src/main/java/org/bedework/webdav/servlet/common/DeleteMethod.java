@@ -52,9 +52,17 @@ public class DeleteMethod extends MethodBase {
         throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED);
       }
 
+      String resourceUri = getResourceUri(req);
+      final int nodeType;
+      if (resourceUri.endsWith("/")) {
+        nodeType = WebdavNsIntf.nodeTypeCollection;
+      } else {
+        nodeType = WebdavNsIntf.nodeTypeUnknown;
+      }
+
       WebdavNsNode node = intf.getNode(getResourceUri(req),
                                        WebdavNsIntf.existanceMust,
-                                       WebdavNsIntf.nodeTypeUnknown,
+                                       nodeType,
                                        false);
 
       if ((node == null) || !node.getExists()) {

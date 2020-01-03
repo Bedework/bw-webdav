@@ -201,9 +201,16 @@ public class PropFindMethod extends MethodBase {
       debug("About to get node at " + resourceUri);
     }
 
+    final int nodeType;
+    if (resourceUri.endsWith("/")) {
+      nodeType = WebdavNsIntf.nodeTypeCollection;
+    } else {
+      nodeType = WebdavNsIntf.nodeTypeUnknown;
+    }
+
     WebdavNsNode node = getNsIntf().getNode(resourceUri,
                                             WebdavNsIntf.existanceMust,
-                                            WebdavNsIntf.nodeTypeUnknown,
+                                            nodeType,
                                             false);
 
     addHeaders(req, resp, node);

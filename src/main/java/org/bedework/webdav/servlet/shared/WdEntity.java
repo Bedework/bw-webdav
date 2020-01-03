@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
  *
  * @param <T>
  */
-public abstract class WdEntity <T> implements Comparable<WdEntity> {
+public abstract class WdEntity <T> implements Comparable<WdEntity<?>> {
   /** The internal name of the entity
    */
   private String name;
@@ -70,51 +70,44 @@ public abstract class WdEntity <T> implements Comparable<WdEntity> {
 
   /**
    * @return true if this can be shared.
-   * @throws WebdavException
    */
-  public abstract boolean getCanShare() throws WebdavException;
+  public abstract boolean getCanShare();
 
   /**
    * @return true if this can be published.
-   * @throws WebdavException
    */
-  public abstract boolean getCanPublish() throws WebdavException;
+  public abstract boolean getCanPublish();
 
   /**
    * @return true if this is an alias for another entity.
-   * @throws WebdavException
    */
-  public abstract boolean isAlias() throws WebdavException;
+  public abstract boolean isAlias();
 
   /**
    * @return null if this is not an alias otherwise the uri of the target
-   * @throws WebdavException
    */
-  public abstract String getAliasUri() throws WebdavException;
+  public abstract String getAliasUri();
 
   /** If isAlias() then resolves the alias. Otherwise just returns the parameter.
    *
    * @return WdEntity or null.
    * @param resolveSubAlias - if true and the alias points to an alias, resolve
    *                  down to a non-alias.
-   * @throws WebdavException
    */
-  public abstract T resolveAlias(final boolean resolveSubAlias) throws WebdavException;
+  public abstract T resolveAlias(final boolean resolveSubAlias);
 
   /** set/replace properties with the given name and value
    *
-   * @param name
-   * @param val
-   * @throws WebdavException
+   * @param name of property
+   * @param val of property
    */
-  public abstract void setProperty(QName name, String val) throws WebdavException;
+  public abstract void setProperty(QName name, String val);
 
   /**
-   * @param name
+   * @param name of property
    * @return null if not set otherwise value of first property found with name
-   * @throws WebdavException
    */
-  public abstract String getProperty(QName name) throws WebdavException;
+  public abstract String getProperty(QName name);
 
   /* ====================================================================
    *                      Bean methods
@@ -123,157 +116,139 @@ public abstract class WdEntity <T> implements Comparable<WdEntity> {
   /** Set the name
    *
    * @param val    String name
-   * @throws WebdavException
    */
-  public void setName(final String val) throws WebdavException {
+  public void setName(final String val) {
     name = val;
   }
 
   /** Get the name
    *
    * @return String   name
-   * @throws WebdavException
    */
-  public String getName() throws WebdavException {
+  public String getName() {
     return name;
   }
 
   /** Set the display name
    *
    * @param val    String display name
-   * @throws WebdavException
    */
-  public void setDisplayName(final String val) throws WebdavException {
+  public void setDisplayName(final String val) {
     displayName = val;
   }
 
   /** Get the display name
    *
    * @return String   display name
-   * @throws WebdavException
    */
-  public String getDisplayName() throws WebdavException {
+  public String getDisplayName() {
     return displayName;
   }
 
   /** Set the path to this collection
    *
    * @param val    String path
-   * @throws WebdavException
    */
-  public void setPath(final String val) throws WebdavException {
+  public void setPath(final String val) {
     path = val;
   }
 
   /** Get the path
    *
    * @return String   path
-   * @throws WebdavException
    */
-  public String getPath() throws WebdavException {
+  public String getPath() {
     return path;
   }
 
   /** Set the path to this collection
    *
    * @param val    String path
-   * @throws WebdavException
    */
-  public void setParentPath(final String val) throws WebdavException {
+  public void setParentPath(final String val) {
     parentPath = val;
   }
 
   /** Get the path
    *
    * @return String   path
-   * @throws WebdavException
    */
-  public String getParentPath() throws WebdavException {
+  public String getParentPath() {
     return parentPath;
   }
 
   /**
-   * @param val
-   * @throws WebdavException
+   * @param val AccessPrincipal
    */
-  public void setOwner(final AccessPrincipal val) throws WebdavException {
+  public void setOwner(final AccessPrincipal val) {
     owner = val;
   }
 
   /**
    * @return AccessPrincipal
-   * @throws WebdavException
    */
-  public AccessPrincipal getOwner() throws WebdavException {
+  public AccessPrincipal getOwner() {
     return owner;
   }
 
   /**
-   * @param val
-   * @throws WebdavException
+   * @param val create date
    */
-  public void setCreated(final String val) throws WebdavException {
+  public void setCreated(final String val) {
     created = val;
   }
 
   /**
    * @return String created
-   * @throws WebdavException
    */
-  public String getCreated() throws WebdavException {
+  public String getCreated() {
     return created;
   }
 
   /**
-   * @param val
-   * @throws WebdavException
+   * @param val lastmod
    */
-  public void setLastmod(final String val) throws WebdavException {
+  public void setLastmod(final String val) {
     lastmod = val;
   }
 
   /**
    * @return String lastmod
-   * @throws WebdavException
    */
-  public String getLastmod() throws WebdavException {
+  public String getLastmod() {
     return lastmod;
   }
 
   /** Get the current etag value
    *
    * @return String    the etag
-   * @throws WebdavException
    */
-  public abstract String getEtag() throws WebdavException;
+  public abstract String getEtag();
 
   /** Get the etag value before any changes were applied
    *
    * @return String    the etag
-   * @throws WebdavException
    */
-  public abstract String getPreviousEtag() throws WebdavException;
+  public abstract String getPreviousEtag();
 
   /** Set the description
    *
    * @param val    String description
-   * @throws WebdavException
    */
-  public void setDescription(final String val) throws WebdavException {
+  public void setDescription(final String val) {
     description = val;
   }
 
   /** Get the description
    *
    * @return String   description
-   * @throws WebdavException
    */
-  public String getDescription() throws WebdavException {
+  public String getDescription() {
     return description;
   }
 
   /**
-   * @param ts
+   * @param ts ToString object
    */
   public void toStringSegment(final ToString ts) {
     try {

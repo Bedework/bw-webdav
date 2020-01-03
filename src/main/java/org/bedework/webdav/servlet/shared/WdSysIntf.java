@@ -32,7 +32,7 @@ public interface WdSysIntf {
    * @return true if this is a collection which allows a sync-report.
    * @throws WebdavException
    */
-  public boolean allowsSyncReport(WdCollection col) throws WebdavException;
+  public boolean allowsSyncReport(WdCollection<?> col) throws WebdavException;
 
   /** Return default content type for this service.
    *
