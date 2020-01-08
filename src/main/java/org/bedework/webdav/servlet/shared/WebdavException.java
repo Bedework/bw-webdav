@@ -38,9 +38,7 @@ public class WebdavException extends Throwable {
    */
   public WebdavException(String s) {
     super(s);
-    if (statusCode < 0) {
-      statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-    }
+    statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
   }
 
   /** Constructor
@@ -49,9 +47,7 @@ public class WebdavException extends Throwable {
    */
   public WebdavException(Throwable t) {
     super(t);
-    if (statusCode < 0) {
-      statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-    }
+    statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
   }
 
   /** Constructor

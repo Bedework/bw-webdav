@@ -37,7 +37,6 @@ public interface WdSysIntf {
   /** Return default content type for this service.
    *
    * @return String - never null.
-   * @throws WebdavException
    */
   public String getDefaultContentType();
 

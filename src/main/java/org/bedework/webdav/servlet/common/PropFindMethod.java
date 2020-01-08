@@ -221,7 +221,8 @@ public class PropFindMethod extends MethodBase {
       openTag(WebdavTags.response);
 
       // XXX href value not encoded correctly
-      property(WebdavTags.href, resourceUri);
+      property(WebdavTags.href,
+               getNsIntf().getSysIntf().getUrlHandler().prefix(resourceUri));
 
       addStatus(HttpServletResponse.SC_NOT_FOUND, null);
 

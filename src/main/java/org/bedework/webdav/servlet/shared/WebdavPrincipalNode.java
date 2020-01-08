@@ -62,14 +62,13 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    * @param account - the principal
    * @param collection - true if this is a collection
    * @param uri of request
-   * @throws WebdavException
    */
   public WebdavPrincipalNode(final WdSysIntf sysi,
                              final UrlHandler urlHandler,
                              final String path,
                              final AccessPrincipal account,
                              final boolean collection,
-                             final String uri) throws WebdavException {
+                             final String uri) {
     super(sysi, urlHandler, path, collection, uri);
     this.account = account;
     userPrincipal = account.getKind() == WhoDefs.whoTypeUser;

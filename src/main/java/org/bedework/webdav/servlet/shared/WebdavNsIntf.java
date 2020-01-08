@@ -107,7 +107,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
    */
   protected HashMap<String, MethodInfo> methods;
 
-  /** Table of created methods
+  /* Table of created methods
   private HashMap<String, MethodBase> createdMethods = new HashMap<String, MethodBase>();
    */
 
@@ -264,6 +264,12 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       xml.property(errorTag, extra);
     }
   }
+
+  /**
+   *
+   * @return system interface
+   */
+  public abstract WdSysIntf getSysIntf();
 
   /** Get an object suitable for use in parsing acls and generating access.
    *
