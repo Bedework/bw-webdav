@@ -47,7 +47,7 @@ public class PropFindMethod extends MethodBase {
    */
   public static class PropRequest {
     /** */
-    public static enum ReqType {
+    public enum ReqType {
       /** */
       prop,
       /** */
@@ -147,7 +147,7 @@ public class PropFindMethod extends MethodBase {
   /** See if the current node represents a valid propfind element
    * and return with a request if so. Otherwise return null.
    *
-   * @param nd
+   * @param nd propfind element node
    * @return PropRequest
    * @throws WebdavException
    */
@@ -169,7 +169,7 @@ public class PropFindMethod extends MethodBase {
 
   /** Just a list of property names in any namespace.
    *
-   * @param nd
+   * @param nd dav:prop node
    * @return PropRequest
    * @throws WebdavException
    */
@@ -181,9 +181,9 @@ public class PropFindMethod extends MethodBase {
   }
 
   /**
-   * @param req
-   * @param resp
-   * @param depth
+   * @param req http request
+   * @param resp http response
+   * @param depth from depth header
    * @throws WebdavException
    */
   public void processResp(final HttpServletRequest req,
