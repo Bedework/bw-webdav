@@ -86,9 +86,7 @@ public class PropFindMethod extends MethodBase {
     if (doc == null) {
       // Treat as allprop request
       parsedReq = new PropRequest(PropRequest.ReqType.propAll);
-    }
-
-    if (doc != null) {
+    } else {
       processDoc(doc);
     }
 
@@ -249,8 +247,7 @@ public class PropFindMethod extends MethodBase {
     var propNameOrAll = (pr.reqType == PropRequest.ReqType.propName) ||
             (pr.reqType == PropRequest.ReqType.propAll);
 
-    if ((pr == null) ||
-            (!propNameOrAll && Util.isEmpty(pr.props)) ||
+    if ((!propNameOrAll && Util.isEmpty(pr.props)) ||
             !node.getExists()) {
       openTag(WebdavTags.propstat);
       if (node.getStatus() == HttpServletResponse.SC_OK) {
@@ -353,7 +350,7 @@ public class PropFindMethod extends MethodBase {
 
   /* Build the lockdiscovery response for a single node
    */
-  private void doLockDiscovery(final WebdavNsNode node) throws WebdavException {
+  private void doLockDiscovery(final WebdavNsNode node) {
   }
 }
 
