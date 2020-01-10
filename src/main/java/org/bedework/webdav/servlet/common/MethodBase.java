@@ -38,13 +38,9 @@ import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URLDecoder;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,26 +74,27 @@ public abstract class MethodBase implements Logged, SecureXml {
       new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss ");
 
   /**
-   * @param req
-   * @param resp
+   * @param req http request
+   * @param resp http response
    * @throws WebdavException
    */
   public abstract void doMethod(HttpServletRequest req,
                                 HttpServletResponse resp)
         throws WebdavException;
 
-  /** Allow servelt to create method.
+  /** Allow servlet to create method.
    */
   public static class MethodInfo {
-    private Class methodClass;
+    private Class<?> methodClass;
 
     private boolean requiresAuth;
 
     /**
-     * @param methodClass
-     * @param requiresAuth
+     * @param methodClass class of method
+     * @param requiresAuth true for requires auth
      */
-    public MethodInfo(final Class methodClass, final boolean requiresAuth) {
+    public MethodInfo(final Class<?> methodClass,
+                      final boolean requiresAuth) {
       this.methodClass = methodClass;
       this.requiresAuth = requiresAuth;
     }
@@ -105,7 +102,7 @@ public abstract class MethodBase implements Logged, SecureXml {
     /**
      * @return Class for this method
      */
-    public Class getMethodClass() {
+    public Class<?> getMethodClass() {
       return methodClass;
     }
 
@@ -122,12 +119,11 @@ public abstract class MethodBase implements Logged, SecureXml {
 
   /** Called at each request
    *
-   * @param nsIntf
-   * @param dumpContent
-   * @throws WebdavException
+   * @param nsIntf interface
+   * @param dumpContent true to provide debug content dump
    */
   public void init(final WebdavNsIntf nsIntf,
-                   final boolean dumpContent) throws WebdavException{
+                   final boolean dumpContent) {
     this.nsIntf = nsIntf;
     this.dumpContent = dumpContent;
 
@@ -169,77 +165,8 @@ public abstract class MethodBase implements Logged, SecureXml {
     return resourceUri;
   }
 
-  /** Return a path, broken into its elements, after "." and ".." are removed.
-   * If the parameter path attempts to go above the root we return null.
-   *
-   * Other than the backslash thing why not use URI?
-   *
-   * @param path      String path to be fixed
-   * @return String[]   fixed path broken into elements
-   * @throws WebdavException
-   */
-  public static List<String> fixPath(final String path) throws WebdavException {
-    if (path == null) {
-      return null;
-    }
-
-    String decoded;
-    try {
-      decoded = URLDecoder.decode(path, "UTF8");
-    } catch (final Throwable t) {
-      throw new WebdavException("bad path: " + path);
-    }
-
-    if (decoded == null) {
-      return (null);
-    }
-
-    /** Make any backslashes into forward slashes.
-     */
-    if (decoded.indexOf('\\') >= 0) {
-      decoded = decoded.replace('\\', '/');
-    }
-
-    /** Ensure a leading '/'
-     */
-    if (!decoded.startsWith("/")) {
-      decoded = "/" + decoded;
-    }
-
-    /** Remove all instances of '//'.
-     */
-    while (decoded.contains("//")) {
-      decoded = decoded.replaceAll("//", "/");
-    }
-
-    /** Somewhere we may have /./ or /../
-     */
-
-    final StringTokenizer st = new StringTokenizer(decoded, "/");
-
-    final ArrayList<String> al = new ArrayList<String>();
-    while (st.hasMoreTokens()) {
-      final String s = st.nextToken();
-
-      if (s.equals(".")) {
-        // ignore
-      } else if (s.equals("..")) {
-        // Back up 1
-        if (al.size() == 0) {
-          // back too far
-          return null;
-        }
-
-        al.remove(al.size() - 1);
-      } else {
-        al.add(s);
-      }
-    }
-
-    return al;
-  }
-
-  protected int defaultDepth(final int depth, final int def) {
+  protected int defaultDepth(final int depth,
+                             final int def) {
     if (depth < 0) {
       return def;
     }
@@ -249,7 +176,8 @@ public abstract class MethodBase implements Logged, SecureXml {
 
   /* depth must have given value
    */
-  protected void checkDepth(final int depth, final int val) throws WebdavException {
+  protected void checkDepth(final int depth,
+                            final int val) throws WebdavException {
     if (depth != val) {
       throw new WebdavBadRequest();
     }
@@ -263,18 +191,12 @@ public abstract class MethodBase implements Logged, SecureXml {
     return "HTTP/1.1 " + status + " " + message;
   }
 
-  protected void addStatus(final int status, String message) throws WebdavException {
-    try {
-      if (message == null) {
-        message = WebdavStatusCode.getMessage(status);
-      }
-
-      property(WebdavTags.status, "HTTP/1.1 " + status + " " + message);
-    } catch (WebdavException wde) {
-      throw wde;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
+  protected void addStatus(final int status, String message) {
+    if (message == null) {
+      message = WebdavStatusCode.getMessage(status);
     }
+
+    property(WebdavTags.status, "HTTP/1.1 " + status + " " + message);
   }
 
   /* A node of null corresponds to * for an OPTIONS request
@@ -371,16 +293,6 @@ public abstract class MethodBase implements Logged, SecureXml {
     return doc;
   }
 
-  protected String formatHTTPDate(final Timestamp val) {
-    if (val == null) {
-      return null;
-    }
-
-    synchronized (httpDateFormatter) {
-      return httpDateFormatter.format(val) + "GMT";
-    }
-  }
-
   private class XmlNotifier extends Notifier {
     private boolean enabled;
 
@@ -392,7 +304,7 @@ public abstract class MethodBase implements Logged, SecureXml {
     }
 
     @Override
-    public void doNotification() throws Throwable {
+    public void doNotification() {
       enabled = false;
 
       if (!openFlag.value) {
@@ -410,16 +322,16 @@ public abstract class MethodBase implements Logged, SecureXml {
 
   /** Build the response for a single node for a propfind request
    *
-   * @param node
-   * @param props
+   * @param node webdav node
+   * @param props list of properties
    * @throws WebdavException on fatal error
    */
   public void doPropFind(final WebdavNsNode node,
                          final Collection<WebdavProperty> props) throws WebdavException {
     final WebdavNsIntf intf = getNsIntf();
-    final Collection<WebdavProperty> unknowns = new ArrayList<WebdavProperty>();
+    final Collection<WebdavProperty> unknowns = new ArrayList<>();
 
-    final Holder<Boolean> openFlag = new Holder<Boolean>(Boolean.FALSE);
+    final Holder<Boolean> openFlag = new Holder<>(Boolean.FALSE);
     final XmlNotifier notifier = new XmlNotifier(openFlag);
     try {
       xml.setNotifier(notifier);
@@ -551,15 +463,15 @@ public abstract class MethodBase implements Logged, SecureXml {
 
   /** Add a namespace
    *
-   * @param val
-   * @throws WebdavException
+   * @param val String namespace
+   * @throws RuntimeException on fatal error
    */
-  public void addNs(final String val) throws WebdavException {
+  public void addNs(final String val) {
     if (xml.getNameSpace(val) == null) {
       try {
         xml.addNs(new NameSpace(val, null), false);
       } catch (IOException e) {
-        throw new WebdavException(e);
+        throw new RuntimeException(e);
       }
     }
   }
@@ -573,49 +485,49 @@ public abstract class MethodBase implements Logged, SecureXml {
     return xml.getNsAbbrev(ns);
   }
 
-  protected void openTag(final QName tag) throws WebdavException {
+  protected void openTag(final QName tag) {
     try {
       xml.openTag(tag);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
-  protected void openTagNoNewline(final QName tag) throws WebdavException {
+  protected void openTagNoNewline(final QName tag) {
     try {
       xml.openTagNoNewline(tag);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
-  protected void closeTag(final QName tag) throws WebdavException {
+  protected void closeTag(final QName tag) {
     try {
       xml.closeTag(tag);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
   /** Emit an empty tag
    *
-   * @param tag
-   * @throws WebdavException
+   * @param tag qname
+   * @throws RuntimeException on fatal error
    */
-  public void emptyTag(final QName tag) throws WebdavException {
+  public void emptyTag(final QName tag) {
     try {
       xml.emptyTag(tag);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
   /** Emit an empty tag corresponding to a node
   *
-  * @param nd
-  * @throws WebdavException
+  * @param nd xml node
+   * @throws RuntimeException on fatal error
   */
-  public void emptyTag(final Node nd) throws WebdavException {
+  public void emptyTag(final Node nd) {
     String ns = nd.getNamespaceURI();
     String ln = nd.getLocalName();
 
@@ -624,28 +536,28 @@ public abstract class MethodBase implements Logged, SecureXml {
 
   /** Emit a property
    *
-   * @param tag
-   * @param val
-   * @throws WebdavException
+   * @param tag qname
+   * @param val element value
+   * @throws RuntimeException on fatal error
    */
-  public void property(final QName tag, final String val) throws WebdavException {
+  public void property(final QName tag, final String val) {
     try {
       xml.property(tag, val);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
-  /** Emit a property
+  /** Emit a property in a cdata
    *
-   * @param tag
-   * @param val
-   * @throws WebdavException
+   * @param tag qname
+   * @param val element value
+   * @throws RuntimeException on fatal error
    */
   public void cdataProperty(final QName tag,
                             final String attrName,
                             final String attrVal,
-                            final String val) throws WebdavException {
+                            final String val) {
     try {
       if (attrName == null) {
         xml.cdataProperty(tag, val);
@@ -655,43 +567,43 @@ public abstract class MethodBase implements Logged, SecureXml {
         xml.closeTagSameLine(tag);
       }
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
   /** Emit a property
    *
-   * @param tag
-   * @param val
-   * @throws WebdavException
+   * @param tag qname
+   * @param val element value
+   * @throws RuntimeException on fatal error
    */
-  public void property(final QName tag, final Reader val) throws WebdavException {
+  public void property(final QName tag, final Reader val) {
     try {
       xml.property(tag, val);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
-  /** Emit a property
+  /** Emit a property with a qname value
   *
-   * @param tag
-   * @param tagVal
-   * @throws WebdavException
+   * @param tag qname
+   * @param tagVal qname
+   * @throws RuntimeException on fatal error
    */
-  public void propertyTagVal(final QName tag, final QName tagVal) throws WebdavException {
+  public void propertyTagVal(final QName tag, final QName tagVal) {
     try {
       xml.propertyTagVal(tag, tagVal);
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 
-  protected void flush() throws WebdavException {
+  protected void flush() {
     try {
       xml.flush();
     } catch (Throwable t) {
-      throw new WebdavException(t);
+      throw new RuntimeException(t);
     }
   }
 

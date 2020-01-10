@@ -55,6 +55,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -88,7 +89,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
   }
 
   /** Mostly to distinguish trace entries */
-  protected static volatile SessCt session = new SessCt();
+  protected static final SessCt session = new SessCt();
   protected int sessNum;
 
   protected WebdavServlet servlet;
@@ -122,10 +123,10 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
   /** Called before any other method is called to allow initialisation to
    * take place at the first or subsequent requests
    *
-   * @param servlet
-   * @param req
+   * @param servlet the WebDAV servlet
+   * @param req http request
    * @param methods    HashMap   table of method info
-   * @param dumpContent
+   * @param dumpContent true to provide a debug trace of content
    * @throws WebdavException on error
    */
   public void init(final WebdavServlet servlet,
@@ -622,8 +623,8 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
    *
    * <p>This method handles etag processing.
    *
-   * @param req
-   * @param resp
+   * @param req http request
+   * @param resp http response
    * @param node - the node
    * @return true - just proceed otherwise status is set
    * @throws WebdavException on error
@@ -662,8 +663,8 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
 
   /** Returns a Content object for the content.
    *
-   * @param req
-   * @param resp
+   * @param req http request
+   * @param resp http response
    * @param contentType      if non-null specifies the content we want
    * @param node             node in question
    * @return content.
@@ -913,10 +914,10 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
     } finally {
       try {
         in.close();
-      } catch (Throwable t) {}
+      } catch (final Throwable ignored) {}
       try {
         out.close();
-      } catch (Throwable t) {}
+      } catch (final Throwable ignored) {}
     }
   }
 
@@ -962,9 +963,10 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
     try {
       uri = new URI(null, null, uri, null).toString();
 
-      uri = new URI(URLEncoder.encode(uri, "UTF-8")).normalize().getPath();
+      uri = new URI(URLEncoder.encode(uri, StandardCharsets.UTF_8))
+              .normalize().getPath();
 
-      uri = URLDecoder.decode(uri, "UTF-8");
+      uri = URLDecoder.decode(uri, StandardCharsets.UTF_8);
 
       if ((uri.length() > 1) && uri.endsWith("/")) {
         uri = uri.substring(0, uri.length() - 1);
@@ -1090,10 +1092,10 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
                                      String resourceUri) throws WebdavException;
 
   /**
-   * @param path
-   * @param token
+   * @param path to collection
+   * @param token sync-token or null
    * @param limit - negative for no limit on result set size
-   * @param recurse
+   * @param recurse - true for infinite depth
    * @return report
    * @throws WebdavException on error
    */
@@ -1103,7 +1105,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
                                                boolean recurse) throws WebdavException;
 
   /** Used to match tokens in If header
-   * @param path
+   * @param path for collection
    * @return sync token or null
    * @throws WebdavException on error
    */
@@ -1154,7 +1156,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
 
   /** TODO - make the url value configurable
    *
-   * @param req
+   * @param req http request
    * @return
    * @throws WebdavException on error
    */
@@ -1294,7 +1296,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
         try {
           xml.addNs(new NameSpace(ns, null), false);
         } catch (final IOException e) {
-          throw new WebdavException(e);
+          throw new RuntimeException(e);
         }
       }
 
@@ -1312,7 +1314,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
 
   /** Override this to create namespace specific property objects.
    *
-   * @param propnode
+   * @param propnode node specifying proeprty
    * @return WebdavProperty
    * @throws WebdavException on error
    */
@@ -1530,7 +1532,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
 
     String decoded;
     try {
-      decoded = URLDecoder.decode(path, "UTF8");
+      decoded = URLDecoder.decode(path, StandardCharsets.UTF_8);
     } catch (Throwable t) {
       throw new WebdavBadRequest("bad path: " + path);
     }
@@ -1539,40 +1541,42 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       return (null);
     }
 
-    /** Make any backslashes into forward slashes.
+    /* Make any backslashes into forward slashes.
      */
     if (decoded.indexOf('\\') >= 0) {
       decoded = decoded.replace('\\', '/');
     }
 
-    /** Ensure a leading '/'
+    /* Ensure a leading '/'
      */
     if (!decoded.startsWith("/")) {
       decoded = "/" + decoded;
     }
 
-    /** Remove all instances of '//'.
+    /* Remove all instances of '//'.
      */
-    while (decoded.indexOf("//") >= 0) {
+    while (decoded.contains("//")) {
       decoded = decoded.replaceAll("//", "/");
     }
 
-    if (decoded.indexOf("/.") < 0) {
+    if (!decoded.contains("/.")) {
       return decoded;
     }
 
-    /** Somewhere we may have /./ or /../
+    /* Somewhere we may have /./ or /../
      */
 
     StringTokenizer st = new StringTokenizer(decoded, "/");
 
-    ArrayList<String> al = new ArrayList<String>();
+    ArrayList<String> al = new ArrayList<>();
     while (st.hasMoreTokens()) {
       String s = st.nextToken();
 
       if (s.equals(".")) {
-        // ignore
-      } else if (s.equals("..")) {
+        continue;
+      }
+
+      if (s.equals("..")) {
         // Back up 1
         if (al.size() == 0) {
           // back too far
@@ -1585,7 +1589,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       }
     }
 
-    /** Reconstruct */
+    /* Reconstruct */
     StringBuilder sb = new StringBuilder();
     for (String s: al) {
       sb.append('/');
@@ -1599,7 +1603,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
     StringBuilder sb = new StringBuilder();
 
     /** Constructor
-     * @param rdr
+     * @param rdr reader
      */
     public DebugReader(final Reader rdr) {
       super(rdr);
@@ -1651,7 +1655,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
   }
 
   /**
-   * @param req
+   * @param req http request
    * @return possibly wrapped reader
    * @throws Throwable
    */
@@ -1750,7 +1754,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
    * listing. We don't need a great deal to start with. It will also allow us to
    * provide stylesheets, images etc. Probably place it in the resources directory.
    *
-   * @param req
+   * @param req http request
    * @param node  WebdavNsNode
    * @return Reader
    * @throws WebdavException on error
