@@ -662,9 +662,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @param content     boolean flag indicating if this is a content related
    *                    property - that is a property which requires fetching
    *                    and/or rendering the content
-   * @throws WebdavException
    */
-  public void init(final boolean content) throws WebdavException {
+  public void init(final boolean content) {
   }
 
   /** Return true if this represents a principal
@@ -720,9 +719,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Set uri
    *
    * @param val
-   * @throws WebdavException
    */
-  public void setUri(final String val) throws WebdavException {
+  public void setUri(final String val) {
     init(false);
     uri = val;
   }
@@ -730,9 +728,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Get uri
    *
    * @return String uri
-   * @throws WebdavException
    */
-  public String getUri() throws WebdavException {
+  public String getUri() {
     init(false);
     return uri;
   }
