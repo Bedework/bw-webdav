@@ -189,11 +189,6 @@ public class PropFindMethod extends MethodBase {
   public void processResp(final HttpServletRequest req,
                           final HttpServletResponse resp,
                           final int depth) throws WebdavException {
-    resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
-    resp.setContentType("text/xml; charset=UTF-8");
-
-    startEmit(resp);
-
     String resourceUri = getResourceUri(req);
     if (debug()) {
       debug("About to get node at " + resourceUri);
@@ -211,23 +206,21 @@ public class PropFindMethod extends MethodBase {
                                             nodeType,
                                             false);
 
+    if (node == null) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
     addHeaders(req, resp, node);
+
+    resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
+    resp.setContentType("text/xml; charset=UTF-8");
+
+    startEmit(resp);
 
     openTag(WebdavTags.multistatus);
 
-    if (node == null) {
-      openTag(WebdavTags.response);
-
-      // XXX href value not encoded correctly
-      property(WebdavTags.href,
-               getNsIntf().getSysIntf().getUrlHandler().prefix(resourceUri));
-
-      addStatus(HttpServletResponse.SC_NOT_FOUND, null);
-
-      closeTag(WebdavTags.response);
-    } else {
-      doNodeAndChildren(node, 0, depth);
-    }
+    doNodeAndChildren(node, 0, depth);
 
     closeTag(WebdavTags.multistatus);
 
