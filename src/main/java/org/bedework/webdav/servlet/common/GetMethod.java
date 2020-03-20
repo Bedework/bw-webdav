@@ -117,10 +117,10 @@ public class GetMethod extends MethodBase {
 
       if ((c.stream == null) && (c.rdr == null)) {
         if (debug()) {
-          debug("status: " + HttpServletResponse.SC_NO_CONTENT);
+          debug("No stream or reader for resource content - send 0 bytes");
         }
 
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        resp.setContentLength(0);
       } else {
         if (debug()) {
           debug("send content - length=" + c.contentLength);
