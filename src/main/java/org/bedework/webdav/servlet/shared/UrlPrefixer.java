@@ -30,9 +30,9 @@ public interface UrlPrefixer {
    * <p>We're doing this because some clients don't handle absolute urls
    * (a violation of the spec)
    *
-   * @param val
+   * @param val to prefix
    * @return String
-   * @throws WebdavException
+   * @throws RuntimeException on error
    */
-  String prefix(final String val) throws WebdavException;
+  String prefix(String val);
 }

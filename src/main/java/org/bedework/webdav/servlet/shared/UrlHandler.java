@@ -97,38 +97,39 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
   }
 
   @Override
-  public String prefix(final String val) throws WebdavException {
-    try {
-      if (val == null) {
-        return null;
-      }
-
-      if (val.toLowerCase().startsWith("mailto:")) {
-        return val;
-      }
-
-      String enc = new URI(null, null, val, null).toString();
-      enc = new URI(enc).toASCIIString();  // XXX ???????
-
-      final StringBuilder sb = new StringBuilder();
-
-      if (!relative) {
-        sb.append(getUrlPrefix());
-      }
-
-      if (!val.startsWith(context + "/")) {
-        append(sb, context);
-      }
-      append(sb, enc);
-
-      return sb.toString();
-    } catch (final Throwable t) {
-      throw new WebdavException(t);
+  public String prefix(final String val) {
+    if (val == null) {
+      return null;
     }
+
+    if (val.toLowerCase().startsWith("mailto:")) {
+      return val;
+    }
+
+    String enc;
+    try {
+      enc = new URI(null, null, val, null).toString();
+      enc = new URI(enc).toASCIIString();  // XXX ???????
+    } catch (final Throwable t) {
+      throw new RuntimeException(t);
+    }
+
+    final StringBuilder sb = new StringBuilder();
+
+    if (!relative) {
+      sb.append(getUrlPrefix());
+    }
+
+    if (!val.startsWith(context + "/")) {
+      append(sb, context);
+    }
+    append(sb, enc);
+
+    return sb.toString();
   }
 
   @Override
-  public String unprefix(String val) throws WebdavException {
+  public String unprefix(String val) {
     if (val == null) {
       return null;
     }

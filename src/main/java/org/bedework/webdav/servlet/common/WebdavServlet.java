@@ -72,9 +72,9 @@ public abstract class WebdavServlet extends HttpServlet
     int waiting;
   }
 
-  private static volatile HashMap<String, Waiter> waiters = new HashMap<>();
+  private static final HashMap<String, Waiter> waiters = new HashMap<>();
 
-  public String getLogPrefix(HttpServletRequest request) {
+  public String getLogPrefix(final HttpServletRequest request) {
     return "webdav";
   }
 
@@ -104,7 +104,7 @@ public abstract class WebdavServlet extends HttpServlet
   @Override
   protected void service(final HttpServletRequest req,
                          HttpServletResponse resp)
-      throws ServletException, IOException {
+      throws IOException {
     WebdavNsIntf intf = null;
     boolean serverError = false;
 
@@ -160,7 +160,7 @@ public abstract class WebdavServlet extends HttpServlet
       if (intf != null) {
         try {
           intf.close();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
           serverError = handleException(intf, t, resp, serverError);
         }
       }
@@ -226,9 +226,9 @@ public abstract class WebdavServlet extends HttpServlet
 
     try {
       if (t instanceof WebdavException) {
-        WebdavException wde = (WebdavException)t;
+        final WebdavException wde = (WebdavException)t;
 
-        int status = wde.getStatusCode();
+        final int status = wde.getStatusCode();
         if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
           error(wde);
           serverError = true;
@@ -240,7 +240,7 @@ public abstract class WebdavServlet extends HttpServlet
       error(t);
       sendError(intf, t, resp);
       return true;
-    } catch (Throwable t1) {
+    } catch (final Throwable t1) {
       // Pretty much screwed if we get here
       return true;
     }
@@ -270,7 +270,7 @@ public abstract class WebdavServlet extends HttpServlet
           resp.setContentType("text/xml; charset=UTF-8");
           if (!emitError(intf, errorTag, wde.getMessage(),
                          resp.getWriter())) {
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
             emitError(intf, errorTag, wde.getMessage(), sw);
 
             try {
@@ -307,8 +307,7 @@ public abstract class WebdavServlet extends HttpServlet
                             final QName errorTag,
                             final String extra,
                             final Writer wtr) {
-    try {
-      XmlEmit xml = new XmlEmit();
+      final XmlEmit xml = new XmlEmit();
       intf.addNamespace(xml);
 
       xml.startEmit(wtr);
@@ -320,10 +319,6 @@ public abstract class WebdavServlet extends HttpServlet
       xml.flush();
 
       return true;
-    } catch (Throwable t1) {
-      // Pretty much screwed if we get here
-      return false;
-    }
   }
   /** Add methods for this namespace
    *
@@ -348,10 +343,10 @@ public abstract class WebdavServlet extends HttpServlet
   }
 
   private void tryWait(final HttpServletRequest req, final boolean in) throws Throwable {
-    Waiter wtr = null;
+    Waiter wtr;
     synchronized (waiters) {
       //String key = req.getRequestedSessionId();
-      String key = req.getRemoteUser();
+      final String key = req.getRemoteUser();
       if (key == null) {
         return;
       }
@@ -395,8 +390,8 @@ public abstract class WebdavServlet extends HttpServlet
 
   @Override
   public void sessionDestroyed(final HttpSessionEvent se) {
-    HttpSession session = se.getSession();
-    String sessid = session.getId();
+    final HttpSession session = se.getSession();
+    final String sessid = session.getId();
     if (sessid == null) {
       return;
     }
@@ -408,57 +403,54 @@ public abstract class WebdavServlet extends HttpServlet
 
   /** Debug
    *
-   * @param req
+   * @param req servlet request to dump
    */
   public void dumpRequest(final HttpServletRequest req) {
-    try {
-      Enumeration names = req.getHeaderNames();
+    Enumeration names = req.getHeaderNames();
 
-      String title = "Request headers";
+    String title = "Request headers";
 
-      debug(title);
+    debug(title);
 
-      while (names.hasMoreElements()) {
-        String key = (String)names.nextElement();
-        Enumeration vals = req.getHeaders(key);
+    while (names.hasMoreElements()) {
+      final String key = (String)names.nextElement();
+      final Enumeration vals = req.getHeaders(key);
 
-        while (vals.hasMoreElements()) {
-          String val = (String)vals.nextElement();
+      while (vals.hasMoreElements()) {
+        String val = (String)vals.nextElement();
 
-          if (key.toLowerCase().equals("authorization") &&
-              (val != null) &&
-              (val.toLowerCase().startsWith("basic"))) {
-            val = "Basic **********";
-          }
-
-          debug("  " + key + " = \"" + val + "\"");
+        if (key.toLowerCase().equals("authorization") &&
+                (val != null) &&
+                (val.toLowerCase().startsWith("basic"))) {
+          val = "Basic **********";
         }
-      }
 
-      names = req.getParameterNames();
-
-      title = "Request parameters";
-
-      debug(title + " - global info and uris");
-      debug("getRemoteAddr = " + req.getRemoteAddr());
-      debug("getRequestURI = " + req.getRequestURI());
-      debug("getRemoteUser = " + req.getRemoteUser());
-      debug("getRequestedSessionId = " + req.getRequestedSessionId());
-      debug("HttpUtils.getRequestURL(req) = " + req.getRequestURL());
-      debug("contextPath=" + req.getContextPath());
-      debug("query=" + req.getQueryString());
-      debug("contentlen=" + req.getContentLength());
-      debug("request=" + req);
-      debug("parameters:");
-
-      debug(title);
-
-      while (names.hasMoreElements()) {
-        String key = (String)names.nextElement();
-        String val = req.getParameter(key);
         debug("  " + key + " = \"" + val + "\"");
       }
-    } catch (Throwable t) {
+    }
+
+    names = req.getParameterNames();
+
+    title = "Request parameters";
+
+    debug(title + " - global info and uris");
+    debug("getRemoteAddr = " + req.getRemoteAddr());
+    debug("getRequestURI = " + req.getRequestURI());
+    debug("getRemoteUser = " + req.getRemoteUser());
+    debug("getRequestedSessionId = " + req.getRequestedSessionId());
+    debug("HttpUtils.getRequestURL(req) = " + req.getRequestURL());
+    debug("contextPath=" + req.getContextPath());
+    debug("query=" + req.getQueryString());
+    debug("contentlen=" + req.getContentLength());
+    debug("request=" + req);
+    debug("parameters:");
+
+    debug(title);
+
+    while (names.hasMoreElements()) {
+      final String key = (String)names.nextElement();
+      final String val = req.getParameter(key);
+      debug("  " + key + " = \"" + val + "\"");
     }
   }
 
@@ -466,7 +458,7 @@ public abstract class WebdavServlet extends HttpServlet
    *                   Logged methods
    * ==================================================================== */
 
-  private BwLogger logger = new BwLogger();
+  private final BwLogger logger = new BwLogger();
 
   @Override
   public BwLogger getLogger() {

@@ -50,9 +50,8 @@ public class Feature {
 
   /**
    * @param xml emitter
-   * @throws Throwable
    */
-  public void toXml(final XmlEmit xml) throws Throwable {
+  public void toXml(final XmlEmit xml) {
     xml.emptyTag(getFeatureName());
   }
 

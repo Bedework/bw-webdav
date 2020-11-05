@@ -32,6 +32,7 @@ import org.bedework.webdav.servlet.shared.WebdavStatusCode;
 
 import org.w3c.dom.Element;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -170,15 +171,18 @@ public class PrincipalMatchReport implements Logged {
   public void process(final HttpServletRequest req,
                       final HttpServletResponse resp,
                       final int depth) throws WebdavException {
-    try {
       resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
       resp.setContentType("text/xml; charset=UTF-8");
 
       final XmlEmit xml = intf.getXmlEmit();
 
+    try {
       xml.startEmit(resp.getWriter());
+    } catch (final IOException e) {
+      throw new WebdavException(e);
+    }
 
-      xml.openTag(WebdavTags.multistatus);
+    xml.openTag(WebdavTags.multistatus);
 
       final String resourceUri = mb.getResourceUri(req);
       final Collection<WebdavNsNode> wdnodes;
@@ -209,16 +213,6 @@ public class PrincipalMatchReport implements Logged {
       xml.closeTag(WebdavTags.multistatus);
 
       xml.flush();
-    } catch (final WebdavException wde) {
-      throw wde;
-    } catch (final Throwable t) {
-      error(t.getMessage());
-      if (debug()) {
-        t.printStackTrace();
-      }
-
-      throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
   }
 
   private Collection<WebdavNsNode> doNodeAndChildren(final WebdavNsNode node)

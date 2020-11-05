@@ -229,45 +229,41 @@ public class WebdavPrincipalNode extends WebdavNsNode {
     final String ns = tag.getNamespaceURI();
     final XmlEmit xml = intf.getXmlEmit();
 
-    try {
-      if (tag.equals(WebdavTags.groupMemberSet)) {
-        // PROPTODO
-        xml.emptyTag(tag);
-        return true;
-      }
-
-      if (tag.equals(WebdavTags.groupMembership)) {
-        // PROPTODO
-        xml.emptyTag(tag);
-        return true;
-      }
-
-      if (tag.equals(WebdavTags.notificationURL) ||
-          tag.equals(AppleServerTags.notificationURL)) {
-        if (wdSysIntf.getNotificationURL() == null) {
-          return false;
-        }
-
-        xml.openTag(tag);
-        generateHref(xml,
-                     wdSysIntf.getNotificationURL());
-        xml.closeTag(tag);
-
-        return true;
-      }
-
-      // Not known - try higher
-      return super.generatePropertyValue(tag, intf, allProp);
-    } catch (final Throwable t) {
-      throw new WebdavException(t);
+    if (tag.equals(WebdavTags.groupMemberSet)) {
+      // PROPTODO
+      xml.emptyTag(tag);
+      return true;
     }
+
+    if (tag.equals(WebdavTags.groupMembership)) {
+      // PROPTODO
+      xml.emptyTag(tag);
+      return true;
+    }
+
+    if (tag.equals(WebdavTags.notificationURL) ||
+            tag.equals(AppleServerTags.notificationURL)) {
+      if (wdSysIntf.getNotificationURL() == null) {
+        return false;
+      }
+
+      xml.openTag(tag);
+      generateHref(xml,
+                   wdSysIntf.getNotificationURL());
+      xml.closeTag(tag);
+
+      return true;
+    }
+
+    // Not known - try higher
+    return super.generatePropertyValue(tag, intf, allProp);
   }
 
   /* ====================================================================
    *                   Logged methods
    * ==================================================================== */
 
-  private BwLogger logger = new BwLogger();
+  private final BwLogger logger = new BwLogger();
 
   @Override
   public BwLogger getLogger() {

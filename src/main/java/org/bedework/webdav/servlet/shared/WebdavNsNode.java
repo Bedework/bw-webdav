@@ -18,6 +18,7 @@
 */
 package org.bedework.webdav.servlet.shared;
 
+import org.bedework.access.AccessException;
 import org.bedework.access.AccessPrincipal;
 import org.bedework.access.AccessXmlUtil;
 import org.bedework.access.CurrentAccess;
@@ -510,14 +511,14 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
       if (tag.equals(WebdavTags.currentUserPrivilegeSet)) {
         // access 5.3
-        CurrentAccess ca = getCurrentAccess();
+        final CurrentAccess ca = getCurrentAccess();
         if (ca == null) {
           xml.emptyTag(tag);
           return true;
         }
 
-        PrivilegeSet ps = ca.getPrivileges();
-        char[] privileges = ps.getPrivileges();
+        final PrivilegeSet ps = ca.getPrivileges();
+        final char[] privileges = ps.getPrivileges();
 
         AccessXmlUtil.emitCurrentPrivSet(xml,
                                          intf.getAccessUtil().getPrivTags(),
@@ -558,7 +559,7 @@ public abstract class WebdavNsNode implements Serializable, Logged {
           return true;
         }
 
-        String val = getContentType();
+        final String val = getContentType();
         if (val == null) {
           return true;
         }
@@ -575,7 +576,7 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
       if (tag.equals(WebdavTags.getlastmodified)) {
         // dav 13.7
-        String val = getLastmodDate();
+        final String val = getLastmodDate();
         if (val == null) {
           return true;
         }
@@ -648,10 +649,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
       // Not known
       return false;
-    } catch (WebdavException wde) {
-      throw wde;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
+    } catch (AccessException ae) {
+      throw new WebdavException(ae);
     }
   }
 

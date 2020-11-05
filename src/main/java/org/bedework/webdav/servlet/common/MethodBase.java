@@ -70,13 +70,13 @@ public abstract class MethodBase implements Logged, SecureXml {
    */
   public abstract void init();
 
-  private SimpleDateFormat httpDateFormatter =
+  private final SimpleDateFormat httpDateFormatter =
       new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss ");
 
   /**
    * @param req http request
    * @param resp http response
-   * @throws WebdavException
+   * @throws WebdavException on fatal error
    */
   public abstract void doMethod(HttpServletRequest req,
                                 HttpServletResponse resp)
@@ -85,9 +85,9 @@ public abstract class MethodBase implements Logged, SecureXml {
   /** Allow servlet to create method.
    */
   public static class MethodInfo {
-    private Class<?> methodClass;
+    private final Class<?> methodClass;
 
-    private boolean requiresAuth;
+    private final boolean requiresAuth;
 
     /**
      * @param methodClass class of method
@@ -148,7 +148,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    *
    * @param req      Servlet request object
    * @return String  fixed up uri
-   * @throws WebdavException
+   * @throws WebdavException on fatal error
    */
   public String getResourceUri(final HttpServletRequest req)
       throws WebdavException {
@@ -263,15 +263,9 @@ public abstract class MethodBase implements Logged, SecureXml {
   protected Document parseContent(final HttpServletRequest req,
                                   final HttpServletResponse resp)
       throws WebdavException{
-    try {
-      hasBriefHeader = Headers.brief(req);
+    hasBriefHeader = Headers.brief(req);
 
-      return parseContent(req.getContentLength(), getNsIntf().getReader(req));
-    } catch (WebdavException we) {
-      throw we;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
+    return parseContent(req.getContentLength(), getNsIntf().getReader(req));
   }
 
   /** Parse a reader and return the DOM representation.
@@ -283,7 +277,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    */
   protected Document parseContent(final int contentLength,
                                   final Reader reader) throws WebdavException{
-    Document doc = parseXmlSafely(contentLength, reader);
+    final Document doc = parseXmlSafely(contentLength, reader);
     if (doc == null) {
       debug("No document");
     } else {
@@ -296,7 +290,7 @@ public abstract class MethodBase implements Logged, SecureXml {
   private class XmlNotifier extends Notifier {
     private boolean enabled;
 
-    private Holder<Boolean> openFlag;
+    private final Holder<Boolean> openFlag;
 
     XmlNotifier(final Holder<Boolean> openFlag) {
       this.openFlag = openFlag;
@@ -368,11 +362,7 @@ public abstract class MethodBase implements Logged, SecureXml {
         openTag(WebdavTags.prop);
 
         for (final WebdavProperty prop: unknowns) {
-          try {
-            xml.emptyTag(prop.getTag());
-          } catch (Throwable t) {
-            throw new WebdavException(t);
-          }
+          xml.emptyTag(prop.getTag());
         }
 
         closeTag(WebdavTags.prop);
@@ -389,75 +379,35 @@ public abstract class MethodBase implements Logged, SecureXml {
    *                   XmlUtil wrappers
    * ==================================================================== */
 
-  protected Collection<Element> getChildren(final Node nd) throws WebdavException {
-    try {
-      return XmlUtil.getElements(nd);
-    } catch (Throwable t) {
-      if (debug()) {
-        getLogger().error(t);
-      }
-
-      throw new WebdavBadRequest(t.getMessage());
-    }
+  protected Collection<Element> getChildren(final Node nd) {
+    return XmlUtil.getElements(nd);
   }
 
-  protected Element[] getChildrenArray(final Node nd) throws WebdavException {
-    try {
-      return XmlUtil.getElementsArray(nd);
-    } catch (Throwable t) {
-      if (debug()) {
-        getLogger().error(t);
-      }
-
-      throw new WebdavBadRequest(t.getMessage());
-    }
+  protected Element[] getChildrenArray(final Node nd) {
+    return XmlUtil.getElementsArray(nd);
   }
 
-  protected Element getOnlyChild(final Node nd) throws WebdavException {
-    try {
-      return XmlUtil.getOnlyElement(nd);
-    } catch (Throwable t) {
-      if (debug()) {
-        getLogger().error(t);
-      }
-
-      throw new WebdavBadRequest(t.getMessage());
-    }
+  protected Element getOnlyChild(final Node nd) {
+    return XmlUtil.getOnlyElement(nd);
   }
 
-  protected String getElementContent(final Element el) throws WebdavException {
-    try {
-      return XmlUtil.getElementContent(el);
-    } catch (Throwable t) {
-      if (debug()) {
-        getLogger().error(t);
-      }
-
-      throw new WebdavBadRequest(t.getMessage());
-    }
+  protected String getElementContent(final Element el) {
+    return XmlUtil.getElementContent(el);
   }
 
-  protected boolean isEmpty(final Element el) throws WebdavException {
-    try {
-      return XmlUtil.isEmpty(el);
-    } catch (Throwable t) {
-      if (debug()) {
-        getLogger().error(t);
-      }
-
-      throw new WebdavBadRequest(t.getMessage());
-    }
+  protected boolean isEmpty(final Element el) {
+    return XmlUtil.isEmpty(el);
   }
 
   /* ====================================================================
    *                   XmlEmit wrappers
    * ==================================================================== */
 
-  protected void startEmit(final HttpServletResponse resp) throws WebdavException {
+  protected void startEmit(final HttpServletResponse resp) {
     try {
       xml.startEmit(resp.getWriter());
-    } catch (Throwable t) {
-      throw new WebdavException(t);
+    } catch (final IOException ie) {
+      throw new RuntimeException(ie);
     }
   }
 
@@ -468,11 +418,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    */
   public void addNs(final String val) {
     if (xml.getNameSpace(val) == null) {
-      try {
-        xml.addNs(new NameSpace(val, null), false);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      xml.addNs(new NameSpace(val, null), false);
     }
   }
 
@@ -486,27 +432,15 @@ public abstract class MethodBase implements Logged, SecureXml {
   }
 
   protected void openTag(final QName tag) {
-    try {
-      xml.openTag(tag);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.openTag(tag);
   }
 
   protected void openTagNoNewline(final QName tag) {
-    try {
-      xml.openTagNoNewline(tag);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.openTagNoNewline(tag);
   }
 
   protected void closeTag(final QName tag) {
-    try {
-      xml.closeTag(tag);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.closeTag(tag);
   }
 
   /** Emit an empty tag
@@ -515,11 +449,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @throws RuntimeException on fatal error
    */
   public void emptyTag(final QName tag) {
-    try {
-      xml.emptyTag(tag);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.emptyTag(tag);
   }
 
   /** Emit an empty tag corresponding to a node
@@ -528,8 +458,8 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @throws RuntimeException on fatal error
   */
   public void emptyTag(final Node nd) {
-    String ns = nd.getNamespaceURI();
-    String ln = nd.getLocalName();
+    final String ns = nd.getNamespaceURI();
+    final String ln = nd.getLocalName();
 
     emptyTag(new QName(ns, ln));
   }
@@ -541,11 +471,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @throws RuntimeException on fatal error
    */
   public void property(final QName tag, final String val) {
-    try {
-      xml.property(tag, val);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.property(tag, val);
   }
 
   /** Emit a property in a cdata
@@ -558,16 +484,12 @@ public abstract class MethodBase implements Logged, SecureXml {
                             final String attrName,
                             final String attrVal,
                             final String val) {
-    try {
-      if (attrName == null) {
-        xml.cdataProperty(tag, val);
-      } else {
-        xml.openTagSameLine(tag, attrName, attrVal);
-        xml.cdataValue(val);
-        xml.closeTagSameLine(tag);
-      }
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
+    if (attrName == null) {
+      xml.cdataProperty(tag, val);
+    } else {
+      xml.openTagSameLine(tag, attrName, attrVal);
+      xml.cdataValue(val);
+      xml.closeTagSameLine(tag);
     }
   }
 
@@ -578,11 +500,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @throws RuntimeException on fatal error
    */
   public void property(final QName tag, final Reader val) {
-    try {
-      xml.property(tag, val);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.property(tag, val);
   }
 
   /** Emit a property with a qname value
@@ -592,26 +510,18 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @throws RuntimeException on fatal error
    */
   public void propertyTagVal(final QName tag, final QName tagVal) {
-    try {
-      xml.propertyTagVal(tag, tagVal);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.propertyTagVal(tag, tagVal);
   }
 
   protected void flush() {
-    try {
-      xml.flush();
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    xml.flush();
   }
 
   /* ====================================================================
    *                   Logged methods
    * ==================================================================== */
 
-  private BwLogger logger = new BwLogger();
+  private final BwLogger logger = new BwLogger();
 
   @Override
   public BwLogger getLogger() {

@@ -77,9 +77,8 @@ public class ServerInfo {
 
   /**
    * @return XML version of server info
-   * @throws Throwable
    */
-  public String toXml() throws Throwable {
+  public String toXml() {
     final StringWriter str = new StringWriter();
     final XmlEmit xml = new XmlEmit();
 
@@ -97,9 +96,8 @@ public class ServerInfo {
 
   /**
    * @param xml emitter
-   * @throws Throwable
    */
-  public void toXml(final XmlEmit xml) throws Throwable {
+  public void toXml(final XmlEmit xml) {
     xml.openTag(WebdavTags.serverinfo);
 
     if (getToken() != null) {

@@ -28,7 +28,7 @@ import org.bedework.util.xml.tagdefs.WebdavTags;
 public class Application {
   private String name;
 
-  private Features features = new Features();
+  private final Features features = new Features();
 
   public Application(final String name) {
     setName(name);
@@ -54,9 +54,8 @@ public class Application {
 
   /**
    * @param xml emitter
-   * @throws Throwable
    */
-  public void toXml(final XmlEmit xml) throws Throwable {
+  public void toXml(final XmlEmit xml) {
     xml.openTag(WebdavTags.application);
 
     xml.property(WebdavTags.name, getName());

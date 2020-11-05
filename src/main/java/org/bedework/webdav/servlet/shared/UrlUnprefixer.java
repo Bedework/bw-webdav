@@ -25,9 +25,9 @@ package org.bedework.webdav.servlet.shared;
 public interface UrlUnprefixer {
   /** Remove any vestige of the host, port or context
    *
-   * @param val
+   * @param val to unprefix
    * @return String
-   * @throws WebdavException
+   * @throws RuntimeException on fatal error
    */
-  String unprefix(String val) throws WebdavException;
+  String unprefix(String val);
 }

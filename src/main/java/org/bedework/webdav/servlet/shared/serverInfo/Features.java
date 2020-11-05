@@ -50,9 +50,8 @@ public class Features {
 
   /**
    * @param xml emitter
-   * @throws Throwable
    */
-  public void toXml(final XmlEmit xml) throws Throwable {
+  public void toXml(final XmlEmit xml) {
     xml.openTag(WebdavTags.features);
 
     if (!Util.isEmpty(getFeatures())) {

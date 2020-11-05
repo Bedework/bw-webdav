@@ -25,25 +25,25 @@ public interface WdSysIntf {
   /**
    * @return UrlHandler object to manipulate urls.
    */
-  public UrlHandler getUrlHandler();
+  UrlHandler getUrlHandler();
 
   /**
    * @param col the collection
    * @return true if this is a collection which allows a sync-report.
    * @throws WebdavException
    */
-  public boolean allowsSyncReport(WdCollection<?> col) throws WebdavException;
+  boolean allowsSyncReport(WdCollection<?> col) throws WebdavException;
 
   /** Return default content type for this service.
    *
    * @return String - never null.
    */
-  public String getDefaultContentType();
+  String getDefaultContentType();
 
   /** Return notification URL for this principal.
    *
    * @return String - null for no notifications.
-   * @throws WebdavException
+   * @throws RuntimeException on fatal error
    */
-  public String getNotificationURL() throws WebdavException;
+  String getNotificationURL();
 }

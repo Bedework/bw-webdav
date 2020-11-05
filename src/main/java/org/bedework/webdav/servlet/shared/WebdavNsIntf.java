@@ -255,10 +255,9 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
    * @param errorTag
    * @param extra
    * @param xml
-   * @throws Throwable
    */
   public void emitError(final QName errorTag, final String extra,
-                        final XmlEmit xml) throws Throwable {
+                        final XmlEmit xml) {
     if (extra == null) {
       xml.emptyTag(errorTag);
     } else {
@@ -486,14 +485,9 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
    * <p>Something more like "http://ahost.rpi.edu/webdav/"
    *
    * @param xml
-   * @throws WebdavException on error
    */
-  public void addNamespace(final XmlEmit xml) throws WebdavException {
-    try {
+  public void addNamespace(final XmlEmit xml) {
       xml.addNs(new NameSpace(WebdavTags.namespace, "DAV"), true);
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
   }
 
   /** Return true if the system disallows directory browsing.
@@ -1218,56 +1212,42 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
    * @throws WebdavException on error
    */
   public void emitSupportedReportSet(final WebdavNsNode node) throws WebdavException {
-    try {
-      xml.openTag(WebdavTags.supportedReportSet);
+    xml.openTag(WebdavTags.supportedReportSet);
 
-      Collection<QName> supportedReports = node.getSupportedReports();
+    final Collection<QName> supportedReports = node.getSupportedReports();
 
-      for (QName qn: supportedReports) {
-        xml.openTag(WebdavTags.supportedReport);
-        xml.openTag(WebdavTags.report);
-        xml.emptyTag(qn);
-        xml.closeTag(WebdavTags.report);
-        xml.closeTag(WebdavTags.supportedReport);
-      }
-      xml.closeTag(WebdavTags.supportedReportSet);
-    } catch (Throwable t) {
-      throw new WebdavException(t);
+    for (final QName qn: supportedReports) {
+      xml.openTag(WebdavTags.supportedReport);
+      xml.openTag(WebdavTags.report);
+      xml.emptyTag(qn);
+      xml.closeTag(WebdavTags.report);
+      xml.closeTag(WebdavTags.supportedReport);
     }
+    xml.closeTag(WebdavTags.supportedReportSet);
   }
 
   /** Open a propstat response.
    *
-   * @throws WebdavException on error
    */
-  public void openPropstat() throws WebdavException {
-    try {
-      xml.openTag(WebdavTags.propstat);
-      xml.openTag(WebdavTags.prop);
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
+  public void openPropstat() {
+    xml.openTag(WebdavTags.propstat);
+    xml.openTag(WebdavTags.prop);
   }
 
   /** Close a propstat response with given result.
    *
-   * @param status
-   * @throws WebdavException on error
+   * @param status int value
    */
-  public void closePropstat(final int status) throws WebdavException {
-    try {
-      xml.closeTag(WebdavTags.prop);
+  public void closePropstat(final int status) {
+    xml.closeTag(WebdavTags.prop);
 
-      if ((status != HttpServletResponse.SC_OK) ||
-          getReturnMultistatusOk()) {
-        xml.property(WebdavTags.status, "HTTP/1.1 " + status + " " +
-                     WebdavStatusCode.getMessage(status));
-      }
-
-      xml.closeTag(WebdavTags.propstat);
-    } catch (Throwable t) {
-      throw new WebdavException(t);
+    if ((status != HttpServletResponse.SC_OK) ||
+            getReturnMultistatusOk()) {
+      xml.property(WebdavTags.status, "HTTP/1.1 " + status + " " +
+              WebdavStatusCode.getMessage(status));
     }
+
+    xml.closeTag(WebdavTags.propstat);
   }
 
   /** Close a propstat response with an ok result.
@@ -1293,11 +1273,7 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       final String ns = propnode.getNamespaceURI();
 
       if (xml.getNameSpace(ns) == null) {
-        try {
-          xml.addNs(new NameSpace(ns, null), false);
-        } catch (final IOException e) {
-          throw new RuntimeException(e);
-        }
+        xml.addNs(new NameSpace(ns, null), false);
       }
 
       final WebdavProperty prop = makeProp(propnode);
@@ -1378,71 +1354,65 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
   public boolean generatePropValue(final WebdavNsNode node,
                                    final WebdavProperty pr,
                                    final boolean allProp) throws WebdavException {
-    QName tag = pr.getTag();
-    String ns = tag.getNamespaceURI();
+    final QName tag = pr.getTag();
+    final String ns = tag.getNamespaceURI();
 
-    try {
-      /* Deal with webdav properties */
-      if (!ns.equals(WebdavTags.namespace)) {
-        // Not ours
-        //xml.emptyTag(tag);
-        return false;
-      }
-
-      if (tag.equals(WebdavTags.lockdiscovery)) {
-        // dav 13.8
-        //xml.emptyTag(tag);
-        return false;
-      }
-
-      if (tag.equals(WebdavTags.source)) {
-        // dav 13.10
-        //xml.emptyTag(tag);
-        return false;
-      }
-
-      if (tag.equals(WebdavTags.supportedlock)) {
-        // dav 13.11
-        //xml.emptyTag(tag);
-        return false;
-      }
-
-      if (tag.equals(WebdavTags.aclRestrictions)) {
-        // access 5.5
-        return false;
-      }
-
-      if (tag.equals(WebdavTags.inheritedAclSet)) {
-        // access 5.6
-        return false;
-      }
-
-      if (tag.equals(WebdavTags.principalCollectionSet)) {
-        // access 5.7
-        xml.openTag(WebdavTags.principalCollectionSet);
-
-        for (String s: getPrincipalCollectionSet(node.getUri())) {
-          xml.property(WebdavTags.href, s);
-        }
-
-        xml.closeTag(WebdavTags.principalCollectionSet);
-        return true;
-      }
-
-      /* Try the node for a value */
-
-      if (node.generatePropertyValue(tag, this, allProp)) {
-        // Generated by node
-        return true;
-      }
-
-      // Not known
+    /* Deal with webdav properties */
+    if (!ns.equals(WebdavTags.namespace)) {
+      // Not ours
+      //xml.emptyTag(tag);
       return false;
-    } catch (WebdavException wde) {
-      throw wde;
-    } catch (Throwable t) {
-      throw new WebdavException(t);
     }
+
+    if (tag.equals(WebdavTags.lockdiscovery)) {
+      // dav 13.8
+      //xml.emptyTag(tag);
+      return false;
+    }
+
+    if (tag.equals(WebdavTags.source)) {
+      // dav 13.10
+      //xml.emptyTag(tag);
+      return false;
+    }
+
+    if (tag.equals(WebdavTags.supportedlock)) {
+      // dav 13.11
+      //xml.emptyTag(tag);
+      return false;
+    }
+
+    if (tag.equals(WebdavTags.aclRestrictions)) {
+      // access 5.5
+      return false;
+    }
+
+    if (tag.equals(WebdavTags.inheritedAclSet)) {
+      // access 5.6
+      return false;
+    }
+
+    if (tag.equals(WebdavTags.principalCollectionSet)) {
+      // access 5.7
+      xml.openTag(WebdavTags.principalCollectionSet);
+
+      for (String s: getPrincipalCollectionSet(node.getUri())) {
+        xml.property(WebdavTags.href, s);
+      }
+
+      xml.closeTag(WebdavTags.principalCollectionSet);
+      return true;
+    }
+
+    /* Try the node for a value */
+
+    if (node.generatePropertyValue(tag, this, allProp)) {
+      // Generated by node
+      return true;
+    }
+
+    // Not known
+    return false;
   }
 
   /** Return the complete URL describing the location of the object
@@ -1478,16 +1448,11 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
   }
 
   /**
-   * @param status
-   * @throws WebdavException on error
+   * @param status int value
    */
-  public void addStatus(final int status) throws WebdavException {
-    try {
-      xml.property(WebdavTags.status, "HTTP/1.1 " + status + " " +
-               WebdavStatusCode.getMessage(status));
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
+  public void addStatus(final int status) {
+    xml.property(WebdavTags.status, "HTTP/1.1 " + status + " " +
+            WebdavStatusCode.getMessage(status));
   }
 
   /** Get the decoded and fixed resource URI. This calls getServletPath() to
@@ -1657,32 +1622,36 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
   /**
    * @param req http request
    * @return possibly wrapped reader
-   * @throws Throwable
+   * @throws WebdavException on fatal error
    */
-  public Reader getReader(final HttpServletRequest req) throws Throwable {
-    Reader rdr;
+  public Reader getReader(final HttpServletRequest req) throws WebdavException {
+    try {
+      Reader rdr;
 
-    if (debug()) {
-      rdr = new DebugReader(req.getReader());
-    } else {
-      rdr = req.getReader();
+      if (debug()) {
+        rdr = new DebugReader(req.getReader());
+      } else {
+        rdr = req.getReader();
+      }
+
+      /* Wrap with a pushback reader and see if there is anything there - some
+       * people are not setting the content length to 0 when there is no body */
+
+      PushbackReader pbr = new PushbackReader(rdr);
+
+      int c = pbr.read();
+
+      if (c == -1) {
+        // No input
+        return null;
+      }
+
+      pbr.unread(c);
+
+      return pbr;
+    } catch (final IOException ie) {
+      throw new WebdavException(ie);
     }
-
-    /* Wrap with a pushback reader and see if there is anything there - some
-     * people are not setting the content length to 0 when there is no body */
-
-    PushbackReader pbr = new PushbackReader(rdr);
-
-    int c = pbr.read();
-
-    if (c == -1) {
-      // No input
-      return null;
-    }
-
-    pbr.unread(c);
-
-    return pbr;
   }
 
   /* ====================================================================
