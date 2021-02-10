@@ -20,7 +20,7 @@
     <bw-util-network.version>4.1.0</bw-util-network.version>
 
 		<!-- Third Party Library Versions -->
-		<commons-codec.version>1.5</commons-codec.version>
+		<commons-codec.version>1.15</commons-codec.version>
 		<apache-http.version>4.2.2</apache-http.version>
     <jaxws-api.version>2.3.1</jaxws-api.version>
 		<servlet-api.version>4.0.0</servlet-api.version>
