@@ -15,10 +15,10 @@
 
 		<!-- Bedework Versions -->
     <bw-access.version>4.0.8</bw-access.version>
-    <bw-util.version>4.0.28-SNAPSHOT</bw-util.version>
+    <bw-util.version>4.0.28</bw-util.version>
     <bw-util-logging.version>4.0.5</bw-util-logging.version>
-    <bw-util-network.version>4.1.0</bw-util-network.version>
-    <bw-util-deploy.version>4.0.28-SNAPSHOT</bw-util-deploy.version>
+    <bw-util-network.version>4.1.1</bw-util-network.version>
+    <bw-util-deploy.version>4.0.28</bw-util-deploy.version>
 
 		<!-- Third Party Library Versions -->
 		<apache-http.version>4.2.2</apache-http.version>
@@ -62,9 +62,9 @@
     <developer>
       <name>Mike Douglass</name>
       <organization>
-        Spherical Cow Group
+        Bedework Commercial Services
       </organization>
-      <organizationUrl>http://sphericalcowgroup.com/</organizationUrl>
+      <organizationUrl>https://bedework.com/</organizationUrl>
     </developer>
     <developer>
       <name>Arlen Johnson</name>
