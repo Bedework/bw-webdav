@@ -60,13 +60,9 @@ public class AccessHelper implements Logged, AccessHelperI {
   private PrivilegeSet maxAllowedPrivs;
 
   @Override
-  public void init(final CallBack cb) throws WebdavException {
+  public void init(final CallBack cb) {
     this.cb = cb;
-    try {
-      access = new Access();
-    } catch (Throwable t) {
-      throw new WebdavException(t);
-    }
+    access = new Access();
   }
 
   @Override

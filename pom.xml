@@ -14,11 +14,10 @@
 		<maven.source.plugin.version>2.1.2</maven.source.plugin.version>
 
 		<!-- Bedework Versions -->
-    <bw-access.version>4.0.8</bw-access.version>
+    <bw-access.version>4.0.9</bw-access.version>
     <bw-util.version>4.0.28</bw-util.version>
-    <bw-util-logging.version>4.0.5</bw-util-logging.version>
-    <bw-util-network.version>4.1.1</bw-util-network.version>
-    <bw-util-deploy.version>4.0.28</bw-util-deploy.version>
+    <bw-util-logging.version>5.0.0</bw-util-logging.version>
+    <bw-util-network.version>4.1.2</bw-util-network.version>
 
 		<!-- Third Party Library Versions -->
 		<apache-http.version>4.2.2</apache-http.version>
@@ -204,49 +203,6 @@
         <configuration>
           <!--<additionalJOption>-Xdoclint:none</additionalJOption>-->
           <failOnError>false</failOnError>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.bedework</groupId>
-        <artifactId>bw-util-maven-deploy-wfmodule</artifactId>
-        <version>${bw-util-deploy.version}</version>
-        <executions>
-          <execution>
-            <phase>install</phase>
-            <goals>
-              <goal>bw-deploy-wfmodule</goal>
-            </goals>
-          </execution>
-        </executions>
-
-        <configuration>
-          <moduleName>org.bedework.webdav</moduleName>
-
-          <moduleDependencies>
-            <moduleDependency>
-              <name>org.bedework.logging</name>
-            </moduleDependency>
-            <moduleDependency>
-              <name>org.bedework.util.misc</name>
-            </moduleDependency>
-            <moduleDependency>
-              <name>org.bedework.util.xml</name>
-            </moduleDependency>
-            <moduleDependency>
-              <name>org.bedework.util.servlet</name>
-            </moduleDependency>
-
-            <moduleDependency>
-              <name>org.bedework.access</name>
-            </moduleDependency>
-
-            <!-- ================= System ========= -->
-
-            <moduleDependency>
-              <name>wildflyee.api</name>
-            </moduleDependency>
-          </moduleDependencies>
         </configuration>
       </plugin>
 		</plugins>

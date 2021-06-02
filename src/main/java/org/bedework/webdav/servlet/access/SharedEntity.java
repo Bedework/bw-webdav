@@ -41,7 +41,7 @@ public interface SharedEntity {
    *
    * @param val
    */
-  void setOwnerHref(final String val);
+  void setOwnerHref(String val);
 
   /** Href of owner
    *
@@ -53,7 +53,7 @@ public interface SharedEntity {
    *
    * @param val
    */
-  void setAccess(final String val);
+  void setAccess(String val);
 
   /** Encoded acl
    *
@@ -65,7 +65,7 @@ public interface SharedEntity {
    *
    * @param val
    */
-  void setParentPath(final String val);
+  void setParentPath(String val);
 
   /** Access is inherited from the parent
    *

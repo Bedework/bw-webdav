@@ -31,14 +31,14 @@ import java.util.Map;
  * @version 1.0
  */
 public class AccessState {
-  private SharedEntity entity;
+  private final SharedEntity entity;
 
   /* Current access for the current principal.
    */
   private CurrentAccess currentAccess;
 
-  private Map<Integer, CurrentAccess> caMap =
-    new HashMap<Integer, CurrentAccess>(20);
+  private final Map<Integer, CurrentAccess> caMap =
+          new HashMap<>(20);
 
   private int lastDesiredAccess;
 
@@ -62,9 +62,8 @@ public class AccessState {
    * ==================================================================== */
 
   /**
-   * @throws WebdavException
    */
-  public void clearCurrentAccess() throws WebdavException {
+  public void clearCurrentAccess() {
     caMap.clear();
   }
 
@@ -120,7 +119,7 @@ public class AccessState {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("AccessState{");
+    final StringBuilder sb = new StringBuilder("AccessState{");
 
     sb.append(entity.toString());
 
@@ -129,7 +128,7 @@ public class AccessState {
         sb.append(", currentAccess=");
         sb.append(getCurrentAccess());
       }
-    } catch (WebdavException cfe) {
+    } catch (final WebdavException cfe) {
       sb.append("exception");
       sb.append(cfe.getMessage());
     }

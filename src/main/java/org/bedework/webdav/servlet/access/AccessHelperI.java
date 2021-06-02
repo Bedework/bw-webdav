@@ -76,9 +76,8 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
   /**
    *
    * @param cb callback
-   * @throws WebdavException on error
    */
-  void init(CallBack cb) throws WebdavException;
+  void init(CallBack cb);
 
   /** Indicate if we are in superuser mode.
    * @param val true for superuser
