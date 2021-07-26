@@ -18,6 +18,7 @@
 */
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.util.misc.response.GetEntityResponse;
 import org.bedework.util.xml.XmlUtil;
 import org.bedework.util.xml.tagdefs.WebdavTags;
 import org.bedework.webdav.servlet.shared.WebdavBadRequest;
@@ -233,10 +234,15 @@ public class PropPatchMethod extends MethodBase {
       for (final Element srnode : children) {
         final Collection<Element> plist;
 
-        final Element propnode = getOnlyChild(srnode);
+        final GetEntityResponse<Element> childResp = getOnlyChild(srnode);
+        if (!childResp.isOk()) {
+          throw new WebdavBadRequest(childResp.getMessage());
+        }
+
+        final var propnode = childResp.getEntity();
 
         if (!XmlUtil.nodeMatches(propnode, WebdavTags.prop)) {
-          throw new WebdavBadRequest();
+          throw new WebdavBadRequest("Expected " + WebdavTags.prop);
         }
 
         if (XmlUtil.nodeMatches(srnode, WebdavTags.set)) {

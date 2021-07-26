@@ -20,6 +20,8 @@ package org.bedework.webdav.servlet.common;
 
 import org.bedework.util.logging.BwLogger;
 import org.bedework.util.logging.Logged;
+import org.bedework.util.misc.response.GetEntityResponse;
+import org.bedework.util.misc.response.Response;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlEmit.Notifier;
@@ -387,8 +389,15 @@ public abstract class MethodBase implements Logged, SecureXml {
     return XmlUtil.getElementsArray(nd);
   }
 
-  protected Element getOnlyChild(final Node nd) {
-    return XmlUtil.getOnlyElement(nd);
+  protected GetEntityResponse<Element> getOnlyChild(final Node nd) {
+    final GetEntityResponse<Element> resp = new GetEntityResponse<>();
+
+    try {
+      resp.setEntity(XmlUtil.getOnlyElement(nd));
+      return resp;
+    } catch (final Throwable t) {
+      return Response.error(resp, t);
+    }
   }
 
   protected String getElementContent(final Element el) {
