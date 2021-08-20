@@ -230,23 +230,21 @@ public abstract class WebdavServlet extends HttpServlet
 
         final int status = wde.getStatusCode();
         if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-          if (!debug()) {
-            // When debugging sendError will output
-            error(wde);
-          }
+          error(wde);
           serverError = true;
         }
         sendError(intf, wde, resp);
         return serverError;
       }
 
-      if (!debug()) {
-        // When debugging sendError will output
+      if (debug()) {
         error(t);
       }
+
       sendError(intf, t, resp);
       return true;
     } catch (final Throwable t1) {
+      error(t1);
       // Pretty much screwed if we get here
       return true;
     }
@@ -262,10 +260,6 @@ public abstract class WebdavServlet extends HttpServlet
       if (t instanceof WebdavException) {
         final WebdavException wde = (WebdavException)t;
         final QName errorTag = wde.getErrorTag();
-
-        if (debug()) {
-          error(wde);
-        }
 
         if (errorTag != null) {
           if (debug()) {
