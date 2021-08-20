@@ -34,26 +34,35 @@ public class WebdavForbidden extends WebdavException {
   }
 
   /** Constructor
-   * @param msg
+   * @param msg text
    */
-  public WebdavForbidden(String msg) {
+  public WebdavForbidden(final String msg) {
     super(HttpServletResponse.SC_FORBIDDEN, msg);
   }
 
   /** Constructor
    *
-   * @param errorTag
+   * @param errorTag to label
    */
-  public WebdavForbidden(QName errorTag) {
+  public WebdavForbidden(final QName errorTag) {
     super(HttpServletResponse.SC_FORBIDDEN, errorTag);
   }
 
   /** Constructor
    *
-   * @param errorTag
-   * @param msg
+   * @param errorTag to label
    */
-  public WebdavForbidden(QName errorTag, String msg) {
+  public WebdavForbidden(final Throwable t,
+                         final QName errorTag) {
+    super(t, HttpServletResponse.SC_FORBIDDEN, errorTag);
+  }
+
+  /** Constructor
+   *
+   * @param errorTag for label
+   * @param msg test
+   */
+  public WebdavForbidden(final QName errorTag, final String msg) {
     super(HttpServletResponse.SC_FORBIDDEN, errorTag, msg);
   }
 }

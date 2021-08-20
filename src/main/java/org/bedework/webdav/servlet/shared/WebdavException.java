@@ -36,7 +36,7 @@ public class WebdavException extends Throwable {
    *
    * @param s message
    */
-  public WebdavException(String s) {
+  public WebdavException(final String s) {
     super(s);
     statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
   }
@@ -45,16 +45,40 @@ public class WebdavException extends Throwable {
    *
    * @param t throwable
    */
-  public WebdavException(Throwable t) {
+  public WebdavException(final Throwable t) {
     super(t);
     statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
   }
 
   /** Constructor
    *
+   * @param t throwable
+   * @param errorTag QName identify error
+   */
+  public WebdavException(final Throwable t,
+                         final QName errorTag) {
+    super(t);
+    this.errorTag = errorTag;
+  }
+
+  /** Constructor
+   *
+   * @param t throwable
+   * @param errorTag QName identify error
+   */
+  public WebdavException(final Throwable t,
+                         final int st,
+                         final QName errorTag) {
+    super(t);
+    statusCode = st;
+    this.errorTag = errorTag;
+  }
+
+  /** Constructor
+   *
    * @param st status
    */
-  public WebdavException(int st) {
+  public WebdavException(final int st) {
     statusCode = st;
   }
 
@@ -63,7 +87,7 @@ public class WebdavException extends Throwable {
    * @param st status
    * @param msg message
    */
-  public WebdavException(int st, String msg) {
+  public WebdavException(final int st, final String msg) {
     super(msg);
     statusCode = st;
   }
@@ -73,7 +97,7 @@ public class WebdavException extends Throwable {
    * @param st status
    * @param errorTag QName identify error
    */
-  public WebdavException(int st, QName errorTag) {
+  public WebdavException(final int st, final QName errorTag) {
     statusCode = st;
     this.errorTag = errorTag;
   }

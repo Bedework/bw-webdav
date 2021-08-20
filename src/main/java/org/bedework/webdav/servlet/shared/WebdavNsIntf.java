@@ -867,14 +867,8 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw wdf;
     } catch (final WebdavException we) {
-      if (debug()) {
-        error(we);
-      }
       throw we;
     } catch (final Throwable t) {
-      if (debug()) {
-        error(t);
-      }
       throw new WebdavException(t);
     }
   }
