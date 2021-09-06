@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bedework</groupId>
 	<artifactId>bw-webdav</artifactId>
-	<version>4.0.12-SNAPSHOT</version>
+	<version>4.0.12</version>
 	<name>bw-webdav</name>
   <description>A generic WebDAV servlet</description>
   <url>https://github.com/Bedework/bw-webdav</url>
@@ -48,7 +48,7 @@
     <connection>scm:git:git@github.com:Bedework/bw-webdav.git</connection>
     <developerConnection>scm:git:git@github.com:Bedework/bw-webdav.git</developerConnection>
     <url>https://github.com/Bedework/bw-webdav</url>
-    <tag>bw-webdav-4.0.3</tag>
+    <tag>bw-webdav-4.0.12</tag>
   </scm>
 
   <issueManagement>
