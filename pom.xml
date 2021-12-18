@@ -1,89 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.bedework</groupId>
+
+  <parent>
+    <groupId>org.bedework</groupId>
+    <artifactId>bedework-parent</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
+  </parent>
+
 	<artifactId>bw-webdav</artifactId>
-	<version>4.0.14-SNAPSHOT</version>
-	<name>bw-webdav</name>
+	<version>5.0.0-SNAPSHOT</version>
+	<name>Bedework: A generic WebDAV servlet</name>
   <description>A generic WebDAV servlet</description>
   <url>https://github.com/Bedework/bw-webdav</url>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Maven Plugin Versions -->
-		<maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
-		<maven.source.plugin.version>2.1.2</maven.source.plugin.version>
-
-		<!-- Bedework Versions -->
-    <bw-access.version>4.0.11-SNAPSHOT</bw-access.version>
-    <bw-util.version>4.0.31</bw-util.version>
-    <bw-util-logging.version>5.0.1-SNAPSHOT</bw-util-logging.version>
-    <bw-util-network.version>4.1.4</bw-util-network.version>
-
-		<!-- Third Party Library Versions -->
-		<apache-http.version>4.2.2</apache-http.version>
-    <jaxws-api.version>2.3.1</jaxws-api.version>
-		<servlet-api.version>4.0.0</servlet-api.version>
-
-    <!-- test only -->
-    <junit.version>4.13.1</junit.version>
-
     <!-- The tests are interceping the getLogger calls and returning null.
          Investigate -->
     <maven.test.skip>true</maven.test.skip>
 	</properties>
-
-  <organization>
-    <name>Bedework</name>
-    <url>https://github.com/Bedework</url>
-  </organization>
-
-  <licenses>
-    <license>
-      <name>Apache License Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com:Bedework/bw-webdav.git</connection>
-    <developerConnection>scm:git:git@github.com:Bedework/bw-webdav.git</developerConnection>
-    <url>https://github.com/Bedework/bw-webdav</url>
-    <tag>bw-webdav-4.0.3</tag>
-  </scm>
-
-  <issueManagement>
-    <system>github</system>
-
-    <url>https://github.com/Bedework/bw-webdav/issues</url>
-  </issueManagement>
-
-  <developers>
-    <developer>
-      <name>Mike Douglass</name>
-      <organization>
-        Bedework Commercial Services
-      </organization>
-      <organizationUrl>https://bedework.com/</organizationUrl>
-    </developer>
-    <developer>
-      <name>Arlen Johnson</name>
-      <organization>
-        Spherical Cow Group
-      </organization>
-      <organizationUrl>http://sphericalcowgroup.com/</organizationUrl>
-    </developer>
-  </developers>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
 
   <dependencies>
     <!-- Bedework Dependencies -->
@@ -91,31 +25,26 @@
     <dependency>
       <groupId>org.bedework</groupId>
       <artifactId>bw-util-logging</artifactId>
-      <version>${bw-util-logging.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.bedework</groupId>
       <artifactId>bw-util-misc</artifactId>
-      <version>${bw-util.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.bedework</groupId>
       <artifactId>bw-util-xml</artifactId>
-      <version>${bw-util.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.bedework</groupId>
       <artifactId>bw-util-servlet</artifactId>
-      <version>${bw-util-network.version}</version>
     </dependency>
 
 		<dependency>
 			<groupId>org.bedework</groupId>
 			<artifactId>bw-access</artifactId>
-			<version>${bw-access.version}</version>
 		</dependency>
 
 		<!-- Third Party Dependencies -->
@@ -123,142 +52,21 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet-api.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.10.19</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>javax.xml.ws</groupId>
       <artifactId>jaxws-api</artifactId>
-      <version>${jaxws-api.version}</version>
     </dependency>
 	</dependencies>
-
-	<build>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.9</version>
-			</extension>
-		</extensions>
-
-		<plugins>
-			<!-- Specify the compiler options and settings -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven.compiler.plugin.version}</version>
-				<configuration>
-					<showDeprecation>false</showDeprecation>
-					<showWarnings>false</showWarnings>
-				</configuration>
-			</plugin>
-			<!-- Produce source jars during the 'verify' phase -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>${maven.source.plugin.version}</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <useReleaseProfile>false</useReleaseProfile>
-          <releaseProfiles>release</releaseProfiles>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.1</version>
-        <configuration>
-          <!--<additionalJOption>-Xdoclint:none</additionalJOption>-->
-          <failOnError>false</failOnError>
-        </configuration>
-      </plugin>
-		</plugins>
-	</build>
-
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.1.1</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <additionalJOption>-Xdoclint:none</additionalJOption>
-              <failOnError>false</failOnError>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
