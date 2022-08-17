@@ -99,6 +99,10 @@ public class WdSynchReport {
    */
   public boolean truncated;
 
+  /** True if the token is valid.
+   */
+  public boolean tokenValid;
+
   /** Token for next time.
    */
   public String token;

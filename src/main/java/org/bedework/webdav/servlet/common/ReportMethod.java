@@ -498,6 +498,11 @@ public class ReportMethod extends MethodBase {
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
+
+    if (!wsr.tokenValid) {
+      throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED,
+                                "Invalid sync token");
+    }
     
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
