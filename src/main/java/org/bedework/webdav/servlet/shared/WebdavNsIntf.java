@@ -795,7 +795,9 @@ public abstract class WebdavNsIntf implements Logged, Serializable {
       /* Headers have to go out before content */
 
       if (pcr.emitEtag) {
-        resp.setHeader("ETag", node.getEtagValue(true));
+        resp.setHeader("ETag",
+                       URLEncoder.encode(node.getEtagValue(true),
+                                         StandardCharsets.UTF_8));
       }
 
       if (fromPost && pcr.created) {
