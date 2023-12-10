@@ -38,10 +38,29 @@ For full details, see [Sonatype's documentation for using Maven to publish relea
 
 ## Release Notes
 ### 4.0.9
-    * Lowercase account unless mixed case environment variable BEDEWORK_MIXEDCASE_ACCOUNTS is set to true
-    * Fixes to report/propfind - allprops and propname were not being handled correctly.
-    * Sync spec says "infinite" for depth
-    * Expect collection when URI ends with "/"
-    * Provide webdav access to WdSysIntf object. Allows prefixing of uri in error response.
-    * For propfind on missing resource return a 404 instead of a 207 with 404 inside.
-    * Return 0 length content with 200 status when no content in resource
+* Lowercase account unless mixed case environment variable BEDEWORK_MIXEDCASE_ACCOUNTS is set to true
+* Fixes to report/propfind - allprops and propname were not being handled correctly.
+* Sync spec says "infinite" for depth
+* Expect collection when URI ends with "/"
+* Provide webdav access to WdSysIntf object. Allows prefixing of uri in error response.
+* For propfind on missing resource return a 404 instead of a 207 with 404 inside.
+* Return 0 length content with 200 status when no content in resource
+
+#### 4.0.10
+* Update library versions
+* Minor fix to check for null. Resulted in many changes to remove throws clauses from the xml emit utility class methods. This of course resulted in many changes up the call hierarchy.
+
+#### 4.0.11
+* Update library versions
+
+#### 4.0.12
+* Update library versions
+
+#### 5.0.0
+* Use bedework-parent for builds
+*  Upgrade library versions
+
+#### 5.0.1
+*  Upgrade library versions
+* Add a limit to how long the sync token is valid. Will allow flushing of old tombstoned data
+* Encode etag
