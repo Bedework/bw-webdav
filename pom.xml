@@ -8,7 +8,7 @@
   </parent>
 
 	<artifactId>bw-webdav</artifactId>
-	<version>5.0.4</version>
+	<version>5.0.5-SNAPSHOT</version>
 	<name>Bedework: A generic WebDAV servlet</name>
   <description>A generic WebDAV servlet</description>
   <url>https://github.com/Bedework/bw-webdav</url>
