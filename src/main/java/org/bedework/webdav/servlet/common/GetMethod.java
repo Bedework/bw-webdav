@@ -43,7 +43,7 @@ public class GetMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                       final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) {
     if (debug()) {
       debug("GetMethod: doMethod");
     }

@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
  *
  *   @author Mike Douglass   douglm  rpi.edu
  */
-public class WebdavException extends Throwable {
+public class WebdavException extends RuntimeException {
   /** gt 0 if set
    */
   int statusCode = -1;
@@ -108,7 +108,9 @@ public class WebdavException extends Throwable {
    * @param errorTag QName identify error
    * @param msg message
    */
-  public WebdavException(int st, QName errorTag, String msg) {
+  public WebdavException(final int st,
+                         final QName errorTag,
+                         final String msg) {
     super(msg);
     statusCode = st;
     this.errorTag = errorTag;
@@ -118,7 +120,7 @@ public class WebdavException extends Throwable {
    * @param val int status
    */
   @SuppressWarnings("unused")
-  public void setStatusCode(int val) {
+  public void setStatusCode(final int val) {
     statusCode = val;
   }
 

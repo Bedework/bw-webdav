@@ -191,15 +191,13 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Get the current access granted to this principal for this node.
    *
    * @return CurrentAccess
-   * @throws WebdavException
    */
-  public abstract CurrentAccess getCurrentAccess() throws WebdavException;
+  public abstract CurrentAccess getCurrentAccess();
 
   /** Update this node after changes.
    *
-   * @throws WebdavException
    */
-  public abstract void update() throws WebdavException;
+  public abstract void update();
 
   /** Result from setting or removing property
    *
@@ -240,10 +238,9 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    *
    * @param filterGetter non-null if there is a filter
    * @return Collection of children
-   * @throws WebdavException on fatal error
    */
   public abstract Collection<? extends WdEntity<?>> getChildren(
-          Supplier<Object> filterGetter) throws WebdavException;
+          Supplier<Object> filterGetter);
 
   /**
    * @return String
@@ -258,9 +255,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
   /**
    * @param xml emitter
-   * @throws WebdavException
    */
-  public void generateHref(final XmlEmit xml) throws WebdavException {
+  public void generateHref(final XmlEmit xml) {
     try {
       generateUrl(xml, WebdavTags.href, uri, getExists());
 //      String url = getUrlPrefix() + new URI(getEncodedUri()).toASCIIString();
@@ -275,26 +271,23 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /**
    * @param xml emitter
    * @param uri
-   * @throws WebdavException
    */
-  public void generateHref(final XmlEmit xml, final String uri) throws WebdavException {
+  public void generateHref(final XmlEmit xml, final String uri) {
     generateUrl(xml, WebdavTags.href, uri, false);
   }
 
   /**
    * @return this nodes fully prefixed uri
-   * @throws WebdavException
    */
-  public String getPrefixedUri() throws WebdavException {
+  public String getPrefixedUri() {
     return urlHandler.prefix(uri);
   }
 
   /**
    * @param uri
    * @return fully prefixed uri
-   * @throws WebdavException
    */
-  public String getPrefixedUri(final String uri) throws WebdavException {
+  public String getPrefixedUri(final String uri) {
     return urlHandler.prefix(uri);
   }
 
@@ -303,12 +296,11 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @param tag
    * @param uri
    * @param exists - true if we KNOW it exists
-   * @throws WebdavException
    */
   public void generateUrl(final XmlEmit xml,
                           final QName tag,
                           final String uri,
-                          final boolean exists) throws WebdavException {
+                          final boolean exists) {
     try {
       /*
       String enc = new URI(null, null, uri, null).toString();
@@ -381,10 +373,9 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @param val   Element defining property to remove
    * @param spr   Holds reult of removing property
    * @return boolean  true if property recognized.
-   * @throws WebdavException
    */
   public boolean removeProperty(final Element val,
-                                final SetPropertyResult spr) throws WebdavException {
+                                final SetPropertyResult spr) {
     try {
       if (XmlUtil.nodeMatches(val, WebdavTags.getetag)) {
         spr.status = HttpServletResponse.SC_FORBIDDEN;
@@ -407,10 +398,9 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @param val   Element defining property to set
    * @param spr   Holds result of setting property
    * @return boolean  true if property recognized and processed.
-   * @throws WebdavException
    */
   public boolean setProperty(final Element val,
-                             final SetPropertyResult spr) throws WebdavException {
+                             final SetPropertyResult spr) {
     try {
       QName tag = new QName(val.getNamespaceURI(),
                             val.getLocalName());
@@ -446,11 +436,10 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @param intf WebdavNsIntf
    * @param allProp    true if we're doing allprop
    * @return boolean   true if emitted
-   * @throws WebdavException
    */
   public boolean generatePropertyValue(final QName tag,
                                        final WebdavNsIntf intf,
-                                       final boolean allProp) throws WebdavException {
+                                       final boolean allProp) {
     final String ns = tag.getNamespaceURI();
     final XmlEmit xml = intf.getXmlEmit();
 
@@ -676,9 +665,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Return a set of PropertyTagEntry defining properties this node supports.
    *
    * @return Collection of PropertyTagEntry
-   * @throws WebdavException
    */
-  public Collection<PropertyTagEntry> getPropertyNames() throws WebdavException {
+  public Collection<PropertyTagEntry> getPropertyNames() {
     if (!isPrincipal()) {
       return propertyNames.values();
     }
@@ -689,9 +677,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Return a set of QName defining reports this node supports.
    *
    * @return Collection of QName
-   * @throws WebdavException
    */
-  public Collection<QName> getSupportedReports() throws WebdavException {
+  public Collection<QName> getSupportedReports() {
     final Collection<QName> res = new ArrayList<>(supportedReports);
 
     if (wdSysIntf.allowsSyncReport(getCollection(false))) {
@@ -735,18 +722,16 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
   /**
    * @return String encoded uri
-   * @throws WebdavException
    */
-  public String getEncodedUri() throws WebdavException {
+  public String getEncodedUri() {
     return getEncodedUri(getUri());
   }
 
   /**
    * @param uri to be encoded
    * @return String encoded uri
-   * @throws WebdavException
    */
-  public String getEncodedUri(final String uri) throws WebdavException {
+  public String getEncodedUri(final String uri) {
     try {
       return new URI(null, null, uri, null).toString();
     } catch (final Throwable t) {
@@ -794,36 +779,32 @@ public abstract class WebdavNsNode implements Serializable, Logged {
 
   /**
    * @param val
-   * @throws WebdavException
    */
-  public void setAlias(final boolean val) throws WebdavException {
+  public void setAlias(final boolean val) {
     init(false);
     alias = val;
   }
 
   /**
    * @return boolean true if an alias
-   * @throws WebdavException
    */
-  public boolean getAlias() throws WebdavException {
+  public boolean getAlias() {
     init(false);
     return alias;
   }
 
   /**
    * @param val
-   * @throws WebdavException
    */
-  public void setTargetUri(final String val) throws WebdavException {
+  public void setTargetUri(final String val) {
     init(false);
     targetUri = val;
   }
 
   /**
    * @return String uri
-   * @throws WebdavException
    */
-  public String getTargetUri() throws WebdavException {
+  public String getTargetUri() {
     init(false);
     return targetUri;
   }
@@ -834,9 +815,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    *
    * @param ns      String interface namespace.
    * @return Collection (possibly empty) of WebdavProperty objects
-   * @throws WebdavException
    * /
-  public Collection<WebdavProperty> getProperties(final String ns) throws WebdavException {
+  public Collection<WebdavProperty> getProperties(final String ns) {
     return new ArrayList<WebdavProperty>();
   }
   */
@@ -845,9 +825,8 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    *
    * @param contentType
    * @return Content object
-   * @throws WebdavException
    */
-  public Content getContent(final String contentType) throws WebdavException {
+  public Content getContent(final String contentType) {
     String cont = getContentString(contentType);
 
     if (cont == null) {
@@ -866,26 +845,23 @@ public abstract class WebdavNsNode implements Serializable, Logged {
   /** Returns an InputStream for the content.
    *
    * @return InputStream       A reader for the content.
-   * @throws WebdavException
    */
-  public InputStream getContentStream() throws WebdavException {
+  public InputStream getContentStream() {
     return null;
   }
 
   /** Return string content
    *
    * @return String       content.
-   * @throws WebdavException
    */
-  public String getContentString(String contentType) throws WebdavException {
+  public String getContentString(String contentType) {
     return null;
   }
 
   /**
    * @param methodTag - acts as a flag for the method type
-   * @throws WebdavException
    */
-  public void setDefaults(final QName methodTag) throws WebdavException {
+  public void setDefaults(final QName methodTag) {
   }
 
   /* ====================================================================
@@ -898,48 +874,41 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    * @param wtr - if standalone output or no xml stream initialized.
    * @param contentType desired content type or null for default.
    * @return actual contentType
-   * @throws WebdavException
    */
   public abstract String writeContent(XmlEmit xml,
                                       Writer wtr,
-                                      String contentType) throws WebdavException;
+                                      String contentType);
 
   /**
    * @return boolean true if this is binary content
-   * @throws WebdavException
    */
-  public abstract boolean getContentBinary() throws WebdavException;
+  public abstract boolean getContentBinary();
 
   /**
    * @return String lang
-   * @throws WebdavException
    */
-  public abstract String getContentLang() throws WebdavException;
+  public abstract String getContentLang();
 
   /**
    * @return long content length
-   * @throws WebdavException
    */
-  public abstract long getContentLen() throws WebdavException;
+  public abstract long getContentLen();
 
   /** A content type of null implies no content (or we don't know)
    *
    * @return String content type
-   * @throws WebdavException
    */
-  public abstract String getContentType() throws WebdavException;
+  public abstract String getContentType();
 
   /**
    * @return String credate
-   * @throws WebdavException
    */
-  public abstract String getCreDate() throws WebdavException;
+  public abstract String getCreDate();
 
   /**
    * @return String name
-   * @throws WebdavException
    */
-  public abstract String getDisplayname() throws WebdavException;
+  public abstract String getDisplayname();
 
   /** Entity tags are defined in RFC2068 - they are supposed to provide some
    * sort of indication the data has changed - e.g. a checksum.
@@ -949,22 +918,19 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    *
    * @param strong
    * @return String
-   * @throws WebdavException
    */
-  public abstract String getEtagValue(boolean strong) throws WebdavException;
+  public abstract String getEtagValue(boolean strong);
 
   /**
    * @return String last mod date
-   * @throws WebdavException
    */
-  public abstract String getLastmodDate() throws WebdavException;
+  public abstract String getLastmodDate();
 
   /** Should return a value suitable for WebdavNsIntf.makeUserHref
    *
    * @return AccessPrincipal owner
-   * @throws WebdavException
    */
-  public abstract AccessPrincipal getOwner() throws WebdavException;
+  public abstract AccessPrincipal getOwner();
 
   /** The node may refer to a collection object which may in fact be an alias to
    * another. For deletions we want to remove the alias itself.
@@ -976,29 +942,25 @@ public abstract class WebdavNsNode implements Serializable, Logged {
    *
    * @param deref true if we want to act upon the target of an alias.
    * @return Collection this node represents
-   * @throws WebdavException
    */
-  public abstract WdCollection<?> getCollection(boolean deref) throws WebdavException;
+  public abstract WdCollection<?> getCollection(boolean deref);
 
-  public abstract WdCollection<?> getImmediateTargetCollection() throws WebdavException;
+  public abstract WdCollection<?> getImmediateTargetCollection();
 
   /**
    * @return true if this node allows a sync-report.
-   * @throws WebdavException
    */
-  public abstract boolean allowsSyncReport() throws WebdavException;
+  public abstract boolean allowsSyncReport();
 
   /**
    * @return true if this represents a deleted resource.
-   * @throws WebdavException
    */
-  public abstract boolean getDeleted() throws WebdavException;
+  public abstract boolean getDeleted();
 
   /**
    * @return String sync-token, a URI
-   * @throws WebdavException
    */
-  public abstract String getSyncToken() throws WebdavException;
+  public abstract String getSyncToken();
 
   /* ********************************************************************
    *                        Protected methods

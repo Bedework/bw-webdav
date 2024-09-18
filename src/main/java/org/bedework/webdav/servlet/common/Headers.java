@@ -42,9 +42,8 @@ public class Headers {
    *
    * @param req    HttpServletRequest
    * @return int   depth - depthInfinity if absent
-   * @throws WebdavException
    */
-  public static int depth(final HttpServletRequest req) throws WebdavException {
+  public static int depth(final HttpServletRequest req) {
     return depth(req, depthNone);
   }
 
@@ -53,10 +52,9 @@ public class Headers {
    * @param req    HttpServletRequest
    * @param def    int default if no header
    * @return int   depth -
-   * @throws WebdavException
    */
   public static int depth(final HttpServletRequest req,
-                          final int def) throws WebdavException {
+                          final int def) {
     String depthStr = req.getHeader("Depth");
 
     if (depthStr == null) {
@@ -208,9 +206,8 @@ public class Headers {
 
     /**
      * @param tagOrToken
-     * @throws WebdavException
-     */
-    public void addTagOrToken(final String tagOrToken) throws WebdavException {
+       */
+    public void addTagOrToken(final String tagOrToken) {
       boolean entityTag;
 
       if (tagOrToken.length() < 3) {
@@ -254,10 +251,8 @@ public class Headers {
    *
    * @param req
    * @return populated IfHeader or null
-   * @throws WebdavException
    */
-  public static IfHeader testIfHeader(final HttpServletRequest req)
-          throws WebdavException {
+  public static IfHeader testIfHeader(final HttpServletRequest req) {
     final String hdrStr = req.getHeader("If");
 
     if (hdrStr == null) {
@@ -304,7 +299,7 @@ public class Headers {
 
   private static String nextTagOrToken(final String hdrStr, // Original header
                                        final String h,      // What we're parsing
-                                       final Holder<Integer> hpos) throws WebdavException {
+                                       final Holder<Integer> hpos) {
     int pos = hpos.value;
 
     if (pos >= h.length()) {
@@ -346,10 +341,8 @@ public class Headers {
    *
    * @param req    HttpServletRequest
    * @return boolean true if present
-   * @throws WebdavException
    */
-  public static boolean ifNoneMatchAny(final HttpServletRequest req)
-          throws WebdavException {
+  public static boolean ifNoneMatchAny(final HttpServletRequest req) {
     String hdrStr = req.getHeader("If-None-Match");
 
     return "*".equals(hdrStr);
@@ -359,10 +352,8 @@ public class Headers {
    *
    * @param req    HttpServletRequest
    * @return String null if not present
-   * @throws WebdavException
    */
-  public static String ifNoneMatch(final HttpServletRequest req)
-          throws WebdavException {
+  public static String ifNoneMatch(final HttpServletRequest req) {
     return req.getHeader("If-None-Match");
   }
 
@@ -370,10 +361,8 @@ public class Headers {
    *
    * @param req    HttpServletRequest
    * @return String null if not present
-   * @throws WebdavException
    */
-  public static String ifMatch(final HttpServletRequest req)
-          throws WebdavException {
+  public static String ifMatch(final HttpServletRequest req) {
     return req.getHeader("If-Match");
   }
 
@@ -381,10 +370,8 @@ public class Headers {
    *
    * @param req    HttpServletRequest
    * @return String null if not present
-   * @throws WebdavException
    */
-  public static String ifScheduleTagMatch(final HttpServletRequest req)
-          throws WebdavException {
+  public static String ifScheduleTagMatch(final HttpServletRequest req) {
     return req.getHeader("If-Schedule-Tag-Match");
   }
 
@@ -406,10 +393,8 @@ public class Headers {
   /**
    * @param req
    * @return populated Ifheaders object
-   * @throws WebdavException
    */
-  public static IfHeaders processIfHeaders(final HttpServletRequest req)
-      throws WebdavException {
+  public static IfHeaders processIfHeaders(final HttpServletRequest req) {
     IfHeaders ih = new IfHeaders();
 
     ih.create = ifNoneMatchAny(req);

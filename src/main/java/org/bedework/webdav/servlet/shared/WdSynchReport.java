@@ -46,11 +46,10 @@ public class WdSynchReport {
      * @param node
      * @param token
      * @param canSync
-     * @throws WebdavException
-     */
+       */
     public WdSynchReportItem(final WebdavNsNode node,
                              final String token,
-                             final boolean canSync) throws WebdavException {
+                             final boolean canSync) {
       this.node = node;
       this.token = token;
       this.canSync = canSync;

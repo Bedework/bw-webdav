@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MoveMethod extends CopyMethod {
   @Override
   public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
+                        HttpServletResponse resp) {
     process(req, resp, false);
   }
 }

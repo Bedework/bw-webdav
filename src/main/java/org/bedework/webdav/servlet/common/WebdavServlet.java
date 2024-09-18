@@ -96,10 +96,8 @@ public abstract class WebdavServlet extends HttpServlet
    *
    * @param req       HttpServletRequest
    * @return WebdavNsIntf  or subclass of
-   * @throws WebdavException on fatal error
    */
-  public abstract WebdavNsIntf getNsIntf(HttpServletRequest req)
-      throws WebdavException;
+  public abstract WebdavNsIntf getNsIntf(HttpServletRequest req);
 
   @Override
   protected void service(final HttpServletRequest req,
@@ -181,7 +179,7 @@ public abstract class WebdavServlet extends HttpServlet
         } else {
           final String str = wresp.toString();
 
-          if ((str == null) || (str.length() == 0)) {
+          if ((str == null) || (str.isEmpty())) {
             debug("------------------------ No response content -------------------");
             resp.setContentLength(0);
           } else {
@@ -406,20 +404,20 @@ public abstract class WebdavServlet extends HttpServlet
    * @param req servlet request to dump
    */
   public void dumpRequest(final HttpServletRequest req) {
-    Enumeration names = req.getHeaderNames();
+    Enumeration<String> names = req.getHeaderNames();
 
     String title = "Request headers";
 
     debug(title);
 
     while (names.hasMoreElements()) {
-      final String key = (String)names.nextElement();
-      final Enumeration vals = req.getHeaders(key);
+      final String key = names.nextElement();
+      final Enumeration<String> vals = req.getHeaders(key);
 
       while (vals.hasMoreElements()) {
-        String val = (String)vals.nextElement();
+        String val = vals.nextElement();
 
-        if (key.toLowerCase().equals("authorization") &&
+        if (key.equalsIgnoreCase("authorization") &&
                 (val != null) &&
                 (val.toLowerCase().startsWith("basic"))) {
           val = "Basic **********";
@@ -448,7 +446,7 @@ public abstract class WebdavServlet extends HttpServlet
     debug(title);
 
     while (names.hasMoreElements()) {
-      final String key = (String)names.nextElement();
+      final String key = names.nextElement();
       final String val = req.getParameter(key);
       debug("  " + key + " = \"" + val + "\"");
     }

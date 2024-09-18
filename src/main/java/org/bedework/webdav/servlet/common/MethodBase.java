@@ -78,11 +78,9 @@ public abstract class MethodBase implements Logged, SecureXml {
   /**
    * @param req http request
    * @param resp http response
-   * @throws WebdavException on fatal error
    */
   public abstract void doMethod(HttpServletRequest req,
-                                HttpServletResponse resp)
-        throws WebdavException;
+                                HttpServletResponse resp);
 
   /** Allow servlet to create method.
    */
@@ -150,10 +148,8 @@ public abstract class MethodBase implements Logged, SecureXml {
    *
    * @param req      Servlet request object
    * @return String  fixed up uri
-   * @throws WebdavException on fatal error
    */
-  public String getResourceUri(final HttpServletRequest req)
-      throws WebdavException {
+  public String getResourceUri(final HttpServletRequest req) {
     if (resourceUri != null) {
       return resourceUri;
     }
@@ -179,7 +175,7 @@ public abstract class MethodBase implements Logged, SecureXml {
   /* depth must have given value
    */
   protected void checkDepth(final int depth,
-                            final int val) throws WebdavException {
+                            final int val) {
     if (depth != val) {
       throw new WebdavBadRequest();
     }
@@ -205,7 +201,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    */
   protected void addHeaders(final HttpServletRequest req,
                             final HttpServletResponse resp,
-                            final WebdavNsNode node) throws WebdavException {
+                            final WebdavNsNode node) {
     addDavHeader(resp, node);
 
     // Lisa say's we need this
@@ -224,7 +220,7 @@ public abstract class MethodBase implements Logged, SecureXml {
   }
 
   public void checkServerInfo(final HttpServletRequest req,
-                              final HttpServletResponse resp) throws WebdavException {
+                              final HttpServletResponse resp) {
     // This probably needs changes
 
     final String curToken = getNsIntf().getServerInfo().getToken();
@@ -251,7 +247,7 @@ public abstract class MethodBase implements Logged, SecureXml {
   }
 
   protected void addDavHeader(final HttpServletResponse resp,
-                              final WebdavNsNode node) throws WebdavException {
+                              final WebdavNsNode node) {
     resp.addHeader("DAV", getNsIntf().getDavHeader(node));
   }
 
@@ -263,8 +259,7 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @exception WebdavException Some error occurred.
    */
   protected Document parseContent(final HttpServletRequest req,
-                                  final HttpServletResponse resp)
-      throws WebdavException{
+                                  final HttpServletResponse resp) {
     hasBriefHeader = Headers.brief(req);
 
     return parseContent(req.getContentLength(), getNsIntf().getReader(req));
@@ -275,10 +270,9 @@ public abstract class MethodBase implements Logged, SecureXml {
    * @param contentLength        Content length
    * @param reader        Reader
    * @return Document  Parsed body or null for no body
-   * @exception WebdavException Some error occurred.
    */
   protected Document parseContent(final int contentLength,
-                                  final Reader reader) throws WebdavException{
+                                  final Reader reader) {
     final Document doc = parseXmlSafely(contentLength, reader);
     if (doc == null) {
       debug("No document");
@@ -320,10 +314,9 @@ public abstract class MethodBase implements Logged, SecureXml {
    *
    * @param node webdav node
    * @param props list of properties
-   * @throws WebdavException on fatal error
    */
   public void doPropFind(final WebdavNsNode node,
-                         final Collection<WebdavProperty> props) throws WebdavException {
+                         final Collection<WebdavProperty> props) {
     final WebdavNsIntf intf = getNsIntf();
     final Collection<WebdavProperty> unknowns = new ArrayList<>();
 
@@ -408,9 +401,9 @@ public abstract class MethodBase implements Logged, SecureXml {
     return XmlUtil.isEmpty(el);
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   XmlEmit wrappers
-   * ==================================================================== */
+   * ============================================================== */
 
   protected void startEmit(final HttpServletResponse resp) {
     try {

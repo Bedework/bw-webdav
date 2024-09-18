@@ -34,7 +34,7 @@ public class LockMethod extends MethodBase {
   }
 
   public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) throws WebdavException {
+                        HttpServletResponse resp) {
 
   }
 }

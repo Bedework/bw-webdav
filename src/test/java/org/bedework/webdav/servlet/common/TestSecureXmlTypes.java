@@ -40,7 +40,7 @@ public class TestSecureXmlTypes {
   private PostRequestPars requestPars;
 
   @Before
-  public void setup() throws WebdavException, IOException {
+  public void setup() throws IOException {
     when(request.getContentType()).thenReturn("application/xml");
     requestPars = new PostRequestPars(request, webdavNsIntf, UUID.randomUUID().toString());
 
@@ -51,12 +51,12 @@ public class TestSecureXmlTypes {
   }
 
   @Test
-  public void testPostRequestParsWithMaliciousRequest() throws WebdavException {
+  public void testPostRequestParsWithMaliciousRequest() {
     assertTrue(requestPars.processXml());
   }
 
   @Test
-  public void testMethodBaseWithMaliciousRequest() throws WebdavException {
+  public void testMethodBaseWithMaliciousRequest() {
     assertNotNull(methodBase.parseContent(request, response));
   }
 

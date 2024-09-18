@@ -79,7 +79,7 @@ public class ReportMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                       final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) {
     if (debug()) {
       debug("ReportMethod: doMethod");
     }
@@ -115,12 +115,11 @@ public class ReportMethod extends MethodBase {
   /* We process the parsed document and produce a response
    *
    * @param doc
-   * @throws WebdavException
    */
   protected void process(final Document doc,
                          final int depth,
                          final HttpServletRequest req,
-                         final HttpServletResponse resp) throws WebdavException {
+                         final HttpServletResponse resp) {
     reportType = getReportType(doc);
 
     if (reportType < 0) {
@@ -134,7 +133,7 @@ public class ReportMethod extends MethodBase {
 
   /* Apply a node to a parsed request - or the other way - whatever.
    */
-  protected void doNodeProperties(final WebdavNsNode node) throws WebdavException {
+  protected void doNodeProperties(final WebdavNsNode node) {
     final int status = node.getStatus();
 
     openTag(WebdavTags.response);
@@ -160,10 +159,9 @@ public class ReportMethod extends MethodBase {
    * objects to process.
    *
    * @param doc
-   * @throws WebdavException
    */
   private void processDoc(final Document doc,
-                          int depth) throws WebdavException {
+                          int depth) {
     try {
       WebdavNsIntf intf = getNsIntf();
 
@@ -227,7 +225,7 @@ public class ReportMethod extends MethodBase {
    *
    */
   private void parseAclPrincipalProps(final Element root,
-                                      final WebdavNsIntf intf) throws WebdavException {
+                                      final WebdavNsIntf intf) {
     try {
       Element[] children = getChildrenArray(root);
       boolean hadProp = false;
@@ -258,7 +256,7 @@ public class ReportMethod extends MethodBase {
 
   private void parseSyncReport(final Element root,
                                final int depth,
-                               final WebdavNsIntf intf) throws WebdavException {
+                               final WebdavNsIntf intf) {
     try {
       final Element[] children = getChildrenArray(root);
 
@@ -358,7 +356,7 @@ public class ReportMethod extends MethodBase {
    */
   private void parsePrincipalPropertySearch(final Element root,
                                             final int depth,
-                                            final WebdavNsIntf intf) throws WebdavException {
+                                            final WebdavNsIntf intf) {
     try {
       final Element[] children = getChildrenArray(root);
 
@@ -420,11 +418,10 @@ public class ReportMethod extends MethodBase {
    * @param req
    * @param resp
    * @param depth
-   * @throws WebdavException
    */
   private void processResp(final HttpServletRequest req,
                            final HttpServletResponse resp,
-                           final int depth) throws WebdavException {
+                           final int depth) {
     WebdavNsIntf intf = getNsIntf();
 
     if (reportType == reportTypeSync) {
@@ -469,12 +466,11 @@ public class ReportMethod extends MethodBase {
    * @param resp
    * @param depth
    * @param intf
-   * @throws WebdavException
    */
   private void processExpandProperty(final HttpServletRequest req,
                                      final HttpServletResponse resp,
                                      final int depth,
-                                     final WebdavNsIntf intf) throws WebdavException {
+                                     final WebdavNsIntf intf) {
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
 
@@ -489,7 +485,7 @@ public class ReportMethod extends MethodBase {
 
   private void processSyncReport(final HttpServletRequest req,
                                  final HttpServletResponse resp,
-                                 final WebdavNsIntf intf) throws WebdavException {
+                                 final WebdavNsIntf intf) {
     final WdSynchReport wsr = intf.getSynchReport(getResourceUri(req),
                                                   syncToken,
                                                   syncLimit,
@@ -543,7 +539,7 @@ public class ReportMethod extends MethodBase {
 
   private void processAclPrincipalPropSet(final HttpServletRequest req,
                                           final HttpServletResponse resp,
-                                          final WebdavNsIntf intf) throws WebdavException {
+                                          final WebdavNsIntf intf) {
     String resourceUri = getResourceUri(req);
     WebdavNsNode node = intf.getNode(resourceUri,
                                      WebdavNsIntf.existanceMust,
@@ -584,12 +580,11 @@ public class ReportMethod extends MethodBase {
    * @param resp
    * @param depth
    * @param intf
-   * @throws WebdavException
    */
   private void processPrincipalPropertySearch(final HttpServletRequest req,
                                               final HttpServletResponse resp,
                                               final int depth,
-                                              final WebdavNsIntf intf) throws WebdavException {
+                                              final WebdavNsIntf intf) {
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
 
@@ -615,9 +610,8 @@ public class ReportMethod extends MethodBase {
    *
    * @param doc
    * @return index or <0 for unknown.
-   * @throws WebdavException
    */
-  private int getReportType(final Document doc) throws WebdavException {
+  private int getReportType(final Document doc) {
     try {
       Element root = doc.getDocumentElement();
 

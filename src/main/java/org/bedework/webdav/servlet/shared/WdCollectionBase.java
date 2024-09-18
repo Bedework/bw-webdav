@@ -27,9 +27,8 @@ package org.bedework.webdav.servlet.shared;
 public abstract class WdCollectionBase <T> extends WdCollection<T> {
   /** Constructor
    *
-   * @throws WebdavException
    */
-  public WdCollectionBase() throws WebdavException {
+  public WdCollectionBase() {
     super();
   }
 

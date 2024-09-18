@@ -45,7 +45,7 @@ public class AclMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                       final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) {
     if (debug()) {
       debug("AclMethod: doMethod");
     }
@@ -68,7 +68,7 @@ public class AclMethod extends MethodBase {
   /* We process the parsed document and produce a Collection of request
    * objects to process.
    */
-  private WebdavNsIntf.AclInfo processDoc(final Document doc, final String uri) throws WebdavException {
+  private WebdavNsIntf.AclInfo processDoc(final Document doc, final String uri) {
     try {
       WebdavNsIntf intf = getNsIntf();
 
@@ -101,7 +101,7 @@ public class AclMethod extends MethodBase {
 
   private void processResp(final HttpServletRequest req,
                           final HttpServletResponse resp,
-                          final WebdavNsIntf.AclInfo ainfo) throws WebdavException {
+                          final WebdavNsIntf.AclInfo ainfo) {
     WebdavNsIntf intf = getNsIntf();
 
     if (ainfo.errorTag == null) {

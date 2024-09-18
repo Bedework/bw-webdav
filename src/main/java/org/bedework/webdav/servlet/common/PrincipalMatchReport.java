@@ -89,10 +89,9 @@ public class PrincipalMatchReport implements Logged {
    *
    * @param root of request
    * @param depth how far down
-   * @throws WebdavException on fatal error
    */
   public void parse(final Element root,
-                    final int depth) throws WebdavException {
+                    final int depth) {
     try {
       if (debug()) {
         debug("ReportMethod: parsePrincipalMatch");
@@ -166,11 +165,10 @@ public class PrincipalMatchReport implements Logged {
    * @param req http request
    * @param resp http response
    * @param depth for search
-   * @throws WebdavException on fatal error
    */
   public void process(final HttpServletRequest req,
                       final HttpServletResponse resp,
-                      final int depth) throws WebdavException {
+                      final int depth) {
       resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
       resp.setContentType("text/xml; charset=UTF-8");
 
@@ -215,8 +213,7 @@ public class PrincipalMatchReport implements Logged {
       xml.flush();
   }
 
-  private Collection<WebdavNsNode> doNodeAndChildren(final WebdavNsNode node)
-          throws WebdavException {
+  private Collection<WebdavNsNode> doNodeAndChildren(final WebdavNsNode node) {
     final Collection<WebdavNsNode> nodes = new ArrayList<>();
 
     if (!nodeMatches(node)) {
@@ -236,7 +233,7 @@ public class PrincipalMatchReport implements Logged {
     return nodes;
   }
 
-  private boolean nodeMatches(final WebdavNsNode node) throws WebdavException {
+  private boolean nodeMatches(final WebdavNsNode node) {
     if (owner) {
       final String account = intf.getAccount();
 

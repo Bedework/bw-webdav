@@ -79,12 +79,12 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   }
 
   @Override
-  public AccessPrincipal getOwner() throws WebdavException {
+  public AccessPrincipal getOwner() {
     return account;
   }
 
   @Override
-  public void update() throws WebdavException {
+  public void update() {
   }
 
   /* ====================================================================
@@ -92,12 +92,12 @@ public class WebdavPrincipalNode extends WebdavNsNode {
    * ==================================================================== */
 
   @Override
-  public CurrentAccess getCurrentAccess() throws WebdavException {
+  public CurrentAccess getCurrentAccess() {
     return null;
   }
 
   @Override
-  public String getEtagValue(final boolean strong) throws WebdavException {
+  public String getEtagValue(final boolean strong) {
     final String val = "1234567890";
 
     if (strong) {
@@ -114,33 +114,32 @@ public class WebdavPrincipalNode extends WebdavNsNode {
 
   @Override
   public Collection<? extends WdEntity<?>> getChildren(
-          Supplier<Object> filterGetter) throws WebdavException {
+          Supplier<Object> filterGetter) {
     return null;
   }
 
   @Override
-  public WdCollection<?> getCollection(final boolean deref) throws WebdavException {
+  public WdCollection<?> getCollection(final boolean deref) {
     return null;
   }
 
   @Override
-  public WdCollection<?> getImmediateTargetCollection()
-          throws WebdavException {
+  public WdCollection<?> getImmediateTargetCollection() {
     return null;
   }
 
   @Override
-  public boolean allowsSyncReport() throws WebdavException {
+  public boolean allowsSyncReport() {
     return false;
   }
 
   @Override
-  public boolean getDeleted() throws WebdavException {
+  public boolean getDeleted() {
     return false;
   }
 
   @Override
-  public String getSyncToken() throws WebdavException {
+  public String getSyncToken() {
     return null;
   }
 
@@ -151,42 +150,42 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   @Override
   public String writeContent(final XmlEmit xml,
                              final Writer wtr,
-                             final String contentType) throws WebdavException {
+                             final String contentType) {
     return null;
   }
 
   @Override
-  public boolean getContentBinary() throws WebdavException {
+  public boolean getContentBinary() {
     return false;
   }
 
   @Override
-  public String getContentLang() throws WebdavException {
+  public String getContentLang() {
     return null;
   }
 
   @Override
-  public long getContentLen() throws WebdavException {
+  public long getContentLen() {
     return 0;
   }
 
   @Override
-  public String getContentType() throws WebdavException {
+  public String getContentType() {
     return null;
   }
 
   @Override
-  public String getCreDate() throws WebdavException {
+  public String getCreDate() {
     return null;
   }
 
   @Override
-  public String getDisplayname() throws WebdavException {
+  public String getDisplayname() {
     return account.getAccount();
   }
 
   @Override
-  public String getLastmodDate() throws WebdavException {
+  public String getLastmodDate() {
     return null;
   }
 
@@ -196,7 +195,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
 
   @Override
   public boolean removeProperty(final Element val,
-                                final SetPropertyResult spr) throws WebdavException {
+                                final SetPropertyResult spr) {
     warn("Unimplemented - removeProperty");
 
     return false;
@@ -204,7 +203,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
 
   @Override
   public boolean setProperty(final Element val,
-                             final SetPropertyResult spr) throws WebdavException {
+                             final SetPropertyResult spr) {
     if (super.setProperty(val, spr)) {
       return true;
     }
@@ -225,7 +224,7 @@ public class WebdavPrincipalNode extends WebdavNsNode {
   @Override
   public boolean generatePropertyValue(final QName tag,
                                        final WebdavNsIntf intf,
-                                       final boolean allProp) throws WebdavException {
+                                       final boolean allProp) {
     final String ns = tag.getNamespaceURI();
     final XmlEmit xml = intf.getXmlEmit();
 

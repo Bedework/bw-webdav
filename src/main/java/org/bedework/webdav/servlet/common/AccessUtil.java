@@ -20,7 +20,6 @@ package org.bedework.webdav.servlet.common;
 
 import org.bedework.access.AccessXmlUtil;
 import org.bedework.util.xml.XmlEmit;
-import org.bedework.webdav.servlet.shared.WebdavException;
 
 import javax.xml.namespace.QName;
 
@@ -29,18 +28,17 @@ import javax.xml.namespace.QName;
  *
  */
 public class AccessUtil extends AccessXmlUtil {
-  private String namespacePrefix;
+  private final String namespacePrefix;
 
   /** Acls use tags in the webdav and caldav namespace. For use over caldav
-   * we should supply the uris. Otherwise a null namespace will be used.
+   * we should supply the uris. Otherwise, a null namespace will be used.
    *
    * @param namespacePrefix String prefix
    * @param xml   XmlEmit
-   * @param cb
-   * @throws WebdavException
+   * @param cb callback
    */
   public AccessUtil(final String namespacePrefix, final XmlEmit xml,
-                    final AccessXmlCb cb) throws WebdavException {
+                    final AccessXmlCb cb) {
     super(caldavPrivTags, xml, cb);
 
     this.namespacePrefix = namespacePrefix;

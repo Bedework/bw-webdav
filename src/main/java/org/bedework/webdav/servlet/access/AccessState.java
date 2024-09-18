@@ -69,9 +69,8 @@ public class AccessState {
 
   /**
    * @return current access object
-   * @throws WebdavException
    */
-  public CurrentAccess getCurrentAccess() throws WebdavException {
+  public CurrentAccess getCurrentAccess() {
     if (currentAccess != null) {
       return currentAccess;
     }
@@ -82,9 +81,8 @@ public class AccessState {
   /**
    * @param desiredAccess
    * @return currentAccess;
-   * @throws WebdavException
    */
-  public CurrentAccess getCurrentAccess(final int desiredAccess) throws WebdavException {
+  public CurrentAccess getCurrentAccess(final int desiredAccess) {
     if ((desiredAccess == lastDesiredAccess) &&
         (currentAccess != null)) {
       return currentAccess;

@@ -38,7 +38,7 @@ public class OptionsMethod extends MethodBase {
   }
 
   public void doMethod(final HttpServletRequest req,
-                       final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) {
     if (debug()) {
       debug("OptionsMethod: doMethod");
     }
@@ -73,7 +73,7 @@ public class OptionsMethod extends MethodBase {
   }
 
   protected void addDavHeader(final HttpServletResponse resp,
-                              final WebdavNsNode node) throws WebdavException {
+                              final WebdavNsNode node) {
     resp.addHeader("DAV", getNsIntf().getDavHeader(node));
   }
 }

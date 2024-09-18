@@ -77,7 +77,7 @@ public class PropFindMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                       final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) {
     if (debug()) {
       debug("PropFindMethod: doMethod");
     }
@@ -112,7 +112,7 @@ public class PropFindMethod extends MethodBase {
    *                   Private methods
    * ==================================================================== */
 
-  private void processDoc(final Document doc) throws WebdavException {
+  private void processDoc(final Document doc) {
     try {
       final Element root = doc.getDocumentElement();
 
@@ -155,9 +155,8 @@ public class PropFindMethod extends MethodBase {
    *
    * @param nd propfind element node
    * @return PropRequest
-   * @throws WebdavException on fatal error
    */
-  public PropRequest tryPropRequest(final Node nd) throws WebdavException {
+  public PropRequest tryPropRequest(final Node nd) {
     if (XmlUtil.nodeMatches(nd, WebdavTags.allprop)) {
       return new PropRequest(PropRequest.ReqType.propAll);
     }
@@ -177,9 +176,8 @@ public class PropFindMethod extends MethodBase {
    *
    * @param nd dav:prop node
    * @return PropRequest
-   * @throws WebdavException on fatal error
    */
-  public PropRequest parseProps(final Node nd) throws WebdavException {
+  public PropRequest parseProps(final Node nd) {
     final PropRequest pr = new PropRequest(PropRequest.ReqType.prop);
     pr.props = getNsIntf().parseProp(nd);
 
@@ -190,11 +188,10 @@ public class PropFindMethod extends MethodBase {
    * @param req http request
    * @param resp http response
    * @param depth from depth header
-   * @throws WebdavException on fatal error
    */
   public void processResp(final HttpServletRequest req,
                           final HttpServletResponse resp,
-                          final int depth) throws WebdavException {
+                          final int depth) {
     final String resourceUri = getResourceUri(req);
     if (debug()) {
       debug("About to get node at " + resourceUri);
@@ -237,10 +234,9 @@ public class PropFindMethod extends MethodBase {
    *
    * @param node current node
    * @param pr the prop request
-   * @throws WebdavException on fatal error
    */
   public void doNodeProperties(final WebdavNsNode node,
-                                final PropRequest pr) throws WebdavException {
+                                final PropRequest pr) {
     node.generateHref(xml);
 
     final var propNameOrAll = (pr.reqType == PropRequest.ReqType.propName) ||
@@ -287,7 +283,7 @@ public class PropFindMethod extends MethodBase {
 
   private void doNodeAndChildren(final WebdavNsNode node,
                                  int curDepth,
-                                 final int maxDepth) throws WebdavException {
+                                 final int maxDepth) {
     openTag(WebdavTags.response);
 
     doNodeProperties(node, parsedReq);
@@ -309,7 +305,7 @@ public class PropFindMethod extends MethodBase {
 
   /* Build the response for a single node for a propnames request
    */
-  private void doPropNames(final WebdavNsNode node) throws WebdavException {
+  private void doPropNames(final WebdavNsNode node) {
     openTag(WebdavTags.prop);
 
     for (final PropertyTagEntry pte: node.getPropertyNames()) {
@@ -323,7 +319,7 @@ public class PropFindMethod extends MethodBase {
 
   /* Build the response for a single node for an allprop request
    */
-  private int doPropAll(final WebdavNsNode node) throws WebdavException {
+  private int doPropAll(final WebdavNsNode node) {
     final WebdavNsIntf intf = getNsIntf();
 
     openTag(WebdavTags.prop);

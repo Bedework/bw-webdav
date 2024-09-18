@@ -38,7 +38,7 @@ public class PostMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                       final HttpServletResponse resp) throws WebdavException {
+                       final HttpServletResponse resp) {
     final PostRequestPars pars = new PostRequestPars(req,
                                                      getNsIntf(),
                                                      getResourceUri(req));
@@ -52,7 +52,7 @@ public class PostMethod extends MethodBase {
   }
 
   protected void handleAddMember(final PostRequestPars pars,
-                                 final HttpServletResponse resp) throws WebdavException {
+                                 final HttpServletResponse resp) {
 
     if (debug()) {
       debug("PostMethod: doMethod");

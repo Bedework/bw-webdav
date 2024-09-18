@@ -17,7 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
  */
 public interface SecureXml {
   default Document parseXmlSafely(final int contentLength,
-                                  final Reader reader) throws WebdavException {
+                                  final Reader reader) {
     if (contentLength == 0) {
       return null;
     }

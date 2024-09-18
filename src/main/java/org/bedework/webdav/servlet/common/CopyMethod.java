@@ -40,13 +40,13 @@ public class CopyMethod extends MethodBase {
 
   @Override
   public void doMethod(HttpServletRequest req,
-                       HttpServletResponse resp) throws WebdavException {
+                       HttpServletResponse resp) {
     process(req, resp, true);
   }
 
   protected void process(HttpServletRequest req,
                          HttpServletResponse resp,
-                         boolean copy) throws WebdavException {
+                         boolean copy) {
     if (debug()) {
       if (copy) {
         debug("CopyMethod: doMethod");

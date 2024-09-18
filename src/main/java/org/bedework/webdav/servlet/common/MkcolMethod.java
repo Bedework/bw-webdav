@@ -39,7 +39,7 @@ public class MkcolMethod extends PropPatchMethod {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                        final HttpServletResponse resp) throws WebdavException {
+                        final HttpServletResponse resp) {
     if (debug()) {
       debug("MkcolMethod: doMethod");
     }

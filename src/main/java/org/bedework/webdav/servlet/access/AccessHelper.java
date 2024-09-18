@@ -98,7 +98,7 @@ public class AccessHelper implements Logged, AccessHelperI {
   }
 
   @Override
-  public SharedEntity getParent(final SharedEntity val) throws WebdavException {
+  public SharedEntity getParent(final SharedEntity val) {
     if (val.getParentPath() == null) {
       return null;
     }
@@ -123,7 +123,7 @@ public class AccessHelper implements Logged, AccessHelperI {
   @Override
   public void changeAccess(final SharedEntity ent,
                            final Collection<Ace> aces,
-                           final boolean replaceAll) throws WebdavException {
+                           final boolean replaceAll) {
     try {
       Acl acl = checkAccess(ent, privWriteAcl, false).getAcl();
 
@@ -148,7 +148,7 @@ public class AccessHelper implements Logged, AccessHelperI {
 
   @Override
   public void defaultAccess(final SharedEntity ent,
-                            final AceWho who) throws WebdavException {
+                            final AceWho who) {
     try {
       Acl acl = checkAccess(ent, privWriteAcl, false).getAcl();
 
@@ -170,8 +170,7 @@ public class AccessHelper implements Logged, AccessHelperI {
   public Collection<? extends SharedEntity>
                 checkAccess(final Collection<? extends SharedEntity> ents,
                                 final int desiredAccess,
-                                final boolean alwaysReturn)
-          throws WebdavException {
+                                final boolean alwaysReturn) {
     TreeSet<SharedEntity> out = new TreeSet<>();
 
     for (SharedEntity sdbe: ents) {
@@ -186,7 +185,7 @@ public class AccessHelper implements Logged, AccessHelperI {
   @Override
   public CurrentAccess checkAccess(final SharedEntity ent,
                                    final int desiredAccess,
-                        final boolean alwaysReturnResult) throws WebdavException {
+                        final boolean alwaysReturnResult) {
     if (ent == null) {
       return null;
     }
@@ -325,7 +324,7 @@ public class AccessHelper implements Logged, AccessHelperI {
    *
    * The collection access might be cached in the pathInfoTable.
    */
-  private char[] getAclChars(final SharedEntity ent) throws WebdavException {
+  private char[] getAclChars(final SharedEntity ent) {
     SharedEntity container;
 
     if (ent.isCollection()) {
@@ -367,7 +366,7 @@ public class AccessHelper implements Logged, AccessHelperI {
 
   private char[] merged(final char[] parentAccess,
                         final String path,
-                        final String access) throws WebdavException {
+                        final String access) {
     try {
       Acl acl = null;
 

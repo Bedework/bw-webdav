@@ -60,11 +60,10 @@ public class PostRequestPars implements SecureXml {
    * @param req - the request
    * @param intf service interface
    * @param resourceUri the uri
-   * @throws WebdavException
    */
   public PostRequestPars(final HttpServletRequest req,
                          final WebdavNsIntf intf,
-                         final String resourceUri) throws WebdavException {
+                         final String resourceUri) {
     this.req = req;
     this.intf = intf;
     this.resourceUri = resourceUri;
@@ -82,9 +81,8 @@ public class PostRequestPars implements SecureXml {
 
   /**
    * @return true if we recognized the request as a particular type
-   * @throws WebdavException
    */
-  public boolean processRequest() throws WebdavException {
+  public boolean processRequest() {
     final String addMemberSuffix = intf.getAddMemberSuffix();
 
     if (addMemberSuffix == null) {
@@ -110,7 +108,7 @@ public class PostRequestPars implements SecureXml {
     return false;
   }
 
-  public boolean processXml() throws WebdavException {
+  public boolean processXml() {
     if (!isAppXml()) {
       return false;
     }
@@ -128,9 +126,8 @@ public class PostRequestPars implements SecureXml {
 
   /**
    * @return Reader if we have a usable reader
-   * @throws WebdavException
    */
-  public Reader getReader() throws WebdavException {
+  public Reader getReader() {
     if (!getTheReader) {
       // Reader already processed
       return null;

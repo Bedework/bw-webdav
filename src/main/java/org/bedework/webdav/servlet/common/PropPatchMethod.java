@@ -49,7 +49,7 @@ public class PropPatchMethod extends MethodBase {
 
   @Override
   public void doMethod(final HttpServletRequest req,
-                        final HttpServletResponse resp) throws WebdavException {
+                        final HttpServletResponse resp) {
     if (debug()) {
       debug("PropPatchMethod: doMethod");
     }
@@ -99,7 +99,7 @@ public class PropPatchMethod extends MethodBase {
                             final Document doc,
                             final WebdavNsNode node,
                             final QName expectedRoot,
-                            final boolean onlySet) throws WebdavException {
+                            final boolean onlySet) {
     try {
       final Element root = doc.getDocumentElement();
 
@@ -222,10 +222,9 @@ public class PropPatchMethod extends MethodBase {
    *
    * @param node to parse
    * @return Collection
-   * @throws WebdavException on
-   */
+\   */
   private Collection<? extends Collection<Element>> processUpdate(
-          final Element node) throws WebdavException {
+          final Element node) {
     final ArrayList<Collection<Element>> res = new ArrayList<>();
 
     try {
@@ -282,7 +281,7 @@ public class PropPatchMethod extends MethodBase {
    */
   private void processPlist(final Collection<Element> plist,
                             final Element node,
-                            final boolean remove) throws WebdavException {
+                            final boolean remove) {
     final Element[] props = getChildrenArray(node);
 
     for (final Element prop : props) {
