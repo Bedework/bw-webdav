@@ -209,7 +209,7 @@ public abstract class MethodBase implements Logged, SecureXml {
 
     final StringBuilder methods = new StringBuilder();
     for (final String name: getNsIntf().getMethodNames()) {
-      if (methods.length() > 0) {
+      if (!methods.isEmpty()) {
         methods.append(", ");
       }
 

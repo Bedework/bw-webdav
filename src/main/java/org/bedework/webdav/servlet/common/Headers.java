@@ -55,29 +55,23 @@ public class Headers {
    */
   public static int depth(final HttpServletRequest req,
                           final int def) {
-    String depthStr = req.getHeader("Depth");
+    final String depthStr = req.getHeader("Depth");
 
     if (depthStr == null) {
       return def;
     }
 
-    if (depthStr.equals("infinity")) {
-      return depthInfinity;
-    }
+    return switch (depthStr) {
+      case "infinity" -> depthInfinity;
+      case "0" -> 0;
+      case "1" -> 1;
+      default -> throw new WebdavBadRequest();
+    };
 
-    if (depthStr.equals("0")) {
-      return 0;
-    }
-
-    if (depthStr.equals("1")) {
-      return 1;
-    }
-
-    throw new WebdavBadRequest();
   }
 
   /**
-   * @param req
+   * @param req http request
    * @return true if we have a (MS) "brief" header or the Prefer header
    *              with "return-minimal" or "return=minimal"
    */
@@ -94,10 +88,10 @@ public class Headers {
       return false;
     }
 
-    String[] bels = b.split(",");
+    final String[] bels = b.split(",");
 
-    for (String bel: bels) {
-      String tr = bel.trim();
+    for (final String bel: bels) {
+      final String tr = bel.trim();
 
       // Previous form in draft
       if ("return-minimal".equalsIgnoreCase(tr)) {
@@ -113,21 +107,21 @@ public class Headers {
   }
 
   /**
-   * @param req
+   * @param req http request
    * @return true if we have a Prefer header
    *              with "return-representation" or "return=representation"
    */
   public static boolean returnRepresentation(final HttpServletRequest req) {
-    String b = req.getHeader("Prefer");
+    final String b = req.getHeader("Prefer");
 
     if (b == null) {
       return false;
     }
 
-    String[] bels = b.split(",");
+    final String[] bels = b.split(",");
 
-    for (String bel: bels) {
-      String tr = bel.trim();
+    for (final String bel: bels) {
+      final String tr = bel.trim();
 
       // Previous form in draft
       if ("return-representation".equalsIgnoreCase(tr)) {
@@ -145,11 +139,11 @@ public class Headers {
   private static boolean preferKeyEquals(final String unparsed,
                                          final String key,
                                          final String val) {
-    if (unparsed.indexOf("=") < 0) {
+    if (!unparsed.contains("=")) {
       return false;
     }
 
-    String[] sp = unparsed.split("=");
+    final String[] sp = unparsed.split("=");
     if ((sp.length != 2) || (sp[0] == null) || (sp[1] == null)) {
       return false;
     }
@@ -167,8 +161,8 @@ public class Headers {
 
   /** Create a location header
    *
-   * @param resp
-   * @param url
+   * @param resp http response
+   * @param url new location
    */
   public static void makeLocation(final HttpServletResponse resp,
                                   final String url) {
@@ -191,8 +185,8 @@ public class Headers {
       public String value;
 
       /** Constructor
-       * @param entityTag
-       * @param value
+       * @param entityTag True if value is an entity tag
+       * @param value The tag or token value
        */
       public TagOrToken(final boolean entityTag,
                         final String value) {
@@ -202,13 +196,13 @@ public class Headers {
     }
 
     /** The list - never null */
-    public List<TagOrToken> tagsAndTokens = new ArrayList<TagOrToken>();
+    public List<TagOrToken> tagsAndTokens = new ArrayList<>();
 
     /**
-     * @param tagOrToken
+     * @param tagOrToken to add
        */
     public void addTagOrToken(final String tagOrToken) {
-      boolean entityTag;
+      final boolean entityTag;
 
       if (tagOrToken.length() < 3) {
         throw new WebdavException("Invalid tag or token for If header: " +
@@ -249,7 +243,7 @@ public class Headers {
    *  ; No LWS allowed in Resource-Tag
    * </pre>
    *
-   * @param req
+   * @param req http request
    * @return populated IfHeader or null
    */
   public static IfHeader testIfHeader(final HttpServletRequest req) {
@@ -261,10 +255,10 @@ public class Headers {
 
     String h = hdrStr.trim();
 
-    IfHeader ih = new IfHeader();
+    final IfHeader ih = new IfHeader();
 
     if (h.startsWith("<")) {
-      int pos = h.indexOf(">");
+      final int pos = h.indexOf(">");
 
       if (pos < 0) {
         throw new WebdavException("Invalid If header: " + hdrStr);
@@ -280,12 +274,12 @@ public class Headers {
 
     h = h.substring(1, h.length() - 1);
 
-    Holder<Integer> hpos = new Holder<Integer>();
+    final Holder<Integer> hpos = new Holder<>();
 
-    hpos.value = new Integer(0);
+    hpos.value = 0;
 
     for (;;) {
-      String ntt = nextTagOrToken(hdrStr, h, hpos);
+      final String ntt = nextTagOrToken(hdrStr, h, hpos);
 
       if (ntt == null) {
         break;
@@ -306,10 +300,10 @@ public class Headers {
       return null; // done
     }
 
-    String res = null;
-    String endDelim;
+    final String res;
+    final String endDelim;
 
-    char delim = h.charAt(pos);
+    final char delim = h.charAt(pos);
 
     if (delim == '<') {
       endDelim = ">";
@@ -332,7 +326,7 @@ public class Headers {
       pos++;
     }
 
-    hpos.value = new Integer(pos);
+    hpos.value = pos;
 
     return res;
   }
@@ -343,7 +337,7 @@ public class Headers {
    * @return boolean true if present
    */
   public static boolean ifNoneMatchAny(final HttpServletRequest req) {
-    String hdrStr = req.getHeader("If-None-Match");
+    final String hdrStr = req.getHeader("If-None-Match");
 
     return "*".equals(hdrStr);
   }
@@ -385,17 +379,17 @@ public class Headers {
      */
     public String ifEtag;
 
-    /** Non null if we got an if header
+    /** Non-null if we got an if header
      */
     public Headers.IfHeader ifHeader;
   }
 
   /**
-   * @param req
+   * @param req http request
    * @return populated Ifheaders object
    */
   public static IfHeaders processIfHeaders(final HttpServletRequest req) {
-    IfHeaders ih = new IfHeaders();
+    final IfHeaders ih = new IfHeaders();
 
     ih.create = ifNoneMatchAny(req);
     ih.ifEtag = ifMatch(req);

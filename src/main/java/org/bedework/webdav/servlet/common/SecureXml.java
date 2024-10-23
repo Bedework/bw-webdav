@@ -28,19 +28,28 @@ public interface SecureXml {
     }
 
     try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      final DocumentBuilderFactory factory =
+              DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
-      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      factory.setFeature(
+              "http://javax.xml.XMLConstants/feature/secure-processing",
+              true);
+      factory.setFeature(
+              "http://xml.org/sax/features/external-general-entities",
+              false);
+      factory.setFeature(
+              "http://xml.org/sax/features/external-parameter-entities",
+              false);
+      factory.setAttribute(
+              "http://apache.org/xml/features/nonvalidating/load-external-dtd",
+              false);
 
-      DocumentBuilder builder = factory.newDocumentBuilder();
+      final DocumentBuilder builder = factory.newDocumentBuilder();
 
       return builder.parse(new InputSource(reader));
-    } catch (SAXException exception) {
+    } catch (final SAXException exception) {
       throw new WebdavBadRequest(exception.getMessage());
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }

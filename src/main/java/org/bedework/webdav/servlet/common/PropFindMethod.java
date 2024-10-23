@@ -143,7 +143,7 @@ public class PropFindMethod extends MethodBase {
     } catch (final Throwable t) {
       System.err.println(t.getMessage());
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -151,7 +151,7 @@ public class PropFindMethod extends MethodBase {
   }
 
   /** See if the current node represents a valid propfind element
-   * and return with a request if so. Otherwise return null.
+   * and return with a request if so. Otherwise, return null.
    *
    * @param nd propfind element node
    * @return PropRequest

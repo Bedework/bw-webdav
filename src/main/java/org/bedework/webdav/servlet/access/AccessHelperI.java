@@ -26,7 +26,6 @@ import org.bedework.access.Ace;
 import org.bedework.access.AceWho;
 import org.bedework.access.CurrentAccess;
 import org.bedework.access.PrivilegeDefs;
-import org.bedework.webdav.servlet.shared.WebdavException;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -50,7 +49,7 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
    */
   abstract class CallBack implements AccessCb, Serializable {
     /**
-     * @param href
+     * @param href for principal
      * @return AccessPrincipal or null for not valid
        */
     public abstract AccessPrincipal getPrincipal(String href);
@@ -161,14 +160,14 @@ public interface AccessHelperI extends PrivilegeDefs, Serializable {
    *
    * <p>We special case the access to the user root e.g /user and the home
    * directory, e.g. /user/douglm
-   *
+   * <p>
    * We deny access to /user to anybody without superuser access. This
    * prevents user browsing. This could be made a system property if the
    * organization wants user browsing.
-   *
+   * <p>
    * Default access to the home directory is read, write-content to the owner
    * only and unlimited to superuser.
-   *
+   * <p>
    * Specific access should be no more than read, write-content to the home
    * directory.
    *

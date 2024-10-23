@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 public class WebdavUtils {
   /** Get the prefix from the request
    *
-   * @param req
+   * @param req http request
    * @return String prefix
    */
   public static String getUrlPrefix(final HttpServletRequest req) {
@@ -74,8 +74,8 @@ public class WebdavUtils {
    * @param c
    * @return boolean true for empty or null Collection
    */
-  public static boolean emptyCollection(Collection c) {
-    return (c == null) || (c.size() == 0);
+  public static boolean emptyCollection(final Collection<?> c) {
+    return (c == null) || (c.isEmpty());
   }
 }
 

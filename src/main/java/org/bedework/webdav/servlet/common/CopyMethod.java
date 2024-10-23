@@ -39,14 +39,14 @@ public class CopyMethod extends MethodBase {
   }
 
   @Override
-  public void doMethod(HttpServletRequest req,
-                       HttpServletResponse resp) {
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) {
     process(req, resp, true);
   }
 
-  protected void process(HttpServletRequest req,
-                         HttpServletResponse resp,
-                         boolean copy) {
+  protected void process(final HttpServletRequest req,
+                         final HttpServletResponse resp,
+                         final boolean copy) {
     if (debug()) {
       if (copy) {
         debug("CopyMethod: doMethod");
@@ -56,7 +56,7 @@ public class CopyMethod extends MethodBase {
     }
 
     try {
-      String dest = req.getHeader("Destination");
+      final String dest = req.getHeader("Destination");
       if (dest == null) {
         if (debug()) {
           debug("No Destination");
@@ -64,15 +64,15 @@ public class CopyMethod extends MethodBase {
         throw new WebdavNotFound("No Destination");
       }
 
-      int depth = Headers.depth(req);
+      final int depth = Headers.depth(req);
       /*
       if (depth == Headers.depthNone) {
         depth = Headers.depthInfinity;
       }
       */
 
-      String ow = req.getHeader("Overwrite");
-      boolean overwrite;
+      final String ow = req.getHeader("Overwrite");
+      final boolean overwrite;
       if (ow == null) {
         overwrite = true;
       } else if ("T".equals(ow)) {
@@ -84,37 +84,37 @@ public class CopyMethod extends MethodBase {
         return;
       }
 
-      WebdavNsIntf intf = getNsIntf();
-      WebdavNsNode from = intf.getNode(getResourceUri(req),
-                                       WebdavNsIntf.existanceMust,
-                                       WebdavNsIntf.nodeTypeUnknown,
-                                       false);
+      final WebdavNsIntf intf = getNsIntf();
+      final WebdavNsNode from = intf.getNode(getResourceUri(req),
+                                             WebdavNsIntf.existanceMust,
+                                             WebdavNsIntf.nodeTypeUnknown,
+                                             false);
 
       if ((from == null) || !from.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
 
-      int toNodeType;
+      final int toNodeType;
       if (from.isCollection()) {
         toNodeType = WebdavNsIntf.nodeTypeCollection;
       } else {
         toNodeType = WebdavNsIntf.nodeTypeEntity;
       }
 
-      WebdavNsNode to = intf.getNode(intf.getUri(dest),
-                                     WebdavNsIntf.existanceMay,
-                                     toNodeType,
-                                     false);
+      final WebdavNsNode to = intf.getNode(intf.getUri(dest),
+                                           WebdavNsIntf.existanceMay,
+                                           toNodeType,
+                                           false);
 
       if (from.equals(to)) {
         throw new WebdavForbidden("source and destination equal");
       }
 
       intf.copyMove(req, resp, from, to, copy, overwrite, depth);
-    } catch (WebdavException we) {
+    } catch (final WebdavException we) {
       throw we;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }

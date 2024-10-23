@@ -37,7 +37,8 @@ public class AccessUtil extends AccessXmlUtil {
    * @param xml   XmlEmit
    * @param cb callback
    */
-  public AccessUtil(final String namespacePrefix, final XmlEmit xml,
+  public AccessUtil(final String namespacePrefix,
+                    final XmlEmit xml,
                     final AccessXmlCb cb) {
     super(caldavPrivTags, xml, cb);
 

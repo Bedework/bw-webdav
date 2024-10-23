@@ -34,10 +34,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MkcolMethod extends PropPatchMethod {
   @Override
-  public void init() {
-  }
-
-  @Override
   public void doMethod(final HttpServletRequest req,
                         final HttpServletResponse resp) {
     if (debug()) {

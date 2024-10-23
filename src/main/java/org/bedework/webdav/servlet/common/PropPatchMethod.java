@@ -204,7 +204,7 @@ public class PropPatchMethod extends MethodBase {
     } catch (final Throwable t) {
       System.err.println(t.getMessage());
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -263,7 +263,7 @@ public class PropPatchMethod extends MethodBase {
     } catch (final Throwable t) {
       System.err.println(t.getMessage());
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

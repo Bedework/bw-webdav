@@ -168,11 +168,10 @@ public abstract class WebdavServlet extends HttpServlet
       } catch (final Throwable ignored) {}
 
       if (debug() && dumpContent &&
-          (resp instanceof CharArrayWrappedResponse)) {
+          (resp instanceof final CharArrayWrappedResponse wresp)) {
         /* instanceof check because we might get a subsequent exception before
          * we wrap the response
          */
-        final CharArrayWrappedResponse wresp = (CharArrayWrappedResponse)resp;
 
         if (wresp.getUsedOutputStream()) {
           debug("------------------------ response written to output stream -------------------");
@@ -223,8 +222,7 @@ public abstract class WebdavServlet extends HttpServlet
     }
 
     try {
-      if (t instanceof WebdavException) {
-        final WebdavException wde = (WebdavException)t;
+      if (t instanceof final WebdavException wde) {
 
         final int status = wde.getStatusCode();
         if (status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
@@ -255,8 +253,7 @@ public abstract class WebdavServlet extends HttpServlet
         intf.rollback();
       } catch (final Throwable ignored) {}
 
-      if (t instanceof WebdavException) {
-        final WebdavException wde = (WebdavException)t;
+      if (t instanceof final WebdavException wde) {
         final QName errorTag = wde.getErrorTag();
 
         if (errorTag != null) {

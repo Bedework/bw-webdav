@@ -71,10 +71,5 @@ public class OptionsMethod extends MethodBase {
       throw new WebdavException(t);
     }
   }
-
-  protected void addDavHeader(final HttpServletResponse resp,
-                              final WebdavNsNode node) {
-    resp.addHeader("DAV", getNsIntf().getDavHeader(node));
-  }
 }
 

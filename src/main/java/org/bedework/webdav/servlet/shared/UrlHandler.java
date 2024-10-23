@@ -63,7 +63,7 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
     urlPrefix = req.getRequestURL().toString();
     final int pos;
 
-    if (context.length() > 0) {
+    if (!context.isEmpty()) {
       pos = urlPrefix.indexOf(context);
     } else {
       pos = urlPrefix.indexOf(req.getRequestURI());
@@ -79,6 +79,7 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
    * @param context null, zero length or the servlet context, e.g. caldav
    * @param relative true if we want relative (to the server) urls
    */
+  @SuppressWarnings("unused")
   public UrlHandler(final String urlPrefix,
                     final String context,
                     final boolean relative) {
@@ -153,7 +154,7 @@ public class UrlHandler implements UrlPrefixer, UrlUnprefixer {
   }
 
   private boolean endsWithSlash(final StringBuilder sb) {
-    if (sb.length() == 0) {
+    if (sb.isEmpty()) {
       return false;
     }
 

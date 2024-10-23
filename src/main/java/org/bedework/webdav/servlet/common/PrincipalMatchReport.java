@@ -64,7 +64,7 @@ public class PrincipalMatchReport implements Logged {
 
   /** Properties to return (none for empty collection)
    */
-  public Collection<WebdavProperty> props = new ArrayList<WebdavProperty>();
+  public Collection<WebdavProperty> props = new ArrayList<>();
 
   /** Constructor
    *
@@ -77,7 +77,7 @@ public class PrincipalMatchReport implements Logged {
   }
 
   /** Parse the principal match request.
-   *
+   * <pre>
    *    <!ELEMENT principal-match ((principal-property | self), prop?)>
    *
    *    <!ELEMENT principal-property ANY>
@@ -86,6 +86,7 @@ public class PrincipalMatchReport implements Logged {
    *    expectation is the value of the named property typically contains
    *    an href element that contains the URI of a principal
    *    <!ELEMENT self EMPTY>
+   *</pre>
    *
    * @param root of request
    * @param depth how far down
@@ -154,7 +155,7 @@ public class PrincipalMatchReport implements Logged {
     } catch (final Throwable t) {
       warn(t.getMessage());
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -250,7 +251,7 @@ public class PrincipalMatchReport implements Logged {
    *                   Logged methods
    * ==================================================================== */
 
-  private BwLogger logger = new BwLogger();
+  private final BwLogger logger = new BwLogger();
 
   @Override
   public BwLogger getLogger() {

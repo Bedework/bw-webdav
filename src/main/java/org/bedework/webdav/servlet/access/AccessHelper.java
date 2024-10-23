@@ -125,9 +125,9 @@ public class AccessHelper implements Logged, AccessHelperI {
                            final Collection<Ace> aces,
                            final boolean replaceAll) {
     try {
-      Acl acl = checkAccess(ent, privWriteAcl, false).getAcl();
+      final Acl acl = checkAccess(ent, privWriteAcl, false).getAcl();
 
-      Collection<Ace> allAces;
+      final Collection<Ace> allAces;
       if (replaceAll) {
         allAces = aces;
       } else {
@@ -139,9 +139,9 @@ public class AccessHelper implements Logged, AccessHelperI {
       ent.setAccess(new Acl(allAces).encodeStr());
 
 //      pathInfoMap.flush();
-    } catch (WebdavException cfe) {
+    } catch (final WebdavException cfe) {
       throw cfe;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }
@@ -150,7 +150,7 @@ public class AccessHelper implements Logged, AccessHelperI {
   public void defaultAccess(final SharedEntity ent,
                             final AceWho who) {
     try {
-      Acl acl = checkAccess(ent, privWriteAcl, false).getAcl();
+      final Acl acl = checkAccess(ent, privWriteAcl, false).getAcl();
 
       /* Now remove any access */
 
@@ -159,9 +159,9 @@ public class AccessHelper implements Logged, AccessHelperI {
 
 //        pathInfoMap.flush();
       }
-    } catch (WebdavException cfe) {
+    } catch (final WebdavException cfe) {
       throw cfe;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }
@@ -171,9 +171,9 @@ public class AccessHelper implements Logged, AccessHelperI {
                 checkAccess(final Collection<? extends SharedEntity> ents,
                                 final int desiredAccess,
                                 final boolean alwaysReturn) {
-    TreeSet<SharedEntity> out = new TreeSet<>();
+    final TreeSet<SharedEntity> out = new TreeSet<>();
 
-    for (SharedEntity sdbe: ents) {
+    for (final SharedEntity sdbe: ents) {
       if (checkAccess(sdbe, desiredAccess, alwaysReturn).getAccessAllowed()) {
         out.add(sdbe);
       }
@@ -193,7 +193,7 @@ public class AccessHelper implements Logged, AccessHelperI {
     AccessState as = ent.getAccessState();
 
     if (as != null) {
-      CurrentAccess ca = as.getCurrentAccess(desiredAccess);
+      final CurrentAccess ca = as.getCurrentAccess(desiredAccess);
 
       if (ca != null) {
         // Checked already
@@ -225,13 +225,13 @@ public class AccessHelper implements Logged, AccessHelperI {
     try {
       CurrentAccess ca = null;
 
-      AccessPrincipal owner = cb.getPrincipal(ent.getOwnerHref());
+      final AccessPrincipal owner = cb.getPrincipal(ent.getOwnerHref());
       PrivilegeSet maxPrivs = null;
 
-      char[] aclChars;
+      final char[] aclChars;
 
       if (ent.isCollection()) {
-        String path = ent.getPath();
+        final String path = ent.getPath();
 
         /* Special case the access to the user root e.g /user and
          * the 'home' directory, e.g. /user/douglm
@@ -305,16 +305,16 @@ public class AccessHelper implements Logged, AccessHelperI {
       }
 
       return ca;
-    } catch (WebdavException cfe) {
+    } catch (final WebdavException cfe) {
       throw cfe;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   Private methods
-   * ==================================================================== */
+   * ============================================================== */
 
   /* If the entity is not a collection we merge the access in with the container
    * access then return the merged aces. We do this because we call getParentPathInfo
@@ -325,7 +325,7 @@ public class AccessHelper implements Logged, AccessHelperI {
    * The collection access might be cached in the pathInfoTable.
    */
   private char[] getAclChars(final SharedEntity ent) {
-    SharedEntity container;
+    final SharedEntity container;
 
     if (ent.isCollection()) {
       container = ent;
@@ -333,12 +333,12 @@ public class AccessHelper implements Logged, AccessHelperI {
       container = getParent(ent);
     }
 
-    String path = container.getPath();
+    final String path = container.getPath();
 
-    String aclStr;
+    final String aclStr;
 
     /* Get access for the parent first if we have one */
-    SharedEntity parent = getParent(container);
+    final SharedEntity parent = getParent(container);
 
     if (parent != null) {
       aclStr = new String(merged(getAclChars(parent),
@@ -351,7 +351,7 @@ public class AccessHelper implements Logged, AccessHelperI {
       throw new WebdavException("Collections must have default access set at root");
     }
 
-    char[] aclChars = aclStr.toCharArray();
+    final char[] aclChars = aclStr.toCharArray();
 
     if (ent.isCollection()) {
       return aclChars;
@@ -381,16 +381,16 @@ public class AccessHelper implements Logged, AccessHelperI {
       }
 
       return acl.encodeAll();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   Logged methods
-   * ==================================================================== */
+   * ============================================================== */
 
-  private BwLogger logger = new BwLogger();
+  private final BwLogger logger = new BwLogger();
 
   @Override
   public BwLogger getLogger() {

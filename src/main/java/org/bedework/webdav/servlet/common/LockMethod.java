@@ -19,8 +19,6 @@
 
 package org.bedework.webdav.servlet.common;
 
-import org.bedework.webdav.servlet.shared.WebdavException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,8 +31,9 @@ public class LockMethod extends MethodBase {
   public void init() {
   }
 
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) {
+  @Override
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) {
 
   }
 }

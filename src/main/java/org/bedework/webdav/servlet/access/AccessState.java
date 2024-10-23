@@ -44,7 +44,7 @@ public class AccessState {
 
   /** Constructor
    *
-   * @param entity
+   * @param entity current shared resource
    */
   public AccessState(final SharedEntity entity) {
     this.entity = entity;
@@ -57,9 +57,9 @@ public class AccessState {
     return entity;
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   Wrapper object methods
-   * ==================================================================== */
+   * ============================================================== */
 
   /**
    */
@@ -79,7 +79,7 @@ public class AccessState {
   }
 
   /**
-   * @param desiredAccess
+   * @param desiredAccess key
    * @return currentAccess;
    */
   public CurrentAccess getCurrentAccess(final int desiredAccess) {
@@ -95,10 +95,11 @@ public class AccessState {
   }
 
   /**
-   * @param ca
-   * @param desiredAccess
+   * @param ca CurrentAccess
+   * @param desiredAccess used as key
    */
-  public void setCurrentAccess(final CurrentAccess ca, final int desiredAccess) {
+  public void setCurrentAccess(final CurrentAccess ca,
+                               final int desiredAccess) {
     currentAccess = ca;
     lastDesiredAccess = desiredAccess;
     caMap.put(desiredAccess , ca);
@@ -111,9 +112,9 @@ public class AccessState {
     return lastDesiredAccess;
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   Object methods
-   * ==================================================================== */
+   * ============================================================== */
 
   @Override
   public String toString() {

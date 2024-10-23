@@ -29,5 +29,6 @@ public interface UrlUnprefixer {
    * @return String
    * @throws RuntimeException on fatal error
    */
+  @SuppressWarnings("unused")
   String unprefix(String val);
 }

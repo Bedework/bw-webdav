@@ -43,16 +43,16 @@ public class DeleteMethod extends MethodBase {
     }
 
     try {
-      WebdavNsIntf intf = getNsIntf();
+      final WebdavNsIntf intf = getNsIntf();
 
-      Headers.IfHeaders ifHeaders = Headers.processIfHeaders(req);
+      final Headers.IfHeaders ifHeaders = Headers.processIfHeaders(req);
       if ((ifHeaders.ifHeader != null) &&
           !intf.syncTokenMatch(ifHeaders.ifHeader)) {
         intf.rollback();
         throw new WebdavException(HttpServletResponse.SC_PRECONDITION_FAILED);
       }
 
-      String resourceUri = getResourceUri(req);
+      final String resourceUri = getResourceUri(req);
       final int nodeType;
       if (resourceUri.endsWith("/")) {
         nodeType = WebdavNsIntf.nodeTypeCollection;
@@ -60,10 +60,10 @@ public class DeleteMethod extends MethodBase {
         nodeType = WebdavNsIntf.nodeTypeUnknown;
       }
 
-      WebdavNsNode node = intf.getNode(getResourceUri(req),
-                                       WebdavNsIntf.existanceMust,
-                                       nodeType,
-                                       false);
+      final WebdavNsNode node = intf.getNode(getResourceUri(req),
+                                             WebdavNsIntf.existanceMust,
+                                             nodeType,
+                                             false);
 
       if ((node == null) || !node.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -73,9 +73,9 @@ public class DeleteMethod extends MethodBase {
       intf.delete(node);
 
       resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    } catch (WebdavException we) {
+    } catch (final WebdavException we) {
       throw we;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }

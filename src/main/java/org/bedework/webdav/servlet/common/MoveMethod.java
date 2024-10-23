@@ -19,8 +19,6 @@
 
 package org.bedework.webdav.servlet.common;
 
-import org.bedework.webdav.servlet.shared.WebdavException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,8 +28,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MoveMethod extends CopyMethod {
   @Override
-  public void doMethod(HttpServletRequest req,
-                        HttpServletResponse resp) {
+  public void doMethod(final HttpServletRequest req,
+                       final HttpServletResponse resp) {
     process(req, resp, false);
   }
 }

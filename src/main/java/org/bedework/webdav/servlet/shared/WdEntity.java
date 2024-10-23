@@ -64,9 +64,9 @@ public abstract class WdEntity <T> implements Comparable<WdEntity<?>> {
 //    setCreated(DateTimeUtil.isoDateTimeUTC(dt));
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                      Abstract methods
-   * ==================================================================== */
+   * ============================================================== */
 
   /**
    * @return true if this can be shared.
@@ -88,7 +88,8 @@ public abstract class WdEntity <T> implements Comparable<WdEntity<?>> {
    */
   public abstract String getAliasUri();
 
-  /** If isAlias() then resolves the alias. Otherwise just returns the parameter.
+  /** If isAlias() then resolves the alias. Otherwise, just returns
+   * the parameter.
    *
    * @return WdEntity or null.
    * @param resolveSubAlias - if true and the alias points to an alias, resolve
@@ -109,9 +110,9 @@ public abstract class WdEntity <T> implements Comparable<WdEntity<?>> {
    */
   public abstract String getProperty(QName name);
 
-  /* ====================================================================
+  /* ==============================================================
    *                      Bean methods
-   * ==================================================================== */
+   * ============================================================== */
 
   /** Set the name
    *
@@ -267,15 +268,15 @@ public abstract class WdEntity <T> implements Comparable<WdEntity<?>> {
     }
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                      Object methods
-   * ==================================================================== */
+   * ============================================================== */
 
   @Override
   public int hashCode() {
     try {
       return getPath().hashCode() * getName().hashCode();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new RuntimeException(t);
     }
   }
@@ -295,7 +296,7 @@ public abstract class WdEntity <T> implements Comparable<WdEntity<?>> {
 
   @Override
   public String toString() {
-    ToString ts = new ToString(this);
+    final ToString ts = new ToString(this);
 
     toStringSegment(ts);
 

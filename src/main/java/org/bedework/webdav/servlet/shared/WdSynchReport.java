@@ -33,19 +33,19 @@ public class WdSynchReport {
   public static class WdSynchReportItem implements Comparable<WdSynchReportItem> {
     /**
      */
-    private String token;
+    private final String token;
 
     /** The changed node
      */
-    private WebdavNsNode node;
+    private final WebdavNsNode node;
 
     /** true if we can provide sync info for this - usually false for aliases */
-    private boolean canSync;
+    private final boolean canSync;
 
     /**
-     * @param node
-     * @param token
-     * @param canSync
+     * @param node for resource
+     * @param token for synch
+     * @param canSync false if cannot synch resource
        */
     public WdSynchReportItem(final WebdavNsNode node,
                              final String token,
@@ -86,6 +86,9 @@ public class WdSynchReport {
 
     @Override
     public boolean equals(final Object o) {
+      if (!(o instanceof WdSynchReportItem)) {
+        return false;
+      }
       return compareTo((WdSynchReportItem)o) == 0;
     }
   }

@@ -97,13 +97,13 @@ public class ReportMethod extends MethodBase {
     pm = new PropFindMethod();
     pm.init(getNsIntf(), true);
 
-    Document doc = parseContent(req, resp);
+    final Document doc = parseContent(req, resp);
 
     if (doc == null) {
       return;
     }
 
-    int depth = Headers.depth(req, 0);
+    final int depth = Headers.depth(req, 0);
 
     if (debug()) {
       debug("ReportMethod: depth=" + depth);
@@ -151,9 +151,9 @@ public class ReportMethod extends MethodBase {
     flush();
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   Private methods
-   * ==================================================================== */
+   * ============================================================== */
 
   /* We process the parsed document and produce a Collection of request
    * objects to process.
@@ -163,9 +163,9 @@ public class ReportMethod extends MethodBase {
   private void processDoc(final Document doc,
                           int depth) {
     try {
-      WebdavNsIntf intf = getNsIntf();
+      final WebdavNsIntf intf = getNsIntf();
 
-      Element root = doc.getDocumentElement();
+      final Element root = doc.getDocumentElement();
 
       if (reportType == reportTypeSync) {
         parseSyncReport(root, depth, intf);
@@ -205,12 +205,12 @@ public class ReportMethod extends MethodBase {
       }
 
       throw new WebdavBadRequest();
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       System.err.println(t.getMessage());
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -227,27 +227,26 @@ public class ReportMethod extends MethodBase {
   private void parseAclPrincipalProps(final Element root,
                                       final WebdavNsIntf intf) {
     try {
-      Element[] children = getChildrenArray(root);
+      final Element[] children = getChildrenArray(root);
       boolean hadProp = false;
 
-      for (int i = 0; i < children.length; i++) {
-        Element curnode = children[i];
-
+      for (final Element curnode: children) {
         if (nodeMatches(curnode, WebdavTags.prop)) {
           if (hadProp) {
-            throw new WebdavBadRequest("More than one DAV:prop element");
+            throw new WebdavBadRequest(
+                    "More than one DAV:prop element");
           }
           propReq = pm.parseProps(curnode);
 
           hadProp = true;
         }
       }
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (Throwable t) {
-      System.err.println(t.getMessage());
+    } catch (final Throwable t) {
+      error(t);
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -317,16 +316,12 @@ public class ReportMethod extends MethodBase {
 
       propReq = pm.parseProps(children[childI]);
 
-    } catch (NumberFormatException nfe) {
+    } catch (final NumberFormatException nfe) {
       throw new WebdavBadRequest("Invalid value");
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (Throwable t) {
-      System.err.println(t.getMessage());
-      if (debug()) {
-        t.printStackTrace();
-      }
-
+    } catch (final Throwable t) {
+      error(t);
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -405,24 +400,20 @@ public class ReportMethod extends MethodBase {
     } catch (final WebdavException wde) {
       throw wde;
     } catch (final Throwable t) {
-      System.err.println(t.getMessage());
-      if (debug()) {
-        t.printStackTrace();
-      }
-
+      error(t);
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
 
   /**
-   * @param req
-   * @param resp
-   * @param depth
+   * @param req http request
+   * @param resp http response
+   * @param depth integer value
    */
   private void processResp(final HttpServletRequest req,
                            final HttpServletResponse resp,
                            final int depth) {
-    WebdavNsIntf intf = getNsIntf();
+    final WebdavNsIntf intf = getNsIntf();
 
     if (reportType == reportTypeSync) {
       processSyncReport(req, resp, intf);
@@ -462,10 +453,10 @@ public class ReportMethod extends MethodBase {
   }
 
   /**
-   * @param req
-   * @param resp
-   * @param depth
-   * @param intf
+   * @param req http request
+   * @param resp http response
+   * @param depth integer value
+   * @param intf our interface
    */
   private void processExpandProperty(final HttpServletRequest req,
                                      final HttpServletResponse resp,
@@ -540,13 +531,13 @@ public class ReportMethod extends MethodBase {
   private void processAclPrincipalPropSet(final HttpServletRequest req,
                                           final HttpServletResponse resp,
                                           final WebdavNsIntf intf) {
-    String resourceUri = getResourceUri(req);
-    WebdavNsNode node = intf.getNode(resourceUri,
-                                     WebdavNsIntf.existanceMust,
-                                     WebdavNsIntf.nodeTypeUnknown,
-                                     false);
+    final String resourceUri = getResourceUri(req);
+    final WebdavNsNode node = intf.getNode(resourceUri,
+                                           WebdavNsIntf.existanceMust,
+                                           WebdavNsIntf.nodeTypeUnknown,
+                                           false);
 
-    Collection<String> hrefs = intf.getAclPrincipalInfo(node);
+    final Collection<String> hrefs = intf.getAclPrincipalInfo(node);
 
     resp.setStatus(WebdavStatusCode.SC_MULTI_STATUS);
     resp.setContentType("text/xml; charset=UTF-8");
@@ -557,11 +548,12 @@ public class ReportMethod extends MethodBase {
     if (!hrefs.isEmpty()) {
       openTag(WebdavTags.response);
 
-      for (String href: hrefs) {
-        WebdavNsNode pnode = getNsIntf().getNode(getNsIntf().getUri(href),
-                                                 WebdavNsIntf.existanceMay,
-                                                 WebdavNsIntf.nodeTypePrincipal,
-                                                 false);
+      for (final String href: hrefs) {
+        final WebdavNsNode pnode =
+                getNsIntf().getNode(getNsIntf().getUri(href),
+                                    WebdavNsIntf.existanceMay,
+                                    WebdavNsIntf.nodeTypePrincipal,
+                                    false);
         if (pnode != null) {
           pm.doNodeProperties(pnode, propReq);
         }
@@ -576,10 +568,10 @@ public class ReportMethod extends MethodBase {
   }
 
   /**
-   * @param req
-   * @param resp
-   * @param depth
-   * @param intf
+   * @param req http request
+   * @param resp http response
+   * @param depth integer value
+   * @param intf our interface
    */
   private void processPrincipalPropertySearch(final HttpServletRequest req,
                                               final HttpServletResponse resp,
@@ -608,12 +600,12 @@ public class ReportMethod extends MethodBase {
 
   /** See if we recognize this report type and return an index.
    *
-   * @param doc
+   * @param doc to search
    * @return index or <0 for unknown.
    */
   private int getReportType(final Document doc) {
     try {
-      Element root = doc.getDocumentElement();
+      final Element root = doc.getDocumentElement();
 
       if (nodeMatches(root, WebdavTags.expandProperty)) {
         return reportTypeExpandProperty;
@@ -640,11 +632,8 @@ public class ReportMethod extends MethodBase {
       }
 
       return -1;
-    } catch (Throwable t) {
-      System.err.println(t.getMessage());
-      if (debug()) {
-        t.printStackTrace();
-      }
+    } catch (final Throwable t) {
+      error(t);
 
       throw new WebdavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }

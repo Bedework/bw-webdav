@@ -50,33 +50,34 @@ public class AclMethod extends MethodBase {
       debug("AclMethod: doMethod");
     }
 
-    Document doc = parseContent(req, resp);
+    final Document doc = parseContent(req, resp);
 
     if (doc == null) {
       return;
     }
 
-    WebdavNsIntf.AclInfo ainfo = processDoc(doc, getResourceUri(req));
+    final WebdavNsIntf.AclInfo ainfo =
+            processDoc(doc, getResourceUri(req));
 
     processResp(req, resp, ainfo);
   }
 
-  /* ====================================================================
+  /* ==============================================================
    *                   Private methods
-   * ==================================================================== */
+   * ============================================================== */
 
   /* We process the parsed document and produce a Collection of request
    * objects to process.
    */
   private WebdavNsIntf.AclInfo processDoc(final Document doc, final String uri) {
     try {
-      WebdavNsIntf intf = getNsIntf();
+      final WebdavNsIntf intf = getNsIntf();
 
-      WebdavNsIntf.AclInfo ainfo = new WebdavNsIntf.AclInfo(uri);
+      final WebdavNsIntf.AclInfo ainfo = new WebdavNsIntf.AclInfo(uri);
 
-      Element root = doc.getDocumentElement();
+      final Element root = doc.getDocumentElement();
 
-      AccessUtil autil = intf.getAccessUtil();
+      final AccessUtil autil = intf.getAccessUtil();
 
       ainfo.acl = autil.getAcl(root, true);
 
@@ -85,14 +86,14 @@ public class AclMethod extends MethodBase {
       }
 
       return ainfo;
-    } catch (WebdavException wde) {
+    } catch (final WebdavException wde) {
       throw wde;
-    } catch (AccessException ae) {
+    } catch (final AccessException ae) {
       throw new WebdavBadRequest(ae.getMessage());
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       error(t.getMessage());
       if (debug()) {
-        t.printStackTrace();
+        error(t);
       }
 
       throw new WebdavServerError();
@@ -102,7 +103,7 @@ public class AclMethod extends MethodBase {
   private void processResp(final HttpServletRequest req,
                           final HttpServletResponse resp,
                           final WebdavNsIntf.AclInfo ainfo) {
-    WebdavNsIntf intf = getNsIntf();
+    final WebdavNsIntf intf = getNsIntf();
 
     if (ainfo.errorTag == null) {
       intf.updateAccess(ainfo);

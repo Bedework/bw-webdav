@@ -49,7 +49,7 @@ public class GetMethod extends MethodBase {
     }
 
     try {
-      WebdavNsIntf intf = getNsIntf();
+      final WebdavNsIntf intf = getNsIntf();
 
       if (intf.specialUri(req, resp, getResourceUri(req))) {
         return;
@@ -58,10 +58,10 @@ public class GetMethod extends MethodBase {
       //String reqContentType = req.getContentType();
       //boolean reqHtml = "text/html".equals(reqContentType);
 
-      WebdavNsNode node = intf.getNode(getResourceUri(req),
-                                       WebdavNsIntf.existanceMust,
-                                       WebdavNsIntf.nodeTypeUnknown,
-                                       false);
+      final WebdavNsNode node = intf.getNode(getResourceUri(req),
+                                             WebdavNsIntf.existanceMust,
+                                             WebdavNsIntf.nodeTypeUnknown,
+                                             false);
 
       if ((node == null) || !node.getExists()) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -78,7 +78,7 @@ public class GetMethod extends MethodBase {
         resp.addHeader("Last-Modified", node.getLastmodDate());
       }
 
-      Content c;
+      final Content c;
 
       /* Get the content now to set up length, type etc.
        */
@@ -132,9 +132,9 @@ public class GetMethod extends MethodBase {
           intf.writeContent(c.rdr, resp.getWriter());
         }
       }
-    } catch (WebdavException we) {
+    } catch (final WebdavException we) {
       throw we;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new WebdavException(t);
     }
   }

@@ -37,21 +37,21 @@ package org.bedework.webdav.servlet.access;
  * @version 1.0
  */
 public interface SharedEntity {
-  /** Href of owner
+  /**
    *
-   * @param val
+   * @param val  Href of owner
    */
   void setOwnerHref(String val);
 
   /** Href of owner
    *
-   * @return String
+   * @return String  Href of owner
    */
   String getOwnerHref();
 
-  /** Encoded acl
+  /**
    *
-   * @param val
+   * @param val Encoded acl
    */
   void setAccess(String val);
 
@@ -63,7 +63,7 @@ public interface SharedEntity {
 
   /** Access is inherited from the parent
    *
-   * @param val
+   * @param val parent path
    */
   void setParentPath(String val);
 
@@ -89,7 +89,7 @@ public interface SharedEntity {
 
   /** Set the access state
    *
-   * @param val
+   * @param val the access state
    */
   void setAccessState(AccessState val);
 
