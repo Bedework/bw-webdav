@@ -19,7 +19,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import org.bedework.access.AccessPrincipal;
-import org.bedework.util.misc.ToString;
+import org.bedework.base.ToString;
 import org.bedework.util.misc.Util;
 
 import javax.xml.namespace.QName;
