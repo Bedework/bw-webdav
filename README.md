@@ -9,7 +9,7 @@ WebdavNsIntf class.
 
 ## Requirements
 
-1. JDK 11
+1. JDK 17
 2. Maven 3
 
 ## Building Locally
@@ -64,3 +64,21 @@ For full details, see [Sonatype's documentation for using Maven to publish relea
 *  Upgrade library versions
 * Add a limit to how long the sync token is valid. Will allow flushing of old tombstoned data
 * Encode etag
+
+#### 5.0.2
+*  Upgrade library versions
+* Make webdavexception subclass of runtimeexception and tidy up a bit. Should be no noticable changes.
+
+#### 5.0.3
+*  Upgrade library versions
+
+#### 5.0.4
+*  Upgrade library versions
+
+#### 5.0.5
+*  Upgrade library versions
+
+#### 5.0.6
+*  Upgrade library versions
+* Move response classes and ToString into bw-base module.
+* Pre-jakarta
