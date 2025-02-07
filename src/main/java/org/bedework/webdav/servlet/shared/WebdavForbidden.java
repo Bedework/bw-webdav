@@ -19,7 +19,7 @@
 
 package org.bedework.webdav.servlet.shared;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 /** Forbidden exception thrown by webdav classes

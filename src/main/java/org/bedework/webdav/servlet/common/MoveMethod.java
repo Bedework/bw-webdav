@@ -19,8 +19,8 @@
 
 package org.bedework.webdav.servlet.common;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** Class called to handle MOVE
  *

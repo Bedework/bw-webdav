@@ -25,8 +25,8 @@ import org.bedework.webdav.servlet.shared.WebdavNotFound;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 import org.bedework.webdav.servlet.shared.WebdavNsNode;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** Class to handle COPY
  *

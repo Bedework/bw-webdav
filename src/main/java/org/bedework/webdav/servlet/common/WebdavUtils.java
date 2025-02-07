@@ -24,7 +24,7 @@ import org.bedework.util.misc.Util;
 
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** Place for utility methods
  *

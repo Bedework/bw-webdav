@@ -19,7 +19,7 @@
 
 package org.bedework.webdav.servlet.shared;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** ServerError exception thrown by webdav classes
  *

@@ -25,8 +25,8 @@ import org.bedework.webdav.servlet.shared.WebdavNsNode;
 
 import org.w3c.dom.Document;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** Class called to handle MKCOL
  *

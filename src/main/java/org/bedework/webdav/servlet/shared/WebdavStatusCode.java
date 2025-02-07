@@ -20,7 +20,7 @@
 package org.bedework.webdav.servlet.shared;
 
 import java.util.HashMap;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** Define webdav status codes.
  *

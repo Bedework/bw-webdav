@@ -23,8 +23,8 @@ import org.bedework.webdav.servlet.shared.WebdavException;
 import org.bedework.webdav.servlet.shared.WebdavNsIntf;
 import org.bedework.webdav.servlet.shared.WebdavNsNode;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** Class called to handle OPTIONS. We should determine what the current
  * url refers to and send a response which shows the allowable methods on that

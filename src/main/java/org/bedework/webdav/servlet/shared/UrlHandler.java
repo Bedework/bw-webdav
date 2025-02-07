@@ -22,7 +22,7 @@ import org.bedework.util.misc.Util;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** Prefix or unprefix urls - or not depending on internal state
 *

@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 
 import java.io.Reader;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  */

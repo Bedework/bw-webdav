@@ -64,8 +64,8 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 /** This acts as an interface to the underlying namespace for which this
