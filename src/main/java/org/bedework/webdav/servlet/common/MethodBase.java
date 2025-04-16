@@ -18,10 +18,9 @@
 */
 package org.bedework.webdav.servlet.common;
 
+import org.bedework.base.response.GetEntityResponse;
 import org.bedework.util.logging.BwLogger;
 import org.bedework.util.logging.Logged;
-import org.bedework.base.response.GetEntityResponse;
-import org.bedework.base.response.Response;
 import org.bedework.util.xml.XmlEmit;
 import org.bedework.util.xml.XmlEmit.NameSpace;
 import org.bedework.util.xml.XmlEmit.Notifier;
@@ -34,6 +33,9 @@ import org.bedework.webdav.servlet.shared.WebdavNsNode;
 import org.bedework.webdav.servlet.shared.WebdavProperty;
 import org.bedework.webdav.servlet.shared.WebdavStatusCode;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.ws.Holder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,10 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-import jakarta.xml.ws.Holder;
 
 /** Base class for all webdav servlet methods.
  */
@@ -389,7 +388,7 @@ public abstract class MethodBase implements Logged, SecureXml {
       resp.setEntity(XmlUtil.getOnlyElement(nd));
       return resp;
     } catch (final Throwable t) {
-      return Response.error(resp, t);
+      return resp.error(t);
     }
   }
 
