@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.bedework</groupId>
     <artifactId>bedework-parent</artifactId>
-    <version>200-SNAPSHOT</version>
+    <version>215</version>
   </parent>
 
 	<artifactId>bw-webdav</artifactId>
@@ -14,7 +14,7 @@
   <url>https://github.com/Bedework/bw-webdav</url>
 
 	<properties>
-    <!-- The tests are interceping the getLogger calls and returning null.
+    <!-- The tests are intercepting the getLogger calls and returning null.
          Investigate -->
     <maven.test.skip>true</maven.test.skip>
 	</properties>
@@ -81,4 +81,39 @@
       <artifactId>jakarta.xml.ws-api</artifactId>
     </dependency>
 	</dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+
+        <executions>
+          <execution>
+            <id>copy-generated-asciidoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/docs/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/generated-docs</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>index.html</include>
+                    <include>asciidoctor.css</include>
+                    <include>tocbot*/*</include>
+                    <include>docinfo/*</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
